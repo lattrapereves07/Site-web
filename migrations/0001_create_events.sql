@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS events (
   end_date TEXT,
   end_time TEXT,
   category TEXT NOT NULL DEFAULT 'evenement',
-  image_key TEXT,
+  image_data TEXT,
   booking_url TEXT,
   is_published INTEGER NOT NULL DEFAULT 1,
   created_at TEXT DEFAULT (datetime('now')),

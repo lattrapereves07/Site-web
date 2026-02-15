@@ -222,8 +222,8 @@ function renderEvents() {
     const tagClass = 'tag-' + (e.category || 'evenement')
     const dateStr = formatDate(e.event_date)
     const timeStr = e.event_time ? ' à ' + e.event_time : ''
-    const thumb = e.image_url
-      ? `<img src="${e.image_url}" class="event-thumb" alt="">`
+    const thumb = e.image_data
+      ? `<img src="${e.image_data}" class="event-thumb" alt="">`
       : `<div class="event-thumb-placeholder">Pas d'image</div>`
     return `
       <div class="event-item ${e.is_published ? '' : 'unpublished'}">
@@ -330,8 +330,8 @@ function openImageModal(id) {
   const e = events.find(ev => ev.id === id)
   const curr = document.getElementById('currentImage')
   const delBtn = document.getElementById('btnDelImage')
-  if (e && e.image_url) {
-    curr.innerHTML = `<img src="${e.image_url}" class="preview" alt="Image actuelle">`
+  if (e && e.image_data) {
+    curr.innerHTML = `<img src="${e.image_data}" class="preview" alt="Image actuelle">`
     delBtn.classList.remove('hidden')
   } else {
     curr.innerHTML = '<p style="color:#888;">Aucune image</p>'

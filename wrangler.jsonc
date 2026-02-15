@@ -10,11 +10,5 @@
       "database_name": "lattrapereves-db",
       "database_id": "placeholder-will-be-replaced"
     }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "IMAGES",
-      "bucket_name": "lattrapereves-images"
-    }
   ]
 }

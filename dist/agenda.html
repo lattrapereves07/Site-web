@@ -117,7 +117,7 @@
         const timeStr = e.event_time ? ' · ' + e.event_time : ''
         const endStr = e.end_date ? ' → ' + formatDate(e.end_date) + (e.end_time ? ' ' + e.end_time : '') : ''
         const tagClass = 'event-tag--' + (e.category || 'evenement')
-        const img = e.image_url ? `<img src="${e.image_url}" class="event-card-img" alt="${esc(e.title)}">` : ''
+        const img = e.image_data ? `<img src="${e.image_data}" class="event-card-img" alt="${esc(e.title)}">` : ''
         const booking = e.booking_url ? `<a href="${esc(e.booking_url)}" target="_blank" rel="noopener" class="btn btn-coral event-booking">Réserver →</a>` : ''
         
         return `
