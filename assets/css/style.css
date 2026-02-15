@@ -573,7 +573,11 @@ main {
 }
 
 .hero-sticker img {
-  filter: drop-shadow(2px 3px 6px rgba(0,0,0,0.12));
+  filter:
+    drop-shadow(0 0 0 white)
+    drop-shadow(0 0 3px white)
+    drop-shadow(0 0 3px white)
+    drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
 }
 
 .hero-sticker--br { bottom: 6%; right: 3%; }
@@ -627,9 +631,9 @@ main {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(252, 245, 233, 0.55) 0%,
-    rgba(252, 245, 233, 0.35) 40%,
-    rgba(252, 245, 233, 0.5) 100%
+    rgba(252, 245, 233, 0.4) 0%,
+    rgba(252, 245, 233, 0.15) 40%,
+    rgba(252, 245, 233, 0.35) 100%
   );
 }
 
@@ -805,27 +809,31 @@ main {
   );
 }
 
-/* --- STICKERS --- */
+/* --- STICKERS (style affiche ATRV : contour blanc + ombre douce) --- */
 .sticker {
   display: inline-block;
-  border: 6px solid var(--white);
-  border-radius: 8px;
-  box-shadow: 2px 3px 8px rgba(0,0,0,0.12);
   transform: rotate(var(--rotate, 0deg));
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  background: var(--white);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .sticker:hover {
   transform: rotate(0deg) scale(1.05);
-  box-shadow: 3px 5px 12px rgba(0,0,0,0.18);
 }
 
 .sticker img {
   display: block;
   width: 100%;
   height: auto;
+  filter:
+    drop-shadow(0 0 0 white)
+    drop-shadow(0 0 3px white)
+    drop-shadow(0 0 3px white)
+    drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
 }
 
 /* Float animation for stickers */
