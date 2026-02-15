@@ -618,8 +618,7 @@ main {
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
-  opacity: 0.18;
-  filter: blur(1px);
+  opacity: 0.35;
 }
 
 .hero--photo .hero-content {
@@ -1736,6 +1735,76 @@ main {
   text-align: center;
   color: var(--dark-grey);
   margin-bottom: 0;
+}
+
+/* Menu images (carte foodtruck) */
+.menu-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto 40px;
+}
+
+.menu-image-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+.menu-image-card:hover {
+  transform: scale(1.02);
+}
+
+.menu-image-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Menu items text */
+.menu-items {
+  display: grid;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.menu-item {
+  padding: 16px 20px;
+  background: var(--beige);
+  border-radius: 12px;
+  border-left: 4px solid var(--coral);
+}
+
+.menu-item h4 {
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  color: var(--dark-grey);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.menu-item p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--dark-grey);
+  opacity: 0.85;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .menu-images {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .menu-section-card {
+    padding: 20px 16px;
+  }
+  .menu-item {
+    padding: 12px 14px;
+  }
 }
 
 /* Torn sky blue edge */
