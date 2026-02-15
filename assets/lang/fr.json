@@ -12,7 +12,7 @@
     "hero_title_1": "FERME DE",
     "hero_title_2": "DÉCOUVERTE",
     "hero_subtitle": "et d'émerveillement",
-    "hero_badge": "Ouverture Printemps 2026",
+    "hero_badge": "Ouverture Été 2026",
     "hero_tagline": "Un refuge sensoriel au cœur du vivant pour ressourcer petits et grands !",
     "hero_cta": "Réserver mes billets",
     "hero_location": "Gravières — Cévennes d'Ardèche (07)",
@@ -156,11 +156,11 @@
     "foodtruck_title": "Le Foodtruck",
     "foodtruck_subtitle": "Petite restauration en plein air",
     "foodtruck_carte_title": "La Carte du Foodtruck",
-    "foodtruck_carte_placeholder": "Carte à venir — Ouverture printemps 2026",
+    "foodtruck_carte_placeholder": "Carte à venir — Ouverture été 2026",
     "buvette_title": "La Buvette",
     "buvette_subtitle": "Boissons, glaces & confiseries",
     "buvette_carte_title": "La Carte de la Buvette",
-    "buvette_carte_placeholder": "Carte à venir — Ouverture printemps 2026",
+    "buvette_carte_placeholder": "Carte à venir — Ouverture été 2026",
     "swim_note": "Coins de baignade à 5 minutes à pied !"
   },
   "infos": {
@@ -201,7 +201,7 @@
     "hero_title": "RÉSERVER MES BILLETS",
     "hero_subtitle": "Achetez en ligne, évitez l'attente",
     "text": "Achetez vos billets d'entrée en ligne et évitez l'attente à l'arrivée !",
-    "placeholder": "Billetterie en cours de configuration — Ouverture printemps 2026",
+    "placeholder": "Billetterie en cours de configuration — Ouverture été 2026",
     "help": "Un souci avec la réservation ? Contactez-nous au <a href=\"tel:+33428400049\">04 28 40 00 49</a> ou par <a href=\"mailto:lattrapereves@mailo.com\">email</a>."
   },
   "mentions": {

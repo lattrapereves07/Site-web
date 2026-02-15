@@ -620,6 +620,19 @@ main {
   object-position: center 30%;
 }
 
+/* Beige overlay for text readability */
+.hero-bg-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(252, 245, 233, 0.55) 0%,
+    rgba(252, 245, 233, 0.35) 40%,
+    rgba(252, 245, 233, 0.5) 100%
+  );
+}
+
 .hero--photo .hero-content {
   z-index: 2;
   position: relative;
@@ -627,29 +640,27 @@ main {
 
 .hero--photo .hero-title-line1 {
   color: var(--dark-grey);
-  text-shadow: 0 1px 8px rgba(252, 245, 233, 0.7);
+  text-shadow: 0 2px 16px rgba(252, 245, 233, 0.95), 0 0 40px rgba(252, 245, 233, 0.8);
 }
 
 .hero--photo .hero-title-line2 {
   color: var(--coral);
-  text-shadow: 0 2px 12px rgba(252, 245, 233, 0.6);
+  text-shadow: 0 2px 16px rgba(252, 245, 233, 0.95), 0 0 40px rgba(252, 245, 233, 0.8);
+}
+
+.hero--photo .hero-subtitle {
+  text-shadow: 0 1px 12px rgba(252, 245, 233, 0.95), 0 0 30px rgba(252, 245, 233, 0.8);
 }
 
 .hero--photo .hero-tagline {
   color: var(--green);
-  text-shadow: 0 1px 6px rgba(252, 245, 233, 0.8);
+  text-shadow: 0 1px 12px rgba(252, 245, 233, 0.95), 0 0 30px rgba(252, 245, 233, 0.8);
 }
 
 .hero--photo .hero-location {
   color: var(--dark-grey);
   opacity: 0.8;
-}
-
-@media (max-width: 768px) {
-  .hero-bg-photo img {
-    opacity: 0.12;
-    object-position: center center;
-  }
+  text-shadow: 0 1px 8px rgba(252, 245, 233, 0.9);
 }
 
 /* Small hero for sub-pages */
@@ -1818,6 +1829,47 @@ main {
     100% 50%,
     100% 100%, 0% 100%
   );
+}
+
+/* --- LIGHTBOX --- */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.85);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2.5rem;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 10001;
+}
+
+.menu-image-card {
+  cursor: pointer;
 }
 
 /* --- PRINT --- */
