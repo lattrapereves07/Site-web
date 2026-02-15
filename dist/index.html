@@ -204,33 +204,44 @@
           <h2 data-i18n="home.events_title">Ce qui se <span class="text-coral">trame</span> bientôt</h2>
         </div>
 
-        <div class="events-grid fade-in">
-          <div class="event-card">
-            <span class="event-date" data-i18n="home.event1_date">SAM 12 AVR 2026</span>
-            <h3 data-i18n="home.event1_title">Grande Ouverture !</h3>
-            <p data-i18n="home.event1_desc">Venez fêter l'ouverture de l'Attrape-Rêves ! Animations, rencontres et surprises toute la journée.</p>
-            <span class="event-tag event-tag--fete" data-i18n="home.event1_tag">Fête</span>
-          </div>
-
-          <div class="event-card">
-            <span class="event-date" data-i18n="home.event2_date">DIM 26 AVR 2026</span>
-            <h3 data-i18n="home.event2_title">Atelier Attrape-Rêves</h3>
-            <p data-i18n="home.event2_desc">Fabriquez votre propre attrape-rêves en plein air.</p>
-            <span class="event-tag event-tag--atelier" data-i18n="home.event2_tag">Atelier</span>
-          </div>
-
-          <div class="event-card">
-            <span class="event-date" data-i18n="home.event3_date">VEN 8 MAI 2026</span>
-            <h3 data-i18n="home.event3_title">Soirée Contes & Étoiles</h3>
-            <p data-i18n="home.event3_desc">Spectacle de contes sous les étoiles.</p>
-            <span class="event-tag event-tag--spectacle" data-i18n="home.event3_tag">Spectacle</span>
-          </div>
+        <div class="events-grid fade-in" id="homeEventsGrid">
+          <p style="text-align:center;color:#888;grid-column:1/-1;">Chargement…</p>
         </div>
 
         <div class="text-center fade-in">
-          <a href="https://www.facebook.com/lattrapereves07/events" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-i18n="home.events_btn">Voir tous nos événements →</a>
+          <a href="agenda.html" class="btn btn-outline" data-i18n="home.events_btn">Voir tous nos événements →</a>
         </div>
       </div>
+
+      <script>
+      fetch('/api/events').then(r=>r.json()).then(events => {
+        const now = new Date().toISOString().slice(0,10)
+        const upcoming = events.filter(e => e.event_date >= now).slice(0, 3)
+        const grid = document.getElementById('homeEventsGrid')
+        if (!upcoming.length) {
+          grid.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1;">Pas d\'événement à venir pour le moment.</p>'
+          return
+        }
+        const months = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛ','SEP','OCT','NOV','DÉC']
+        const days = ['DIM','LUN','MAR','MER','JEU','VEN','SAM']
+        const catLabels = {atelier:'Atelier',spectacle:'Spectacle',fete:'Fête',evenement:'Événement'}
+        grid.innerHTML = upcoming.map(e => {
+          const [y,m,d] = e.event_date.split('-')
+          const dt = new Date(y, m-1, d)
+          const dateStr = `${days[dt.getDay()]} ${parseInt(d)} ${months[parseInt(m)-1]} ${y}`
+          const timeStr = e.event_time ? ` · ${e.event_time}` : ''
+          const tagClass = 'event-tag--' + (e.category || 'evenement')
+          return `<div class="event-card">
+            <span class="event-date">${dateStr}${timeStr}</span>
+            <h3>${e.title.replace(/</g,'&lt;')}</h3>
+            <p>${(e.description||'').replace(/</g,'&lt;')}</p>
+            <span class="event-tag ${tagClass}">${catLabels[e.category]||e.category}</span>
+          </div>`
+        }).join('')
+      }).catch(() => {
+        document.getElementById('homeEventsGrid').innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1;">Impossible de charger les événements.</p>'
+      })
+      </script>
     </section>
 
     <!-- ======== FOODTRUCK ======== -->
