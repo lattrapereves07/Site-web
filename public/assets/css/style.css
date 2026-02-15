@@ -1079,9 +1079,10 @@ main {
   color: var(--white);
 }
 
-.event-tag--fete { background: var(--yellow); color: var(--dark-grey); }
+.event-tag--concert { background: var(--yellow); color: var(--dark-grey); }
 .event-tag--atelier { background: var(--sky-blue); }
 .event-tag--spectacle { background: var(--green); }
+.event-tag--evenement { background: var(--coral); }
 .event-tag--other { background: var(--coral); }
 
 /* --- FOODTRUCK SECTION --- */

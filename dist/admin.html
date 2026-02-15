@@ -55,7 +55,7 @@
     .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
     .tag-atelier { background: #e8f5e9; color: #2e7d32; }
     .tag-spectacle { background: #e3f2fd; color: #1565c0; }
-    .tag-fete { background: #fff3e0; color: #e65100; }
+    .tag-concert { background: #fff3e0; color: #e65100; }
     .tag-evenement { background: #f3e5f5; color: #7b1fa2; }
     
     @media (max-width: 600px) {
@@ -97,7 +97,7 @@
         <select id="fCategory">
           <option value="atelier">Atelier</option>
           <option value="spectacle">Spectacle</option>
-          <option value="fete">Fête</option>
+          <option value="concert">Concert</option>
           <option value="evenement">Événement</option>
         </select>
       </div>
@@ -220,6 +220,7 @@ function renderEvents() {
   }
   el.innerHTML = events.map(e => {
     const tagClass = 'tag-' + (e.category || 'evenement')
+    const catLabels = {atelier:'Atelier',spectacle:'Spectacle',concert:'Concert',evenement:'Événement'}
     const dateStr = formatDate(e.event_date)
     const timeStr = e.event_time ? ' à ' + e.event_time : ''
     const thumb = e.image_data
@@ -230,7 +231,7 @@ function renderEvents() {
         ${thumb}
         <div class="event-info">
           <h3>${esc(e.title)}</h3>
-          <div class="meta">${dateStr}${timeStr} · <span class="tag ${tagClass}">${esc(e.category)}</span>
+          <div class="meta">${dateStr}${timeStr} · <span class="tag ${tagClass}">${catLabels[e.category]||e.category}</span>
             ${e.is_published ? '' : ' · <em>Brouillon</em>'}
             ${e.booking_url ? ' · <a href="'+esc(e.booking_url)+'" target="_blank">🔗 Résa</a>' : ''}
           </div>

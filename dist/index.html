@@ -224,18 +224,20 @@
         }
         const months = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛ','SEP','OCT','NOV','DÉC']
         const days = ['DIM','LUN','MAR','MER','JEU','VEN','SAM']
-        const catLabels = {atelier:'Atelier',spectacle:'Spectacle',fete:'Fête',evenement:'Événement'}
+        const catLabels = {atelier:'Atelier',spectacle:'Spectacle',concert:'Concert',evenement:'Événement'}
         grid.innerHTML = upcoming.map(e => {
           const [y,m,d] = e.event_date.split('-')
           const dt = new Date(y, m-1, d)
           const dateStr = `${days[dt.getDay()]} ${parseInt(d)} ${months[parseInt(m)-1]} ${y}`
           const timeStr = e.event_time ? ` · ${e.event_time}` : ''
           const tagClass = 'event-tag--' + (e.category || 'evenement')
+          const booking = e.booking_url ? `<a href="${e.booking_url.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" class="btn btn-coral" style="margin-top:12px;font-size:0.9rem;">Réserver →</a>` : ''
           return `<div class="event-card">
             <span class="event-date">${dateStr}${timeStr}</span>
             <h3>${e.title.replace(/</g,'&lt;')}</h3>
             <p>${(e.description||'').replace(/</g,'&lt;')}</p>
             <span class="event-tag ${tagClass}">${catLabels[e.category]||e.category}</span>
+            ${booking}
           </div>`
         }).join('')
       }).catch(() => {

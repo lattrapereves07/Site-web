@@ -60,7 +60,7 @@
           <button class="btn btn-outline filter-btn active" data-filter="all" onclick="filterEvents('all',this)">Tout</button>
           <button class="btn btn-outline filter-btn" data-filter="atelier" onclick="filterEvents('atelier',this)">Ateliers</button>
           <button class="btn btn-outline filter-btn" data-filter="spectacle" onclick="filterEvents('spectacle',this)">Spectacles</button>
-          <button class="btn btn-outline filter-btn" data-filter="fete" onclick="filterEvents('fete',this)">Fêtes</button>
+          <button class="btn btn-outline filter-btn" data-filter="concert" onclick="filterEvents('concert',this)">Concerts</button>
           <button class="btn btn-outline filter-btn" data-filter="evenement" onclick="filterEvents('evenement',this)">Événements</button>
         </div>
 
@@ -147,7 +147,7 @@
     }
 
     function catLabel(c) {
-      const labels = { atelier: 'Atelier', spectacle: 'Spectacle', fete: 'Fête', evenement: 'Événement' }
+      const labels = { atelier: 'Atelier', spectacle: 'Spectacle', concert: 'Concert', evenement: 'Événement' }
       return labels[c] || c
     }
 
