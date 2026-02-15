@@ -2,11 +2,12 @@ module.exports = {
   apps: [
     {
       name: 'attrape-reves',
-      script: 'node_modules/.bin/serve',
-      args: '-l 3000 -s .',
+      script: 'npx',
+      args: 'wrangler pages dev dist --d1=lattrapereves-db --r2=IMAGES --local --ip 0.0.0.0 --port 3000',
       cwd: '/home/user/webapp',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'development',
+        PORT: 3000
       },
       watch: false,
       instances: 1,

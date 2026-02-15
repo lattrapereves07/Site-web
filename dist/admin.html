@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Agenda — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .admin-wrap { max-width: 900px; margin: 100px auto 40px; padding: 0 20px; }
+    .admin-title { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin-bottom: 24px; }
+    
+    /* Login */
+    .login-box { max-width: 400px; margin: 120px auto; padding: 40px; background: var(--beige); border-radius: 16px; text-align: center; }
+    .login-box h1 { font-family: var(--font-title); color: var(--coral); margin-bottom: 20px; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-box .error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+    
+    /* Form */
+    .event-form { background: var(--beige); border-radius: 16px; padding: 24px; margin-bottom: 32px; }
+    .event-form h2 { font-family: var(--font-title); color: var(--dark-grey); margin-bottom: 16px; font-size: 1.4rem; }
+    .form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .form-row > * { flex: 1; min-width: 200px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 4px; color: var(--dark-grey); font-size: 0.9rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; box-sizing: border-box; font-family: var(--font-body); }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .form-actions .btn { cursor: pointer; border: none; font-size: 1rem; }
+    
+    /* Event list */
+    .event-item { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .event-item.unpublished { opacity: 0.6; border-left: 4px solid #aaa; }
+    .event-thumb { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--light-beige); }
+    .event-thumb-placeholder { width: 80px; height: 80px; border-radius: 8px; background: var(--light-beige); display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.75rem; flex-shrink: 0; }
+    .event-info { flex: 1; }
+    .event-info h3 { margin: 0 0 4px; font-family: var(--font-accent); color: var(--dark-grey); }
+    .event-info .meta { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
+    .event-info .desc { font-size: 0.9rem; color: var(--dark-grey); }
+    .event-actions { display: flex; gap: 6px; flex-shrink: 0; flex-direction: column; }
+    .event-actions button { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-edit { background: var(--sky-blue); color: white; }
+    .btn-del { background: #c0392b; color: white; }
+    .btn-img { background: var(--green); color: white; }
+    .btn-cancel { background: #999; color: white; }
+    
+    /* Image upload modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; }
+    .modal h3 { font-family: var(--font-title); color: var(--dark-grey); margin-bottom: 16px; }
+    .modal input[type=file] { margin-bottom: 12px; }
+    .modal .preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 12px; }
+    
+    .hidden { display: none !important; }
+    .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .tag-atelier { background: #e8f5e9; color: #2e7d32; }
+    .tag-spectacle { background: #e3f2fd; color: #1565c0; }
+    .tag-fete { background: #fff3e0; color: #e65100; }
+    .tag-evenement { background: #f3e5f5; color: #7b1fa2; }
+    
+    @media (max-width: 600px) {
+      .event-item { flex-direction: column; }
+      .event-actions { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div id="loginScreen" class="login-box">
+  <img src="assets/images/logo.png" alt="Logo" width="60" style="margin-bottom: 12px;">
+  <h1>Admin Agenda</h1>
+  <div id="loginError" class="error hidden"></div>
+  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus>
+  <button class="btn btn-coral" onclick="doLogin()" style="width:100%;cursor:pointer;border:none;font-size:1rem;">Connexion</button>
+</div>
+
+<!-- Admin panel -->
+<div id="adminPanel" class="admin-wrap hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h1 class="admin-title" style="margin-bottom:0;">🎪 Agenda — Admin</h1>
+    <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
+  </div>
+  <p style="margin-bottom:24px;color:#888;">Ajouter, modifier ou supprimer des événements et ateliers.</p>
+
+  <!-- Add/Edit form -->
+  <div class="event-form" id="eventForm">
+    <h2 id="formTitle">➕ Nouvel événement</h2>
+    <input type="hidden" id="editId">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Titre *</label>
+        <input type="text" id="fTitle" placeholder="Ex: Atelier Attrape-Rêves">
+      </div>
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select id="fCategory">
+          <option value="atelier">Atelier</option>
+          <option value="spectacle">Spectacle</option>
+          <option value="fete">Fête</option>
+          <option value="evenement">Événement</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="fDesc" placeholder="Description de l'événement..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date début *</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="form-group">
+        <label>Heure</label>
+        <input type="time" id="fTime">
+      </div>
+      <div class="form-group">
+        <label>Date fin</label>
+        <input type="date" id="fEndDate">
+      </div>
+      <div class="form-group">
+        <label>Heure fin</label>
+        <input type="time" id="fEndTime">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Lien réservation</label>
+        <input type="url" id="fBooking" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Publié ?</label>
+        <select id="fPublished">
+          <option value="1">Oui — visible</option>
+          <option value="0">Non — brouillon</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-coral" onclick="saveEvent()" style="cursor:pointer;border:none;font-size:1rem;">Enregistrer</button>
+      <button class="btn btn-cancel hidden" id="btnCancel" onclick="cancelEdit()" style="cursor:pointer;font-size:1rem;">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Events list -->
+  <div id="eventsList"></div>
+</div>
+
+<!-- Image upload modal -->
+<div id="imageModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>📷 Image de l'événement</h3>
+    <div id="currentImage"></div>
+    <input type="file" id="imageFile" accept="image/*">
+    <div id="imagePreview"></div>
+    <div class="form-actions">
+      <button class="btn btn-coral" onclick="uploadImage()" style="cursor:pointer;border:none;font-size:1rem;">Envoyer</button>
+      <button class="btn btn-del" id="btnDelImage" onclick="deleteImage()" style="cursor:pointer;font-size:0.9rem;" class="hidden">Supprimer image</button>
+      <button class="btn btn-cancel" onclick="closeImageModal()" style="cursor:pointer;font-size:1rem;">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('atrv_token') || ''
+let events = []
+let imageEventId = null
+
+// Auto-login if token stored
+if (token) {
+  fetch('/api/admin/events', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(r => { if (r.ok) { showAdmin(); loadEvents(); } else { token = ''; localStorage.removeItem('atrv_token'); } })
+    .catch(() => {})
+}
+
+document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  if (r.ok) {
+    const data = await r.json()
+    token = data.token
+    localStorage.setItem('atrv_token', token)
+    showAdmin()
+    loadEvents()
+  } else {
+    document.getElementById('loginError').textContent = 'Mot de passe incorrect'
+    document.getElementById('loginError').classList.remove('hidden')
+  }
+}
+
+function showAdmin() {
+  document.getElementById('loginScreen').classList.add('hidden')
+  document.getElementById('adminPanel').classList.remove('hidden')
+}
+
+function logout() {
+  token = ''
+  localStorage.removeItem('atrv_token')
+  location.reload()
+}
+
+async function loadEvents() {
+  const r = await fetch('/api/admin/events', { headers: { 'Authorization': 'Bearer ' + token } })
+  events = await r.json()
+  renderEvents()
+}
+
+function renderEvents() {
+  const el = document.getElementById('eventsList')
+  if (!events.length) {
+    el.innerHTML = '<p style="text-align:center;color:#888;padding:40px;">Aucun événement pour le moment.</p>'
+    return
+  }
+  el.innerHTML = events.map(e => {
+    const tagClass = 'tag-' + (e.category || 'evenement')
+    const dateStr = formatDate(e.event_date)
+    const timeStr = e.event_time ? ' à ' + e.event_time : ''
+    const thumb = e.image_url
+      ? `<img src="${e.image_url}" class="event-thumb" alt="">`
+      : `<div class="event-thumb-placeholder">Pas d'image</div>`
+    return `
+      <div class="event-item ${e.is_published ? '' : 'unpublished'}">
+        ${thumb}
+        <div class="event-info">
+          <h3>${esc(e.title)}</h3>
+          <div class="meta">${dateStr}${timeStr} · <span class="tag ${tagClass}">${esc(e.category)}</span>
+            ${e.is_published ? '' : ' · <em>Brouillon</em>'}
+            ${e.booking_url ? ' · <a href="'+esc(e.booking_url)+'" target="_blank">🔗 Résa</a>' : ''}
+          </div>
+          <div class="desc">${esc(e.description || '')}</div>
+        </div>
+        <div class="event-actions">
+          <button class="btn-edit" onclick="editEvent(${e.id})">✏️ Modifier</button>
+          <button class="btn-img" onclick="openImageModal(${e.id})">📷 Image</button>
+          <button class="btn-del" onclick="deleteEvent(${e.id})">🗑️ Supprimer</button>
+        </div>
+      </div>`
+  }).join('')
+}
+
+function formatDate(d) {
+  if (!d) return ''
+  const [y, m, day] = d.split('-')
+  const months = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛ','SEP','OCT','NOV','DÉC']
+  const days = ['DIM','LUN','MAR','MER','JEU','VEN','SAM']
+  const dt = new Date(y, m-1, day)
+  return `${days[dt.getDay()]} ${parseInt(day)} ${months[parseInt(m)-1]} ${y}`
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML }
+
+function editEvent(id) {
+  const e = events.find(ev => ev.id === id)
+  if (!e) return
+  document.getElementById('editId').value = id
+  document.getElementById('fTitle').value = e.title
+  document.getElementById('fDesc').value = e.description || ''
+  document.getElementById('fDate').value = e.event_date
+  document.getElementById('fTime').value = e.event_time || ''
+  document.getElementById('fEndDate').value = e.end_date || ''
+  document.getElementById('fEndTime').value = e.end_time || ''
+  document.getElementById('fCategory').value = e.category
+  document.getElementById('fBooking').value = e.booking_url || ''
+  document.getElementById('fPublished').value = e.is_published ? '1' : '0'
+  document.getElementById('formTitle').textContent = '✏️ Modifier : ' + e.title
+  document.getElementById('btnCancel').classList.remove('hidden')
+  document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' })
+}
+
+function cancelEdit() {
+  document.getElementById('editId').value = ''
+  document.getElementById('fTitle').value = ''
+  document.getElementById('fDesc').value = ''
+  document.getElementById('fDate').value = ''
+  document.getElementById('fTime').value = ''
+  document.getElementById('fEndDate').value = ''
+  document.getElementById('fEndTime').value = ''
+  document.getElementById('fBooking').value = ''
+  document.getElementById('fPublished').value = '1'
+  document.getElementById('formTitle').textContent = '➕ Nouvel événement'
+  document.getElementById('btnCancel').classList.add('hidden')
+}
+
+async function saveEvent() {
+  const id = document.getElementById('editId').value
+  const body = {
+    title: document.getElementById('fTitle').value,
+    description: document.getElementById('fDesc').value,
+    event_date: document.getElementById('fDate').value,
+    event_time: document.getElementById('fTime').value,
+    end_date: document.getElementById('fEndDate').value,
+    end_time: document.getElementById('fEndTime').value,
+    category: document.getElementById('fCategory').value,
+    booking_url: document.getElementById('fBooking').value,
+    is_published: parseInt(document.getElementById('fPublished').value)
+  }
+  if (!body.title || !body.event_date) { alert('Titre et date sont obligatoires.'); return }
+
+  const url = id ? `/api/admin/events/${id}` : '/api/admin/events'
+  const method = id ? 'PUT' : 'POST'
+  
+  await fetch(url, {
+    method,
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  cancelEdit()
+  loadEvents()
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Supprimer cet événement ?')) return
+  await fetch(`/api/admin/events/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  loadEvents()
+}
+
+// Image modal
+function openImageModal(id) {
+  imageEventId = id
+  const e = events.find(ev => ev.id === id)
+  const curr = document.getElementById('currentImage')
+  const delBtn = document.getElementById('btnDelImage')
+  if (e && e.image_url) {
+    curr.innerHTML = `<img src="${e.image_url}" class="preview" alt="Image actuelle">`
+    delBtn.classList.remove('hidden')
+  } else {
+    curr.innerHTML = '<p style="color:#888;">Aucune image</p>'
+    delBtn.classList.add('hidden')
+  }
+  document.getElementById('imagePreview').innerHTML = ''
+  document.getElementById('imageFile').value = ''
+  document.getElementById('imageModal').classList.remove('hidden')
+}
+
+function closeImageModal() {
+  document.getElementById('imageModal').classList.add('hidden')
+  imageEventId = null
+}
+
+document.getElementById('imageFile').addEventListener('change', function() {
+  const file = this.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = e => {
+      document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" class="preview" alt="Aperçu">`
+    }
+    reader.readAsDataURL(file)
+  }
+})
+
+async function uploadImage() {
+  const file = document.getElementById('imageFile').files[0]
+  if (!file) { alert('Choisis une image.'); return }
+  
+  const formData = new FormData()
+  formData.append('image', file)
+  
+  await fetch(`/api/admin/events/${imageEventId}/image`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: formData
+  })
+  closeImageModal()
+  loadEvents()
+}
+
+async function deleteImage() {
+  if (!confirm('Supprimer cette image ?')) return
+  await fetch(`/api/admin/events/${imageEventId}/image`, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  closeImageModal()
+  loadEvents()
+}
+</script>
+</body>
+</html>

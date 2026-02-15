@@ -687,11 +687,11 @@ main {
 
 @media (max-width: 768px) {
   .hero--photo {
-    min-height: 100vh;
+    min-height: 75vh;
     padding: 100px 16px 40px;
   }
   .hero-bg-photo img {
-    object-position: center center;
+    object-position: 55% 15%;
   }
 }
 
