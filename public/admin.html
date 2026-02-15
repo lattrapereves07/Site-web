@@ -256,6 +256,7 @@ function formatDate(d) {
 }
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML }
+function fixUrl(u) { u = u.trim(); if (!u) return ''; if (!/^https?:\/\//i.test(u)) u = 'https://' + u; return u }
 
 function editEvent(id) {
   const e = events.find(ev => ev.id === id)
@@ -299,7 +300,7 @@ async function saveEvent() {
     end_date: document.getElementById('fEndDate').value,
     end_time: document.getElementById('fEndTime').value,
     category: document.getElementById('fCategory').value,
-    booking_url: document.getElementById('fBooking').value,
+    booking_url: fixUrl(document.getElementById('fBooking').value),
     is_published: parseInt(document.getElementById('fPublished').value)
   }
   if (!body.title || !body.event_date) { alert('Titre et date sont obligatoires.'); return }
