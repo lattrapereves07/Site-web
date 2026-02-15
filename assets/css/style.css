@@ -601,6 +601,59 @@ main {
   .hero-sticker--tr img { width: 90px; }
 }
 
+/* Hero with background photo */
+.hero--photo {
+  background: var(--beige);
+}
+
+.hero-bg-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0.18;
+  filter: blur(1px);
+}
+
+.hero--photo .hero-content {
+  z-index: 2;
+  position: relative;
+}
+
+.hero--photo .hero-title-line1 {
+  color: var(--dark-grey);
+  text-shadow: 0 1px 8px rgba(252, 245, 233, 0.7);
+}
+
+.hero--photo .hero-title-line2 {
+  color: var(--coral);
+  text-shadow: 0 2px 12px rgba(252, 245, 233, 0.6);
+}
+
+.hero--photo .hero-tagline {
+  color: var(--green);
+  text-shadow: 0 1px 6px rgba(252, 245, 233, 0.8);
+}
+
+.hero--photo .hero-location {
+  color: var(--dark-grey);
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .hero-bg-photo img {
+    opacity: 0.12;
+    object-position: center center;
+  }
+}
+
 /* Small hero for sub-pages */
 .hero-small {
   min-height: 40vh;
