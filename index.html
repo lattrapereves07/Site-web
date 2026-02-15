@@ -64,7 +64,7 @@
         <a href="le-lieu.html" data-i18n="nav.le_lieu">Le lieu</a>
         <a href="decouvrir.html" data-i18n="nav.decouvrir">Découvrir</a>
         <a href="decouvrir.html#filets" data-i18n="nav.filets">Filets & Jeux</a>
-        <a href="foodtruck.html" data-i18n="nav.foodtruck">Foodtruck</a>
+        <a href="manger-et-boire.html" data-i18n="nav.manger">Manger & Boire</a>
         <a href="agenda.html" data-i18n="nav.agenda">Agenda</a>
         <a href="infos-pratiques.html" data-i18n="nav.infos">Infos pratiques</a>
       </nav>
@@ -97,7 +97,7 @@
     <a href="le-lieu.html" data-page="le-lieu.html" data-i18n="nav.le_lieu">Le lieu</a>
     <a href="decouvrir.html" data-page="decouvrir.html" data-i18n="nav.decouvrir">Découvrir</a>
     <a href="decouvrir.html#filets" data-page="" data-i18n="nav.filets">Filets & Jeux</a>
-    <a href="foodtruck.html" data-page="foodtruck.html" data-i18n="nav.foodtruck">Foodtruck</a>
+    <a href="manger-et-boire.html" data-page="manger-et-boire.html" data-i18n="nav.manger">Manger & Boire</a>
     <a href="agenda.html" data-page="agenda.html" data-i18n="nav.agenda">Agenda</a>
     <a href="infos-pratiques.html" data-page="infos-pratiques.html" data-i18n="nav.infos">Infos pratiques</a>
     <a href="billetterie.html" data-page="billetterie.html" data-i18n="nav.billetterie">Billetterie</a>
@@ -108,7 +108,7 @@
     <!-- ======== HERO ======== -->
     <section class="hero torn-edge-bottom torn-beige" aria-label="Accueil">
       <div class="hero-content">
-        <img src="assets/images/logo-full.png" alt="Logo L'Attrape-Rêves — Ferme de découverte" class="hero-logo" data-i18n-alt="alt.logo" width="180" height="220" loading="eager">
+        <img src="assets/images/logo-full.png" alt="Logo L'Attrape-Rêves — Ferme de découverte" class="hero-logo" data-i18n-alt="alt.logo" width="220" height="260" loading="eager">
         <div class="hero-title-line1" data-i18n="home.hero_title_1">FERME DE</div>
         <div class="hero-title-line2" data-i18n="home.hero_title_2">DÉCOUVERTE</div>
         <div class="hero-subtitle" data-i18n="home.hero_subtitle">et d'émerveillement</div>
@@ -122,7 +122,7 @@
 
       <!-- Floating stickers -->
       <div class="hero-sticker hero-sticker--br sticker-float" style="--rotate: 6deg; animation-delay: 0s;">
-        <img src="assets/images/donkey-desk.png" alt="Illustration d'un âne à son bureau" data-i18n-alt="alt.donkey_desk" width="180" loading="lazy">
+        <img src="assets/images/donkey-deckchair.png" alt="Illustration d'un âne dans un transat avec un enfant" data-i18n-alt="alt.donkey_deckchair" width="200" loading="lazy">
       </div>
       <div class="hero-sticker hero-sticker--tl sticker-float" style="--rotate: -8deg; animation-delay: -1s;">
         <img src="assets/images/chicken-orange.png" alt="Illustration d'une poule orange" data-i18n-alt="alt.chicken_orange" width="150" loading="lazy">
@@ -175,13 +175,25 @@
             <p data-i18n="home.card_jeux_text">Jeux en bois, merveilles et curiosités qui réveillent la part d'enfance.</p>
           </a>
 
-          <a href="decouvrir.html#arts" class="discover-card">
+          <a href="manger-et-boire.html" class="discover-card">
             <div class="sticker" style="--rotate: 3deg;">
-              <img src="assets/images/pigs-drinks.png" alt="Arts vivants et culture" loading="lazy">
+              <img src="assets/images/guinguette.png" alt="Manger et boire" loading="lazy">
             </div>
-            <h3 data-i18n="home.card_arts_title">Arts Vivants & Culture</h3>
-            <p data-i18n="home.card_arts_text">Spectacles, ateliers, instants poétiques pour s'émerveiller.</p>
+            <h3 data-i18n="home.card_manger_title">Manger & Boire</h3>
+            <p data-i18n="home.card_manger_text">Petite restauration, buvette, glaces… Une pause gourmande au cœur de la nature.</p>
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== ARTS VIVANTS (section distincte) ======== -->
+    <section class="section section--arts-culture torn-edge-bottom torn-sky-blue" style="padding-bottom: 100px;">
+      <div class="container">
+        <div class="text-center fade-in">
+          <h2 data-i18n="home.arts_section_title">Arts Vivants & Culture</h2>
+          <div class="arts-badge" data-i18n="home.arts_badge">Événements ponctuels</div>
+          <p style="max-width: 600px; margin: 0 auto 24px; font-size: 1.1rem; line-height: 1.7;" data-i18n="home.arts_section_text">Spectacles, ateliers créatifs, contes, musique… Des instants magiques qui ponctuent la vie du lieu. Animés par La Compagnie des Songes.</p>
+          <a href="agenda.html" class="btn btn-white" data-i18n="home.arts_section_btn">Voir l'agenda →</a>
         </div>
       </div>
     </section>
@@ -227,7 +239,7 @@
       <div class="container">
         <div class="text-center fade-in mb-32">
           <h2 class="h1 text-white" data-i18n="home.food_title" style="font-family: var(--font-title);">ON SE RÉGALE !</h2>
-          <p class="text-yellow" style="font-family: var(--font-hand); font-size: 1.4rem; margin-bottom: 0;" data-i18n="home.food_subtitle">Le Foodtruck de l'Attrape-Rêves</p>
+          <p class="text-yellow" style="font-family: var(--font-hand); font-size: 1.4rem; margin-bottom: 0;" data-i18n="home.food_subtitle">Petite restauration & buvette</p>
         </div>
 
         <div class="foodtruck-cols fade-in">
@@ -236,7 +248,7 @@
           </div>
           <div>
             <p class="text-white" style="font-size: 1.1rem; line-height: 1.7;" data-i18n="home.food_text">Une pause gourmande entre deux cabrioles dans les filets ou une séance de câlins aux chèvres. Boissons fraîches, petite restauration…</p>
-            <a href="foodtruck.html" class="btn btn-white" data-i18n="home.food_link">Carte et infos →</a>
+            <a href="manger-et-boire.html" class="btn btn-white" data-i18n="home.food_link">Carte et infos →</a>
           </div>
         </div>
       </div>

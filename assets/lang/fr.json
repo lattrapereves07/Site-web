@@ -3,7 +3,7 @@
     "le_lieu": "Le lieu",
     "decouvrir": "Découvrir",
     "filets": "Filets & Jeux",
-    "foodtruck": "Foodtruck",
+    "manger": "Manger & Boire",
     "agenda": "Agenda",
     "infos": "Infos pratiques",
     "billetterie": "Billetterie"
@@ -26,8 +26,12 @@
     "card_filets_placeholder": "FILETS",
     "card_jeux_title": "Jeux & Curiosités",
     "card_jeux_text": "Jeux en bois, merveilles et curiosités qui réveillent la part d'enfance.",
-    "card_arts_title": "Arts Vivants & Culture",
-    "card_arts_text": "Spectacles, ateliers, instants poétiques pour s'émerveiller.",
+    "card_manger_title": "Manger & Boire",
+    "card_manger_text": "Petite restauration, buvette, glaces… Une pause gourmande au cœur de la nature.",
+    "arts_section_title": "Arts Vivants & Culture",
+    "arts_badge": "Événements ponctuels",
+    "arts_section_text": "Spectacles, ateliers créatifs, contes, musique… Des instants magiques qui ponctuent la vie du lieu. Animés par La Compagnie des Songes.",
+    "arts_section_btn": "Voir l'agenda →",
     "events_title": "Ce qui se <span class=\"text-coral\">trame</span> bientôt",
     "event1_date": "SAM 12 AVR 2026",
     "event1_title": "Grande Ouverture !",
@@ -43,7 +47,7 @@
     "event3_tag": "Spectacle",
     "events_btn": "Voir tous nos événements →",
     "food_title": "ON SE RÉGALE !",
-    "food_subtitle": "Le Foodtruck de l'Attrape-Rêves",
+    "food_subtitle": "Petite restauration & buvette",
     "food_text": "Une pause gourmande entre deux cabrioles dans les filets ou une séance de câlins aux chèvres. Boissons fraîches, petite restauration…",
     "food_link": "Carte et infos →"
   },
@@ -108,6 +112,7 @@
     "jeux_text": "Jeux en bois, installations insolites, merveilles cachées… Ici tout est pensé pour réveiller la part d'enfance, stimuler l'imagination et piquer la curiosité. On ne vous dit pas tout… venez voir !",
     "jeux_placeholder": "Photo à venir",
     "arts_title": "Arts Vivants & Culture",
+    "arts_badge": "Événements ponctuels",
     "arts_text": "Spectacles, ateliers créatifs, contes, musique… Des instants qui viennent ponctuer la vie du lieu pour surprendre et émerveiller. La Compagnie des Songes, association présente sur place, anime ces moments de partage et de découverte culturelle. Consultez notre agenda pour découvrir la programmation.",
     "arts_btn": "Voir l'agenda →"
   },
@@ -143,12 +148,18 @@
     "priv_text": "Vous souhaitez organiser un anniversaire, une sortie de groupe, un événement privé à l'Attrape-Rêves ? Contactez-nous !",
     "priv_btn": "Nous contacter"
   },
-  "foodtruck": {
-    "hero_title": "LE FOODTRUCK",
-    "hero_subtitle": "Se régaler au cœur de la nature",
-    "text": "Une pause gourmande au cœur de la nature. Notre foodtruck vous propose boissons fraîches et petite restauration pour reprendre des forces entre deux aventures.",
-    "menu_title": "La Carte",
-    "menu_placeholder": "Carte à venir — Ouverture printemps 2026",
+  "manger": {
+    "hero_title": "MANGER & BOIRE",
+    "hero_subtitle": "Petite restauration et buvette",
+    "intro": "Une pause gourmande entre deux cabrioles dans les filets ou une séance de câlins aux chèvres. On mange bien, on boit frais, et on profite de la nature.",
+    "foodtruck_title": "Le Foodtruck",
+    "foodtruck_subtitle": "Petite restauration en plein air",
+    "foodtruck_carte_title": "La Carte du Foodtruck",
+    "foodtruck_carte_placeholder": "Carte à venir — Ouverture printemps 2026",
+    "buvette_title": "La Buvette",
+    "buvette_subtitle": "Boissons, glaces & confiseries",
+    "buvette_carte_title": "La Carte de la Buvette",
+    "buvette_carte_placeholder": "Carte à venir — Ouverture printemps 2026",
     "swim_note": "Coins de baignade à 5 minutes à pied !"
   },
   "infos": {
