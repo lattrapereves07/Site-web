@@ -1,12 +1,11 @@
 {
   "nav": {
     "le_lieu": "Le lieu [TO_TRANSLATE]",
-    "decouvrir": "Découvrir [TO_TRANSLATE]",
-    "filets": "Filets & Jeux [TO_TRANSLATE]",
-    "foodtruck": "Foodtruck [TO_TRANSLATE]",
+    "decouvrir": "Dieren & Spelen [TO_TRANSLATE]",
+    "manger": "Eten & Drinken [TO_TRANSLATE]",
     "agenda": "Agenda [TO_TRANSLATE]",
-    "infos": "Infos pratiques [TO_TRANSLATE]",
-    "billetterie": "Billetterie [TO_TRANSLATE]"
+    "infos": "Praktische info [TO_TRANSLATE]",
+    "billetterie": "Tickets [TO_TRANSLATE]"
   },
   "home": {
     "hero_title_1": "FERME DE [TO_TRANSLATE]",
@@ -83,8 +82,8 @@
     "photo_placeholder": "Photo à venir [TO_TRANSLATE]"
   },
   "decouvrir": {
-    "hero_title": "DÉCOUVRIR [TO_TRANSLATE]",
-    "hero_subtitle": "Toutes nos activités [TO_TRANSLATE]",
+    "hero_title": "DIEREN & SPELEN [TO_TRANSLATE]",
+    "hero_subtitle": "Al onze activiteiten [TO_TRANSLATE]",
     "animaux_title": "Nos pensionnaires [TO_TRANSLATE]",
     "animaux_intro": "Cette ferme prend soin toute l'année de ses ânes, ses chèvres naines, ses poules et ses cochons. Ici on prend le temps de les observer, de les nourrir, de les caresser. Un moment simple où se tissent des liens authentiques avec le vivant. [TO_TRANSLATE]",
     "anes_title": "Ânes [TO_TRANSLATE]",
@@ -157,13 +156,13 @@
     "horaires_text": "<strong>Avril à Juin :</strong> Mercredis, week-ends et jours fériés — 10h-18h<br><strong>Juillet – Août :</strong> Tous les jours — 10h-19h<br><strong>Septembre – Octobre :</strong> Mercredis et week-ends — 10h-18h [TO_TRANSLATE]",
     "tarifs_title": "Tarifs [TO_TRANSLATE]",
     "tarif_adulte": "Adulte [TO_TRANSLATE]",
-    "tarif_adulte_prix": "[TARIF] € [TO_TRANSLATE]",
+    "tarif_adulte_prix": "13 € [TO_TRANSLATE]",
     "tarif_enfant": "Enfant (3-12 ans) [TO_TRANSLATE]",
-    "tarif_enfant_prix": "[TARIF] € [TO_TRANSLATE]",
+    "tarif_enfant_prix": "10 € [TO_TRANSLATE]",
     "tarif_petit": "Moins de 3 ans [TO_TRANSLATE]",
     "tarif_petit_prix": "Gratuit [TO_TRANSLATE]",
     "tarif_reduit": "Tarif réduit [TO_TRANSLATE]",
-    "tarif_reduit_prix": "[TARIF] € [TO_TRANSLATE]",
+    "tarif_reduit_prix": "10 € [TO_TRANSLATE]",
     "acces_title": "Comment venir [TO_TRANSLATE]",
     "acces_address": "514 chemin de la Vernède<br>07140 Gravières [TO_TRANSLATE]",
     "acces_phone": "04 28 40 00 49 [TO_TRANSLATE]",
