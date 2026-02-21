@@ -870,6 +870,10 @@ main {
     drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
 }
 
+.sticker--no-outline img {
+  filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
+}
+
 /* Float animation for stickers */
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(var(--rotate, 0deg)); }
