@@ -11,7 +11,10 @@ module.exports = {
       },
       watch: false,
       instances: 1,
-      exec_mode: 'fork'
+      exec_mode: 'fork',
+      max_restarts: 3,
+      restart_delay: 5000,
+      autorestart: true
     }
   ]
 }
