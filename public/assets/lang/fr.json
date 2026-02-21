@@ -174,8 +174,6 @@
     "tarif_enfant_prix": "10 €",
     "tarif_petit": "Moins de 3 ans",
     "tarif_petit_prix": "Gratuit",
-    "tarif_reduit": "Tarif réduit",
-    "tarif_reduit_prix": "10 €",
     "acces_title": "Comment venir",
     "acces_address": "514 chemin de la Vernède<br>07140 Gravières",
     "acces_phone": "04 28 40 00 49",
@@ -224,13 +222,13 @@
   "mentions": {
     "title": "MENTIONS LÉGALES",
     "editeur_title": "Éditeur du site",
-    "editeur_text": "La Fabrique aux Merveilles<br>SIRET : 999 141 526 00015<br>514 chemin de la Vernède, 07140 Gravières<br>Téléphone : 04 28 40 00 49<br>Email : contact@lattrapereves07.fr<br>Responsable de la publication : [NOM À COMPLÉTER]",
+    "editeur_text": "La Fabrique aux Merveilles<br>SIRET : 999 141 526 00015<br>514 chemin de la Vernède, 07140 Gravières<br>Téléphone : 04 28 40 00 49<br>Email : contact@lattrapereves07.fr<br>Responsable de la publication : Louis Pick",
     "hebergement_title": "Hébergement",
     "hebergement_text": "GitHub Pages — GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA<br>CDN / DNS : Cloudflare Inc., 101 Townsend St, San Francisco, CA 94107, USA",
     "pi_title": "Propriété intellectuelle",
-    "pi_text": "L'ensemble du contenu de ce site (textes, illustrations, images, logo) est la propriété de La Fabrique aux Merveilles / La Compagnie des Songes, sauf mention contraire. Toute reproduction est interdite sans autorisation.",
+    "pi_text": "L'ensemble du contenu de ce site (textes, illustrations, images, logo) est la propriété de La Fabrique aux Merveilles, sauf mention contraire. Toute reproduction est interdite sans autorisation.",
     "credits_title": "Crédits illustrations",
-    "credits_text": "[À COMPLÉTER]"
+    "credits_text": "Clarence Nalpas — Aurélie Morand : B-com-in"
   },
   "politique": {
     "title": "POLITIQUE DE CONFIDENTIALITÉ",
