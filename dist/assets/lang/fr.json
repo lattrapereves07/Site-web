@@ -214,8 +214,8 @@
   },
   "billetterie": {
     "hero_title": "RÉSERVER MES BILLETS",
-    "hero_subtitle": "Achetez en ligne, évitez l'attente",
-    "text": "Achetez vos billets d'entrée en ligne et évitez l'attente à l'arrivée !",
+    "hero_subtitle": "Achetez en ligne, simplifiez votre arrivée",
+    "text": "Achetez vos billets d'entrée en ligne pour profiter dès votre arrivée !",
     "placeholder": "Billetterie en cours de configuration — Ouverture été 2026",
     "help": "Un souci avec la réservation ? Contactez-nous au <a href=\"tel:+33428400049\">04 28 40 00 49</a> ou par <a href=\"mailto:contact@lattrapereves07.fr\">email</a>."
   },
