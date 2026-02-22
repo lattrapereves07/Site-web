@@ -17,7 +17,8 @@ const requireAuth = async (c: any, next: any) => {
     return c.json({ error: 'Non autorisé' }, 401)
   }
   const token = auth.replace('Bearer ', '')
-  const password = c.env.ADMIN_PASSWORD || 'attrapereves2026'
+  const password = c.env.ADMIN_PASSWORD
+  if (!password) return c.json({ error: 'ADMIN_PASSWORD non configuré' }, 500)
   if (token !== password) {
     return c.json({ error: 'Mot de passe incorrect' }, 401)
   }
@@ -44,7 +45,8 @@ app.get('/api/events', async (c) => {
 // Login check
 app.post('/api/admin/login', async (c) => {
   const { password } = await c.req.json()
-  const adminPwd = c.env.ADMIN_PASSWORD || 'attrapereves2026'
+  const adminPwd = c.env.ADMIN_PASSWORD
+  if (!adminPwd) return c.json({ error: 'ADMIN_PASSWORD non configuré' }, 500)
   if (password === adminPwd) {
     return c.json({ success: true, token: password })
   }
