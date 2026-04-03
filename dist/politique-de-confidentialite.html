@@ -14,38 +14,7 @@
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-  <!-- ======== BANDEAU OUVERTURE ======== -->
-  <div class="ouverture-banner" id="ouvertureBanner" role="alert">
-    <span class="banner-emoji" aria-hidden="true">🌿</span>
-    <span>Ouverture le <strong>28 Juin !</strong> Venez rêver avec nous&nbsp;🎉</span>
-    <span class="banner-emoji" aria-hidden="true">🌿</span>
-    <button class="banner-close" onclick="closeBanner()" aria-label="Fermer le bandeau">&times;</button>
-  </div>
-
-  <script>
-  (function() {
-    function setBannerHeight() {
-      var b = document.getElementById('ouvertureBanner');
-      if (b && b.style.display !== 'none') {
-        document.documentElement.style.setProperty('--banner-height', b.offsetHeight + 'px');
-      } else {
-        document.documentElement.style.setProperty('--banner-height', '0px');
-      }
-    }
-    window.closeBanner = function() {
-      var b = document.getElementById('ouvertureBanner');
-      if (b) { b.style.display = 'none'; }
-      document.documentElement.style.setProperty('--banner-height', '0px');
-    };
-    document.addEventListener('DOMContentLoaded', setBannerHeight);
-    window.addEventListener('resize', setBannerHeight);
-  })();
-  </script>
-
-
-
-  <!-- Header -->
+<body><!-- Header -->
   <header class="site-header" role="banner">
     <div class="header-inner">
       <div class="header-logo"><a href="index.html" aria-label="Accueil"><img src="assets/images/logo.png" alt="Logo L'Attrape-Rêves" width="48" height="48"><span class="header-logo-text">L'Attrape-Rêves</span></a></div>

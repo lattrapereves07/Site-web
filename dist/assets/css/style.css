@@ -213,77 +213,16 @@ p {
   box-shadow: 2px 5px 0 rgba(0,0,0,0.15);
 }
 
-/* --- BANDEAU OUVERTURE --- */
-.ouverture-banner {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  z-index: 1010;
-  background: var(--green);
-  color: var(--white);
-  text-align: center;
-  padding: 10px 16px;
-  font-family: var(--font-hand);
-  font-size: 1.05rem;
-  letter-spacing: 0.3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.ouverture-banner .banner-emoji {
-  font-size: 1.25rem;
-  animation: banner-wiggle 2.5s ease-in-out infinite;
-  display: inline-block;
-}
-
-.ouverture-banner strong {
-  font-family: var(--font-title);
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-  color: var(--yellow);
-}
-
-.ouverture-banner .banner-close {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  font-size: 1.3rem;
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px 6px;
-  transition: color 0.2s;
-}
-
-.ouverture-banner .banner-close:hover {
-  color: var(--white);
-}
-
-@keyframes banner-wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(-12deg); }
-  40% { transform: rotate(12deg); }
-  60% { transform: rotate(-8deg); }
-  80% { transform: rotate(8deg); }
-}
-
 /* --- HEADER --- */
 .site-header {
   position: fixed;
-  top: var(--banner-height, 0px); left: 0;
+  top: 0; left: 0;
   width: 100%;
   z-index: 1000;
   background: var(--white);
   box-shadow: 0 2px 10px rgba(0,0,0,0.06);
   border-bottom: 2px solid var(--beige);
   height: var(--header-height);
-  transition: top 0.3s ease;
 }
 
 .header-inner {
@@ -598,14 +537,21 @@ main {
 .hero-badge {
   display: inline-block;
   font-family: var(--font-accent);
-  font-size: 1.05rem;
+  font-size: clamp(1.5rem, 3.5vw, 2.4rem);
   background: var(--coral);
   color: var(--white);
-  padding: 8px 24px;
-  border-radius: 30px;
+  padding: 14px 40px;
+  border-radius: 40px;
   transform: rotate(-2deg);
   margin-bottom: 24px;
-  box-shadow: 2px 3px 0 var(--brown);
+  box-shadow: 4px 5px 0 var(--brown);
+  animation: badge-pulse 2.8s ease-in-out infinite;
+  letter-spacing: 0.5px;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: rotate(-2deg) scale(1); }
+  50%       { transform: rotate(-2deg) scale(1.06); }
 }
 
 .hero-tagline {
@@ -730,7 +676,7 @@ main {
 }
 
 .hero--photo .hero-badge {
-  box-shadow: 2px 3px 0 var(--brown), 0 2px 12px rgba(0,0,0,0.25);
+  box-shadow: 4px 5px 0 var(--brown), 0 4px 18px rgba(0,0,0,0.3);
 }
 
 .hero--photo .hero-tagline {

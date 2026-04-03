@@ -48,38 +48,7 @@
   }
   </script>
 </head>
-<body>
-  <!-- ======== BANDEAU OUVERTURE ======== -->
-  <div class="ouverture-banner" id="ouvertureBanner" role="alert">
-    <span class="banner-emoji" aria-hidden="true">🌿</span>
-    <span>Ouverture le <strong>28 Juin !</strong> Venez rêver avec nous&nbsp;🎉</span>
-    <span class="banner-emoji" aria-hidden="true">🌿</span>
-    <button class="banner-close" onclick="closeBanner()" aria-label="Fermer le bandeau">&times;</button>
-  </div>
-
-  <script>
-  (function() {
-    function setBannerHeight() {
-      var b = document.getElementById('ouvertureBanner');
-      if (b && b.style.display !== 'none') {
-        document.documentElement.style.setProperty('--banner-height', b.offsetHeight + 'px');
-      } else {
-        document.documentElement.style.setProperty('--banner-height', '0px');
-      }
-    }
-    window.closeBanner = function() {
-      var b = document.getElementById('ouvertureBanner');
-      if (b) { b.style.display = 'none'; }
-      document.documentElement.style.setProperty('--banner-height', '0px');
-    };
-    document.addEventListener('DOMContentLoaded', setBannerHeight);
-    window.addEventListener('resize', setBannerHeight);
-  })();
-  </script>
-
-
-
-  <!-- ======== HEADER ======== -->
+<body><!-- ======== HEADER ======== -->
   <header class="site-header" role="banner">
     <div class="header-inner">
       <div class="header-logo">
@@ -142,7 +111,7 @@
         <div class="hero-title-line1" data-i18n="home.hero_title_1">FERME DE</div>
         <div class="hero-title-line2" data-i18n="home.hero_title_2">DÉCOUVERTE</div>
         <div class="hero-subtitle" data-i18n="home.hero_subtitle">et d'émerveillement</div>
-        <div class="hero-badge" data-i18n="home.hero_badge">Ouverture Été 2026</div>
+        <div class="hero-badge" data-i18n="home.hero_badge">Ouverture le 28 Juin !</div>
         <div class="hero-tagline" data-i18n="home.hero_tagline">Un refuge sensoriel au cœur du vivant pour ressourcer petits et grands !</div>
         <div class="hero-cta">
           <a href="billetterie.html" class="btn btn-coral-large" data-i18n="home.hero_cta">Réserver mes billets</a>
