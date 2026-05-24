@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "lattrapereves",
+  "account_id": "ca231675fad0e75c7bd269bb0688a127",
   "compatibility_date": "2024-12-01",
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist",
