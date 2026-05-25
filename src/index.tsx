@@ -134,8 +134,46 @@ app.delete('/api/admin/events/:id/image', requireAuth, async (c) => {
   const id = c.req.param('id')
   await c.env.DB.prepare('UPDATE events SET image_data=NULL, updated_at=datetime(\'now\') WHERE id=?')
     .bind(id).run()
-  
+
   return c.json({ success: true })
+})
+
+// ===== INVITATIONS API =====
+
+// Submit RSVP (public)
+app.post('/api/invitation', async (c) => {
+  const body = await c.req.json()
+  const { nom_prenom, type_invitation, present, nb_adultes, nb_enfants, repas_json, message } = body
+
+  if (!nom_prenom?.trim() || !type_invitation) {
+    return c.json({ error: 'Champs requis manquants' }, 400)
+  }
+  if (!['pro', 'perso'].includes(type_invitation)) {
+    return c.json({ error: 'Type invalide' }, 400)
+  }
+
+  const result = await c.env.DB.prepare(
+    `INSERT INTO invitations (nom_prenom, type_invitation, present, nb_adultes, nb_enfants, repas_json, message)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    nom_prenom.trim(),
+    type_invitation,
+    present ? 1 : 0,
+    nb_adultes ?? null,
+    nb_enfants ?? null,
+    repas_json ?? null,
+    message?.trim() || null
+  ).run()
+
+  return c.json({ success: true, id: result.meta.last_row_id }, 201)
+})
+
+// List all RSVPs (admin)
+app.get('/api/admin/invitations', requireAuth, async (c) => {
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM invitations ORDER BY submitted_at DESC`
+  ).all()
+  return c.json(results)
 })
 
 export default app

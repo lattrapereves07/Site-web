@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitation Inauguration — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { background: #FCF5E9; margin: 0; font-family: var(--font-ui); }
+
+    .inv-page { max-width: 600px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* Header */
+    .inv-header { text-align: center; padding: 32px 0 16px; }
+    .inv-logo { width: 72px; margin-bottom: 12px; }
+    .inv-title { font-family: var(--font-title); font-size: 2.6rem; color: #4E7438; margin: 0 0 4px; line-height: 1; }
+    .inv-subtitle { font-family: var(--font-hand); font-size: 1.2rem; color: var(--coral); margin: 0; }
+
+    /* Event info */
+    .inv-event { background: white; border-radius: 16px; padding: 20px 24px; margin: 16px 0 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .inv-date { font-family: var(--font-title); font-size: 1.4rem; color: #4E7438; margin-bottom: 4px; }
+    .inv-lieu { font-size: 0.9rem; color: #888; margin-bottom: 14px; }
+    .inv-programme { border-top: 1px solid #f0e8d8; padding-top: 12px; display: grid; gap: 6px; }
+    .inv-programme-line { display: flex; gap: 10px; align-items: baseline; font-size: 0.95rem; }
+    .inv-programme-heure { font-family: var(--font-ui); font-weight: 700; color: #4E7438; min-width: 44px; }
+    .inv-programme-desc { color: #444; }
+
+    .heart-sep { text-align: center; font-size: 1.2rem; margin: 8px 0; color: #4E7438; opacity: 0.6; }
+
+    /* Form card */
+    .inv-card { background: white; border-radius: 20px; padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .inv-card h2 { font-family: var(--font-title); font-size: 1.6rem; color: var(--coral); margin: 0 0 6px; }
+    .inv-deadline { font-size: 0.9rem; color: #888; margin: 0 0 24px; padding: 8px 12px; background: #fff8f0; border-radius: 8px; border-left: 3px solid var(--coral); }
+    .inv-deadline strong { color: var(--coral); }
+
+    /* Fields */
+    .field-group { margin-bottom: 20px; }
+    .field-group > label:not(.radio-label):not(.checkbox-label):not(.repas-option) {
+      display: block; font-weight: 700; color: #333; margin-bottom: 6px; font-size: 0.95rem;
+    }
+    .label-note { font-weight: 400; color: #999; font-size: 0.85rem; }
+    .field-group input[type="text"],
+    .field-group select,
+    .field-group textarea {
+      width: 100%; padding: 12px 14px; border: 2px solid #e8dece; border-radius: 10px;
+      font-family: var(--font-ui); font-size: 1rem; box-sizing: border-box;
+      background: #fdfaf5; transition: border-color 0.15s;
+    }
+    .field-group input[type="text"]:focus,
+    .field-group select:focus,
+    .field-group textarea:focus { outline: none; border-color: #4E7438; background: white; }
+    .field-group textarea { min-height: 80px; resize: vertical; }
+
+    /* Checkbox absent */
+    .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.95rem; color: #555; }
+    .checkbox-label input { width: 18px; height: 18px; accent-color: #4E7438; cursor: pointer; }
+
+    /* Radio group accompagnant */
+    .radio-group { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .radio-label { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 2px solid #e8dece; border-radius: 10px; cursor: pointer; font-size: 0.95rem; color: #444; transition: border-color 0.15s, background 0.15s; }
+    .radio-label:has(input:checked) { border-color: #4E7438; background: #f0f5ed; color: #2d4a1e; }
+    .radio-label input { accent-color: #4E7438; width: 16px; height: 16px; }
+
+    /* Repas */
+    .repas-section-title { font-weight: 700; color: #333; margin-bottom: 8px; font-size: 0.95rem; }
+    .repas-section-note { font-weight: 400; color: #999; font-size: 0.85rem; }
+    .repas-options { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .repas-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 2px solid #e8dece; border-radius: 10px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .repas-option:has(input:checked) { border-color: #4E7438; background: #f0f5ed; }
+    .repas-option input { accent-color: #4E7438; width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; }
+    .repas-content { flex: 1; }
+    .repas-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .repas-name { font-weight: 700; color: #2d4a1e; font-size: 0.95rem; }
+    .repas-price { font-weight: 600; color: #4E7438; font-size: 0.85rem; }
+    .tag-vege { background: #e8f5e0; color: #3a6b20; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .repas-desc { font-size: 0.82rem; color: #777; margin-top: 3px; line-height: 1.4; }
+
+    /* Enfants section */
+    .enfants-section { border-top: 1px solid #f0e8d8; padding-top: 16px; margin-top: 4px; }
+    .enfants-section-title { font-weight: 700; color: #333; font-size: 1rem; margin-bottom: 12px; }
+    .enfant-block { background: #fdfaf5; border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+    .enfant-block-title { font-weight: 700; color: #4E7438; font-size: 0.9rem; margin-bottom: 8px; }
+
+    /* Error */
+    .form-error { background: #fde8e8; color: #c0392b; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 12px; }
+
+    /* Submit */
+    .btn-green { background: #4E7438; color: white; border: none; padding: 14px 32px; border-radius: 30px; font-family: var(--font-ui); font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: background 0.2s; width: 100%; margin-top: 8px; }
+    .btn-green:hover { background: #3d5c2c; }
+    .btn-green:disabled { background: #9ab88c; cursor: not-allowed; }
+
+    /* Success */
+    .success-box { text-align: center; padding: 20px 0 8px; }
+    .success-icon { font-size: 3rem; margin-bottom: 12px; }
+    .success-box h2 { font-family: var(--font-title); font-size: 2rem; color: #4E7438; margin-bottom: 8px; }
+    .success-box p { color: #555; font-size: 1rem; margin: 4px 0; }
+    .success-details { background: #f0f5ed; border-radius: 10px; padding: 12px 16px; margin-top: 16px; font-size: 0.9rem; color: #444; line-height: 1.8; white-space: pre-line; text-align: left; }
+
+    .hidden { display: none !important; }
+
+    /* Footer */
+    .inv-footer { text-align: center; margin-top: 32px; font-size: 0.8rem; color: #bbb; }
+  </style>
+</head>
+<body>
+
+<div class="inv-page">
+
+  <!-- Header -->
+  <header class="inv-header">
+    <img src="assets/images/logo.png" alt="L'Attrape-Rêves" class="inv-logo">
+    <h1 class="inv-title">Inauguration</h1>
+    <p class="inv-subtitle">L'Attrape-Rêves</p>
+  </header>
+
+  <!-- Event info -->
+  <div class="inv-event">
+    <div class="inv-date">Samedi 27 juin 2025</div>
+    <div class="inv-lieu">514 chemin de la Vernède · Gravières (07140)</div>
+    <div class="inv-programme">
+      <div class="inv-programme-line"><span class="inv-programme-heure">17h</span><span class="inv-programme-desc">Accueil</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">18h</span><span class="inv-programme-desc">Apéritif</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">19h</span><span class="inv-programme-desc">Discours & remise des pass et invitations</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">20h30</span><span class="inv-programme-desc">Concert + Foodtruck</span></div>
+    </div>
+  </div>
+
+  <div class="heart-sep">♥</div>
+
+  <!-- Form card -->
+  <div id="formContainer" class="inv-card">
+    <h2>Votre réponse</h2>
+    <p class="inv-deadline">Merci de répondre avant le <strong>14 juin 2025</strong></p>
+
+    <form id="invForm" onsubmit="submitForm(event)" novalidate>
+
+      <!-- Nom -->
+      <div class="field-group">
+        <label for="nom">Votre nom et prénom *</label>
+        <input type="text" id="nom" name="nom" placeholder="Ex : Marie Dupont" autocomplete="name">
+      </div>
+
+      <!-- Absent -->
+      <div class="field-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="absent" onchange="togglePresence()">
+          <span>Je ne pourrai pas être présent·e à l'inauguration</span>
+        </label>
+      </div>
+
+      <!-- Section si présent -->
+      <div id="presentSection">
+
+        <!-- Accompagnant adulte -->
+        <div class="field-group">
+          <label>Adultes présents</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="nb_adultes" value="1" checked onchange="toggleAccompagnant()">
+              Je viens seul·e
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="nb_adultes" value="2" onchange="toggleAccompagnant()">
+              Je viens avec mon/ma conjoint·e
+            </label>
+          </div>
+        </div>
+
+        <!-- Repas adulte 1 -->
+        <div class="field-group">
+          <div class="repas-section-title">🍔 Votre repas <span class="repas-section-note">(optionnel — réglé sur place le soir)</span></div>
+          <div class="repas-options" id="repasAdulte1"></div>
+        </div>
+
+        <!-- Repas adulte 2 -->
+        <div class="field-group hidden" id="sectionRepasAdulte2">
+          <div class="repas-section-title">🍔 Repas pour votre accompagnant·e</div>
+          <div class="repas-options" id="repasAdulte2"></div>
+        </div>
+
+        <!-- Enfants -->
+        <div class="enfants-section">
+          <div class="enfants-section-title">👧 Enfants qui vous accompagnent</div>
+
+          <div class="field-group">
+            <label for="nb_enfants">Nombre d'enfants</label>
+            <select id="nb_enfants" onchange="updateEnfants()">
+              <option value="0">Aucun enfant</option>
+              <option value="1">1 enfant</option>
+              <option value="2">2 enfants</option>
+              <option value="3">3 enfants</option>
+              <option value="4">4 enfants</option>
+            </select>
+          </div>
+
+          <!-- Repas enfants générés dynamiquement -->
+          <div id="enfantsRepasSection"></div>
+
+        </div>
+
+      </div><!-- /presentSection -->
+
+      <!-- Message -->
+      <div class="field-group" style="margin-top: 20px;">
+        <label for="message">Message (facultatif)</label>
+        <textarea id="message" placeholder="Un mot, une question..."></textarea>
+      </div>
+
+      <div id="formError" class="form-error hidden"></div>
+
+      <button type="submit" id="submitBtn" class="btn-green">Envoyer ma réponse</button>
+
+    </form>
+  </div>
+
+  <!-- Success -->
+  <div id="successMsg" class="inv-card hidden">
+    <div class="success-box">
+      <div class="success-icon">💚</div>
+      <h2 id="successTitle">Merci !</h2>
+      <p id="successText"></p>
+      <div class="success-details" id="successDetails"></div>
+    </div>
+  </div>
+
+  <div class="inv-footer">L'Attrape-Rêves · Gravières, Ardèche</div>
+
+</div>
+
+<script>
+const REPAS_OPTIONS = [
+  { value: '', label: 'Pas de repas', desc: null, price: null, vege: false },
+  { value: 'cochon', label: 'Le cochon', desc: 'Effiloché de porc au paprika fumé et au tandoori, sauce yaourt de brebis, carottes râpées, oignons rouges, salade verte', price: '10€', vege: false },
+  { value: 'hareng', label: 'Le hareng', desc: 'Tartare de hareng aux pommes granny smith, menthe, aneth, gingembre, sauce yaourt de brebis, carottes râpées, salade verte', price: '10€', vege: false },
+  { value: 'biquet', label: "Le pt'i biquet", desc: "Pesto maison, fromage de chèvre, légumes du soleil confits, oignons caramélisés, carottes râpées, noix concassées, salade verte", price: '12€', vege: true }
+];
+
+function makeRepasOptions(name) {
+  return REPAS_OPTIONS.map((o, i) => `
+    <label class="repas-option">
+      <input type="radio" name="${name}" value="${o.value}"${i === 0 ? ' checked' : ''}>
+      <div class="repas-content">
+        <div class="repas-title">
+          <span class="repas-name">${o.label}</span>
+          ${o.price ? `<span class="repas-price">${o.price}</span>` : ''}
+          ${o.vege ? '<span class="tag-vege">végétarien</span>' : ''}
+        </div>
+        ${o.desc ? `<div class="repas-desc">${o.desc}</div>` : ''}
+      </div>
+    </label>
+  `).join('');
+}
+
+document.getElementById('repasAdulte1').innerHTML = makeRepasOptions('repas_adulte1');
+document.getElementById('repasAdulte2').innerHTML = makeRepasOptions('repas_adulte2');
+
+function togglePresence() {
+  const absent = document.getElementById('absent').checked;
+  document.getElementById('presentSection').classList.toggle('hidden', absent);
+}
+
+function toggleAccompagnant() {
+  const nb = document.querySelector('input[name="nb_adultes"]:checked')?.value;
+  document.getElementById('sectionRepasAdulte2').classList.toggle('hidden', nb !== '2');
+}
+
+function updateEnfants() {
+  const nb = parseInt(document.getElementById('nb_enfants').value || '0');
+  const container = document.getElementById('enfantsRepasSection');
+  container.innerHTML = '';
+  for (let i = 1; i <= nb; i++) {
+    const block = document.createElement('div');
+    block.className = 'enfant-block';
+    block.innerHTML = `
+      <div class="enfant-block-title">🍔 Repas pour l'enfant ${nb > 1 ? i : ''}</div>
+      <div class="repas-options" id="repasEnfant${i}"></div>
+    `;
+    container.appendChild(block);
+    document.getElementById(`repasEnfant${i}`).innerHTML = makeRepasOptions(`repas_enfant${i}`);
+  }
+}
+
+function repasLabel(val) {
+  const found = REPAS_OPTIONS.find(o => o.value === val);
+  return found && found.value !== '' ? found.label + (found.price ? ` (${found.price})` : '') : 'Pas de repas';
+}
+
+function getRepasJson(absent) {
+  if (absent) return null;
+  const nb = parseInt(document.querySelector('input[name="nb_adultes"]:checked')?.value || '1');
+  const nbEnfants = parseInt(document.getElementById('nb_enfants').value || '0');
+  const repas = {
+    adulte1: document.querySelector('input[name="repas_adulte1"]:checked')?.value || ''
+  };
+  if (nb === 2) {
+    repas.adulte2 = document.querySelector('input[name="repas_adulte2"]:checked')?.value || '';
+  }
+  if (nbEnfants > 0) {
+    repas.enfants = [];
+    for (let i = 1; i <= nbEnfants; i++) {
+      repas.enfants.push(document.querySelector(`input[name="repas_enfant${i}"]:checked`)?.value || '');
+    }
+  }
+  return JSON.stringify(repas);
+}
+
+async function submitForm(e) {
+  e.preventDefault();
+  const nom = document.getElementById('nom').value.trim();
+  if (!nom) {
+    showError('Merci d\'indiquer votre nom et prénom.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+  document.getElementById('formError').classList.add('hidden');
+
+  const absent = document.getElementById('absent').checked;
+  const nb = parseInt(document.querySelector('input[name="nb_adultes"]:checked')?.value || '1');
+  const nbEnfants = parseInt(document.getElementById('nb_enfants').value || '0');
+
+  const payload = {
+    nom_prenom: nom,
+    type_invitation: 'perso',
+    present: !absent,
+    nb_adultes: absent ? null : nb,
+    nb_enfants: absent ? null : nbEnfants,
+    repas_json: getRepasJson(absent),
+    message: document.getElementById('message').value.trim() || null
+  };
+
+  try {
+    const res = await fetch('/api/invitation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error();
+
+    document.getElementById('formContainer').classList.add('hidden');
+    const successMsg = document.getElementById('successMsg');
+    successMsg.classList.remove('hidden');
+
+    if (absent) {
+      document.getElementById('successTitle').textContent = 'Réponse enregistrée';
+      document.getElementById('successText').textContent = `Merci ${nom}, nous avons bien noté votre absence.`;
+      document.getElementById('successDetails').textContent = 'Nous espérons vous retrouver bientôt à L\'Attrape-Rêves !';
+    } else {
+      document.getElementById('successTitle').textContent = 'À bientôt !';
+      document.getElementById('successText').textContent = `Merci ${nom}, votre présence est confirmée.`;
+      const repas = JSON.parse(payload.repas_json || '{}');
+      let lines = [
+        '📅 Samedi 27 juin · 17h',
+        '📍 514 ch. de la Vernède, Gravières',
+        '',
+        `🍔 Votre repas : ${repasLabel(repas.adulte1 || '')}`
+      ];
+      if (nb === 2) lines.push(`🍔 Repas accompagnant·e : ${repasLabel(repas.adulte2 || '')}`);
+      if (nbEnfants > 0) {
+        (repas.enfants || []).forEach((r, i) => {
+          lines.push(`🍔 Repas enfant${nbEnfants > 1 ? ' ' + (i + 1) : ''} : ${repasLabel(r)}`);
+        });
+      }
+      document.getElementById('successDetails').textContent = lines.join('\n');
+    }
+  } catch {
+    showError('Une erreur est survenue, veuillez réessayer.');
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma réponse';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+
+</body>
+</html>

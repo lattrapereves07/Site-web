@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Invitations — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { background: #FCF5E9; margin: 0; font-family: var(--font-ui); }
+
+    /* Login */
+    .login-box { max-width: 400px; margin: 100px auto; padding: 40px; background: white; border-radius: 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .login-box img { margin-bottom: 12px; }
+    .login-box h1 { font-family: var(--font-title); color: var(--coral); margin-bottom: 20px; font-size: 1.8rem; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid #e8dece; border-radius: 10px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; font-family: var(--font-ui); }
+    .login-box input:focus { outline: none; border-color: #4E7438; }
+    .login-error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+    .btn-green { background: #4E7438; color: white; border: none; padding: 13px 32px; border-radius: 30px; font-family: var(--font-ui); font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-green:hover { background: #3d5c2c; }
+    .btn-green:disabled { background: #9ab88c; cursor: not-allowed; }
+    .btn-outline { background: white; color: #4E7438; border: 2px solid #4E7438; padding: 8px 20px; border-radius: 20px; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-outline:hover { background: #4E7438; color: white; }
+
+    /* Admin wrap */
+    .admin-wrap { max-width: 960px; margin: 0 auto; padding: 80px 20px 60px; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .admin-header h1 { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin: 0; }
+    .admin-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* Stats grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
+    .stat-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .stat-label { font-size: 0.8rem; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-value { font-family: var(--font-title); font-size: 2.2rem; color: #4E7438; line-height: 1; }
+    .stat-value.coral { color: var(--coral); }
+    .stat-value.grey { color: #aaa; }
+
+    /* Sandwichs detail */
+    .sandwichs-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 32px; }
+    .sandwichs-card h3 { font-family: var(--font-title); font-size: 1.2rem; color: #333; margin: 0 0 14px; }
+    .sandwich-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f0e8; font-size: 0.95rem; }
+    .sandwich-row:last-child { border-bottom: none; }
+    .sandwich-name { color: #444; }
+    .sandwich-count { font-weight: 700; color: #4E7438; font-size: 1.1rem; }
+
+    /* Filters */
+    .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .filter-btn { padding: 6px 16px; border-radius: 20px; border: 2px solid #e8dece; background: white; font-family: var(--font-ui); font-size: 0.85rem; cursor: pointer; color: #666; transition: all 0.15s; }
+    .filter-btn.active { border-color: #4E7438; background: #f0f5ed; color: #2d4a1e; font-weight: 700; }
+    .filter-count { font-size: 0.8rem; color: #999; margin-left: 4px; }
+
+    /* Table */
+    .table-wrap { background: white; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; }
+    .table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .table-wrap th { background: #f7f3ec; color: #666; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0e8d8; }
+    .table-wrap td { padding: 12px 14px; border-bottom: 1px solid #f9f4ee; color: #444; vertical-align: top; }
+    .table-wrap tr:last-child td { border-bottom: none; }
+    .table-wrap tr:hover td { background: #fdfaf5; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+    .badge-pro { background: #e3f2fd; color: #1565c0; }
+    .badge-perso { background: #f3e5f5; color: #7b1fa2; }
+    .badge-present { background: #e8f5e0; color: #3a6b20; }
+    .badge-absent { background: #fde8e8; color: #c0392b; }
+    .repas-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .repas-chip { background: #f0f5ed; color: #2d4a1e; font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; }
+    .message-text { font-style: italic; color: #888; font-size: 0.82rem; max-width: 200px; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: #bbb; font-size: 1rem; }
+    .loading { text-align: center; padding: 48px 20px; color: #999; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 700px) {
+      .table-wrap { overflow-x: auto; }
+      .table-wrap table { min-width: 600px; }
+      .admin-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div id="loginScreen" class="login-box">
+  <img src="assets/images/logo.png" alt="Logo" width="56">
+  <h1>Admin Invitations</h1>
+  <div id="loginError" class="login-error hidden"></div>
+  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus
+    onkeydown="if(event.key==='Enter') doLogin()">
+  <br>
+  <button class="btn-green" onclick="doLogin()" style="width:100%;margin-top:4px;">Connexion</button>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="hidden">
+  <div class="admin-wrap">
+
+    <div class="admin-header">
+      <h1>Inaugurations — Réponses</h1>
+      <div class="admin-actions">
+        <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn-outline" onclick="loadData()">↻ Actualiser</button>
+        <button class="btn-outline" style="color:#c0392b;border-color:#c0392b;" onclick="logout()">Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-label">Total réponses</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Présents</div><div class="stat-value" id="statPresents">—</div></div>
+      <div class="stat-card"><div class="stat-label">Absents</div><div class="stat-value coral" id="statAbsents">—</div></div>
+      <div class="stat-card"><div class="stat-label">Adultes attendus</div><div class="stat-value" id="statAdultes">—</div></div>
+      <div class="stat-card"><div class="stat-label">Enfants attendus</div><div class="stat-value" id="statEnfants">—</div></div>
+      <div class="stat-card"><div class="stat-label">Sandwichs total</div><div class="stat-value" id="statSandwichs">—</div></div>
+    </div>
+
+    <!-- Sandwichs detail -->
+    <div class="sandwichs-card">
+      <h3>🍔 Détail sandwichs commandés</h3>
+      <div class="sandwich-row"><span class="sandwich-name">Le cochon (10€)</span><span class="sandwich-count" id="countCochon">0</span></div>
+      <div class="sandwich-row"><span class="sandwich-name">Le hareng (10€)</span><span class="sandwich-count" id="countHareng">0</span></div>
+      <div class="sandwich-row"><span class="sandwich-name">Le pt'i biquet végé (12€)</span><span class="sandwich-count" id="countBiquet">0</span></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Tous <span class="filter-count" id="fc-all"></span></button>
+      <button class="filter-btn" data-filter="present" onclick="setFilter('present', this)">Présents <span class="filter-count" id="fc-present"></span></button>
+      <button class="filter-btn" data-filter="absent" onclick="setFilter('absent', this)">Absents <span class="filter-count" id="fc-absent"></span></button>
+      <button class="filter-btn" data-filter="pro" onclick="setFilter('pro', this)">Pro <span class="filter-count" id="fc-pro"></span></button>
+      <button class="filter-btn" data-filter="perso" onclick="setFilter('perso', this)">Perso <span class="filter-count" id="fc-perso"></span></button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div id="loadingState" class="loading">Chargement…</div>
+      <div id="emptyState" class="empty-state hidden">Aucune réponse pour l'instant.</div>
+      <table id="invTable" class="hidden">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Nom / Prénom</th>
+            <th>Type</th>
+            <th>Présence</th>
+            <th>Adultes</th>
+            <th>Enfants</th>
+            <th>Repas</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let token = sessionStorage.getItem('inv_admin_token') || '';
+let allInvitations = [];
+let currentFilter = 'all';
+
+const REPAS_LABELS = { cochon: 'Cochon', hareng: 'Hareng', biquet: "Pt'i biquet", '': '' };
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (!pwd) return;
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    });
+    const data = await res.json();
+    if (data.success) {
+      token = data.token;
+      sessionStorage.setItem('inv_admin_token', token);
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      loadData();
+    } else {
+      document.getElementById('loginError').textContent = 'Mot de passe incorrect';
+      document.getElementById('loginError').classList.remove('hidden');
+    }
+  } catch {
+    document.getElementById('loginError').textContent = 'Erreur de connexion';
+    document.getElementById('loginError').classList.remove('hidden');
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('inv_admin_token');
+  token = '';
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginPwd').value = '';
+}
+
+async function loadData() {
+  document.getElementById('loadingState').classList.remove('hidden');
+  document.getElementById('invTable').classList.add('hidden');
+  document.getElementById('emptyState').classList.add('hidden');
+
+  try {
+    const res = await fetch('/api/admin/invitations', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (res.status === 401) { logout(); return; }
+    allInvitations = await res.json();
+    computeStats();
+    renderTable();
+  } catch {
+    document.getElementById('loadingState').textContent = 'Erreur de chargement.';
+  }
+}
+
+function computeStats() {
+  const presents = allInvitations.filter(i => i.present);
+  const absents = allInvitations.filter(i => !i.present);
+  const totalAdultes = presents.reduce((s, i) => s + (i.nb_adultes || 0), 0);
+  const totalEnfants = presents.reduce((s, i) => s + (i.nb_enfants || 0), 0);
+  const counts = { cochon: 0, hareng: 0, biquet: 0 };
+
+  for (const inv of presents) {
+    if (!inv.repas_json) continue;
+    try {
+      const repas = JSON.parse(inv.repas_json);
+      if (repas.adulte1 && counts[repas.adulte1] !== undefined) counts[repas.adulte1]++;
+      if (repas.adulte2 && counts[repas.adulte2] !== undefined) counts[repas.adulte2]++;
+      for (const r of (repas.enfants || [])) {
+        if (r && counts[r] !== undefined) counts[r]++;
+      }
+    } catch {}
+  }
+
+  const totalSandwichs = counts.cochon + counts.hareng + counts.biquet;
+  const pros = allInvitations.filter(i => i.type_invitation === 'pro');
+  const persos = allInvitations.filter(i => i.type_invitation === 'perso');
+
+  document.getElementById('statTotal').textContent = allInvitations.length;
+  document.getElementById('statPresents').textContent = presents.length;
+  document.getElementById('statAbsents').textContent = absents.length;
+  document.getElementById('statAdultes').textContent = totalAdultes;
+  document.getElementById('statEnfants').textContent = totalEnfants;
+  document.getElementById('statSandwichs').textContent = totalSandwichs;
+
+  document.getElementById('countCochon').textContent = counts.cochon;
+  document.getElementById('countHareng').textContent = counts.hareng;
+  document.getElementById('countBiquet').textContent = counts.biquet;
+
+  document.getElementById('fc-all').textContent = allInvitations.length;
+  document.getElementById('fc-present').textContent = presents.length;
+  document.getElementById('fc-absent').textContent = absents.length;
+  document.getElementById('fc-pro').textContent = pros.length;
+  document.getElementById('fc-perso').textContent = persos.length;
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function getFiltered() {
+  if (currentFilter === 'all') return allInvitations;
+  if (currentFilter === 'present') return allInvitations.filter(i => i.present);
+  if (currentFilter === 'absent') return allInvitations.filter(i => !i.present);
+  if (currentFilter === 'pro') return allInvitations.filter(i => i.type_invitation === 'pro');
+  if (currentFilter === 'perso') return allInvitations.filter(i => i.type_invitation === 'perso');
+  return allInvitations;
+}
+
+function repasChips(inv) {
+  if (!inv.present || !inv.repas_json) return '';
+  try {
+    const repas = JSON.parse(inv.repas_json);
+    const chips = [];
+    if (repas.adulte1) chips.push(`<span class="repas-chip">${REPAS_LABELS[repas.adulte1] || repas.adulte1}</span>`);
+    if (repas.adulte2) chips.push(`<span class="repas-chip">${REPAS_LABELS[repas.adulte2] || repas.adulte2}</span>`);
+    for (const r of (repas.enfants || [])) {
+      if (r) chips.push(`<span class="repas-chip">${REPAS_LABELS[r] || r}</span>`);
+    }
+    return chips.length ? `<div class="repas-chips">${chips.join('')}</div>` : '<span style="color:#ccc">—</span>';
+  } catch {
+    return '';
+  }
+}
+
+function formatDate(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) +
+    ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  document.getElementById('loadingState').classList.add('hidden');
+
+  if (filtered.length === 0) {
+    document.getElementById('emptyState').classList.remove('hidden');
+    document.getElementById('invTable').classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('invTable').classList.remove('hidden');
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = filtered.map(inv => `
+    <tr>
+      <td style="white-space:nowrap;color:#999;font-size:0.8rem;">${formatDate(inv.submitted_at)}</td>
+      <td style="font-weight:700;color:#333;">${escHtml(inv.nom_prenom)}</td>
+      <td><span class="badge badge-${inv.type_invitation}">${inv.type_invitation}</span></td>
+      <td><span class="badge badge-${inv.present ? 'present' : 'absent'}">${inv.present ? 'Présent·e' : 'Absent·e'}</span></td>
+      <td style="text-align:center;">${inv.present ? (inv.nb_adultes || '—') : '—'}</td>
+      <td style="text-align:center;">${inv.present && inv.nb_enfants ? inv.nb_enfants : '—'}</td>
+      <td>${repasChips(inv)}</td>
+      <td><span class="message-text">${inv.message ? escHtml(inv.message) : ''}</span></td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function exportCSV() {
+  const headers = ['Date', 'Nom/Prénom', 'Type', 'Présent', 'Nb Adultes', 'Nb Enfants', 'Repas Adulte 1', 'Repas Adulte 2', 'Repas Enfants', 'Message'];
+  const rows = allInvitations.map(inv => {
+    let repas = {};
+    try { repas = JSON.parse(inv.repas_json || '{}'); } catch {}
+    return [
+      formatDate(inv.submitted_at),
+      inv.nom_prenom,
+      inv.type_invitation,
+      inv.present ? 'Oui' : 'Non',
+      inv.nb_adultes || '',
+      inv.nb_enfants || '',
+      REPAS_LABELS[repas.adulte1] || repas.adulte1 || '',
+      REPAS_LABELS[repas.adulte2] || repas.adulte2 || '',
+      (repas.enfants || []).map(r => REPAS_LABELS[r] || r).join(' / '),
+      inv.message || ''
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+  });
+
+  const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `reponses-inauguration-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// Auto-login si token en session
+if (token) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  loadData();
+}
+</script>
+
+</body>
+</html>
