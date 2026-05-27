@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traductions des panneaux — L'Attrape-Rêves</title>
+  <meta name="description" content="Traductions multilingues des panneaux du site L'Attrape-Rêves — English, Nederlands, Deutsch.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .panneaux-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .panneau-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 28px 24px 24px;
+      border: 1px solid #f0ece6;
+      position: relative;
+    }
+    .panneau-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: var(--color-coral, #e05a3a);
+      color: #fff;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+    .panneau-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-coral, #e05a3a);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .panneau-card h3 {
+      font-size: 1.15rem;
+      margin: 0 0 12px;
+      color: var(--color-dark, #1a1a2e);
+    }
+    .panneau-card p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: #444;
+      margin: 0;
+    }
+    .panneaux-intro {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .panneaux-intro p {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <div class="header-logo"><a href="index.html" aria-label="Accueil"><img src="assets/images/logo.png" alt="Logo L'Attrape-Rêves" width="48" height="48"><span class="header-logo-text">L'Attrape-Rêves</span></a></div>
+      <nav class="nav-links" aria-label="Navigation principale">
+        <a href="le-lieu.html" data-i18n="nav.le_lieu">Le lieu</a>
+        <a href="decouvrir.html" data-i18n="nav.decouvrir">Animaux et jeux</a>
+        <a href="manger-et-boire.html" data-i18n="nav.manger">Manger &amp; Boire</a>
+        <a href="agenda.html" data-i18n="nav.agenda">Agenda</a>
+        <a href="infos-pratiques.html" data-i18n="nav.infos">Infos pratiques</a>
+      </nav>
+      <div class="header-right">
+        <div class="lang-switcher"><button class="lang-btn active" data-lang="fr">FR</button><span>|</span><button class="lang-btn" data-lang="en">EN</button><span>|</span><button class="lang-btn" data-lang="nl">NL</button><span>|</span><button class="lang-btn" data-lang="de">DE</button></div>
+        <a href="billetterie.html" class="btn-billetterie" data-i18n="nav.billetterie">Billetterie</a>
+      </div>
+      <button class="hamburger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <div class="mobile-overlay" aria-hidden="true"></div>
+  <nav class="mobile-nav" aria-label="Navigation mobile">
+    <div class="mobile-lang-switcher"><button class="lang-btn active" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="nl">NL</button><button class="lang-btn" data-lang="de">DE</button></div>
+    <a href="le-lieu.html" data-page="le-lieu.html" data-i18n="nav.le_lieu">Le lieu</a>
+    <a href="decouvrir.html" data-page="decouvrir.html" data-i18n="nav.decouvrir">Animaux et jeux</a>
+    <a href="manger-et-boire.html" data-page="manger-et-boire.html" data-i18n="nav.manger">Manger &amp; Boire</a>
+    <a href="agenda.html" data-page="agenda.html" data-i18n="nav.agenda">Agenda</a>
+    <a href="infos-pratiques.html" data-page="infos-pratiques.html" data-i18n="nav.infos">Infos pratiques</a>
+    <a href="billetterie.html" data-page="billetterie.html" data-i18n="nav.billetterie">Billetterie</a>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero-small torn-edge-bottom torn-beige">
+      <div class="hero-content">
+        <h1 data-i18n="panneaux.page_title">TRADUCTIONS DES PANNEAUX</h1>
+      </div>
+    </section>
+
+    <!-- Panneaux -->
+    <section class="section section--beige" style="padding-top: 60px; padding-bottom: 80px;">
+      <div class="container">
+
+        <div class="panneaux-grid fade-in">
+
+          <!-- Panneau 1 -->
+          <div class="panneau-card">
+            <div class="panneau-number">1</div>
+            <span class="panneau-label" data-i18n="panneaux.panneau_label">Panneau</span>
+            <h3 data-i18n="panneaux.p1_title">Bienvenue</h3>
+            <p data-i18n="panneaux.p1_text">[Texte à compléter]</p>
+          </div>
+
+          <!-- Panneau 2 -->
+          <div class="panneau-card">
+            <div class="panneau-number">2</div>
+            <span class="panneau-label" data-i18n="panneaux.panneau_label">Panneau</span>
+            <h3 data-i18n="panneaux.p2_title">Nos animaux</h3>
+            <p data-i18n="panneaux.p2_text">[Texte à compléter]</p>
+          </div>
+
+          <!-- Panneau 3 -->
+          <div class="panneau-card">
+            <div class="panneau-number">3</div>
+            <span class="panneau-label" data-i18n="panneaux.panneau_label">Panneau</span>
+            <h3 data-i18n="panneaux.p3_title">Le parcours sensoriel</h3>
+            <p data-i18n="panneaux.p3_text">[Texte à compléter]</p>
+          </div>
+
+          <!-- Panneau 4 -->
+          <div class="panneau-card">
+            <div class="panneau-number">4</div>
+            <span class="panneau-label" data-i18n="panneaux.panneau_label">Panneau</span>
+            <h3 data-i18n="panneaux.p4_title">Les filets dans les arbres</h3>
+            <p data-i18n="panneaux.p4_text">[Texte à compléter]</p>
+          </div>
+
+          <!-- Panneau 5 -->
+          <div class="panneau-card">
+            <div class="panneau-number">5</div>
+            <span class="panneau-label" data-i18n="panneaux.panneau_label">Panneau</span>
+            <h3 data-i18n="panneaux.p5_title">Règles du site</h3>
+            <p data-i18n="panneaux.p5_text">[Texte à compléter]</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="assets/images/logo.png" alt="Logo" class="footer-logo" width="60" height="60">
+          <p class="footer-tagline" data-i18n="footer.tagline">Ferme de découverte et d'émerveillement</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/profile.php?id=61589690244420" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a href="https://www.instagram.com/lattrapereves.07" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4 data-i18n="footer.col_contact">Contact</h4><p data-i18n="footer.address">514 chemin de la Vernède<br>07140 Gravières</p><p><a href="tel:+33428400049" data-i18n="footer.phone">04 28 40 00 49</a></p><p><a href="mailto:contact@lattrapereves07.fr" data-i18n="footer.email">contact@lattrapereves07.fr</a></p></div>
+        <div class="footer-col"><h4 data-i18n="footer.col_links">Liens</h4><ul><li><a href="https://www.compagniedessonges.fr/" target="_blank" rel="noopener noreferrer" data-i18n="footer.link_compagnie">La Compagnie des Songes</a></li><li><a href="mentions-legales.html" data-i18n="footer.link_mentions">Mentions légales</a></li><li><a href="politique-de-confidentialite.html" data-i18n="footer.link_politique">Politique de confidentialité</a></li></ul></div>
+        <div class="footer-col"><h4 data-i18n="footer.col_support">Nous soutenir</h4><ul><li><a href="https://fr.tipeee.com/lattrapereves" target="_blank" rel="noopener noreferrer" data-i18n="footer.link_tipeee">Soutenir sur Tipeee</a></li><li><a href="https://compagniedessonges.assoconnect.com/collect/choice/386815-r-la-compagnie-des-songes-l-attrape-reves" target="_blank" rel="noopener noreferrer" data-i18n="footer.link_adhesion">Adhérer à l'association</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><div class="container"><p data-i18n="footer.bottom">&copy; 2026 L'Attrape-Rêves — La Fabrique aux Merveilles — Tous droits réservés</p></div></div>
+  </footer>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

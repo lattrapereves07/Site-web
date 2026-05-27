@@ -263,5 +263,20 @@
     "pigs_drinks": "Illustration de cochons prenant un verre",
     "guinguette": "Illustration du foodtruck guinguette",
     "deckchair": "Illustration d'un transat rayé"
+  },
+  "panneaux": {
+    "page_title": "TRADUCTIONS DES PANNEAUX",
+    "page_subtitle": "Sélectionnez votre langue — les textes de tous les panneaux s'affichent dans la langue choisie.",
+    "panneau_label": "Panneau",
+    "p1_title": "Les Bambous Mystérieux",
+    "p1_text": "Partout dans le monde, où qu'ils soient tous les bambous de la même espèce fleurissent en même temps, puis meurent.<br>Est-ce qu'ils communiquent entre eux ?<br>Sont-ils programmés depuis des siècles ?<br>Personne ne le sait vraiment...<br>Et cela reste un beau mystère de la vie.",
+    "p2_title": "Le Martin-Pêcheur : L'Oiseau Bleu des rêves",
+    "p2_text": "On le voit comme tel mais il n'est pas bleu. Ses plumes sont brunes. Comme son plumage, peu importe que nos rêves soient réels ou non, tant qu'ils sont beaux.",
+    "p3_title": "Le Serre de Barre",
+    "p3_text": "Il est ici depuis 300 millions d'années.<br>Et si tu t'arrêtais un instant pour le contempler ?<br>Pour lui nous ne sommes qu'un souffle,<br>Dans un instant nous serons partis...",
+    "p4_title": "Le Chêne",
+    "p4_text": "Lentement, il grimpe vers le soleil pour nourrir ses racines et nous offre son ombre. Un réseau de champignons se développe sous ses pieds pour communiquer avec les autres arbres, on l'appelle le Mycélium.",
+    "p5_title": "Règles du site",
+    "p5_text": "[Texte à compléter — remplacez cette ligne par le texte exact de votre panneau n°5]"
   }
 }

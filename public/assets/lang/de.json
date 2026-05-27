@@ -263,5 +263,20 @@
     "pigs_drinks": "Illustration von Schweinen beim Trinken",
     "guinguette": "Illustration des Guinguette-Foodtrucks",
     "deckchair": "Illustration eines gestreiften Liegestuhls"
+  },
+  "panneaux": {
+    "page_title": "ÜBERSETZUNGEN DER SCHILDER",
+    "page_subtitle": "Wählen Sie Ihre Sprache — die Texte aller Schilder werden in der gewählten Sprache angezeigt.",
+    "panneau_label": "Schild",
+    "p1_title": "Die mysteriösen Bambusse",
+    "p1_text": "Überall auf der Welt, wo auch immer sie sind, blühen alle Bambusse derselben Art gleichzeitig und sterben dann.<br>Kommunizieren sie miteinander?<br>Sind sie seit Jahrhunderten programmiert?<br>Niemand weiß es wirklich...<br>Und es bleibt ein schönes Geheimnis des Lebens.",
+    "p2_title": "Der Eisvogel: Der Blaue Vogel der Träume",
+    "p2_text": "Wir sehen ihn als solchen, aber er ist nicht blau. Seine Federn sind braun. Wie sein Gefieder, spielt es keine Rolle, ob unsere Träume real sind oder nicht, solange sie schön sind.",
+    "p3_title": "Der Serre de Barre",
+    "p3_text": "Er ist seit 300 Millionen Jahren hier.<br>Was wäre, wenn du einen Moment innehieltest, um ihn zu betrachten?<br>Für ihn sind wir nur ein Atemzug,<br>In einem Augenblick werden wir gegangen sein...",
+    "p4_title": "Die Eiche",
+    "p4_text": "Langsam klettert sie zur Sonne, um ihre Wurzeln zu nähren, und schenkt uns ihren Schatten. Ein Netz aus Pilzen wächst unter ihren Füßen, um mit anderen Bäumen zu kommunizieren — wir nennen es das Myzel.",
+    "p5_title": "Geländeregeln",
+    "p5_text": "[Text auszufüllen — ersetzen Sie diese Zeile durch den genauen Text von Schild Nr. 5]"
   }
 }
