@@ -176,4 +176,11 @@ app.get('/api/admin/invitations', requireAuth, async (c) => {
   return c.json(results)
 })
 
+// Delete an RSVP (admin)
+app.delete('/api/admin/invitations/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  await c.env.DB.prepare('DELETE FROM invitations WHERE id=?').bind(id).run()
+  return c.json({ success: true })
+})
+
 export default app

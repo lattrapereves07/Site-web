@@ -66,6 +66,8 @@
     .repas-chip { background: #f0f5ed; color: #2d4a1e; font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; }
     .message-text { font-style: italic; color: #888; font-size: 0.82rem; max-width: 200px; }
 
+    .btn-del { background: none; border: none; cursor: pointer; color: #ddd; font-size: 1rem; padding: 4px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; line-height: 1; }
+    .btn-del:hover { color: #c0392b; background: #fde8e8; }
     .empty-state { text-align: center; padding: 48px 20px; color: #bbb; font-size: 1rem; }
     .loading { text-align: center; padding: 48px 20px; color: #999; }
 
@@ -146,6 +148,7 @@
             <th>Enfants</th>
             <th>Repas</th>
             <th>Message</th>
+            <th></th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -318,8 +321,25 @@ function renderTable() {
       <td style="text-align:center;">${inv.present && inv.nb_enfants ? inv.nb_enfants : '—'}</td>
       <td>${repasChips(inv)}</td>
       <td><span class="message-text">${inv.message ? escHtml(inv.message) : ''}</span></td>
+      <td><button class="btn-del" onclick="deleteInvitation(${inv.id}, '${escHtml(inv.nom_prenom)}')" title="Supprimer">✕</button></td>
     </tr>
   `).join('');
+}
+
+async function deleteInvitation(id, nom) {
+  if (!confirm(`Supprimer la réponse de ${nom} ?`)) return;
+  try {
+    const res = await fetch(`/api/admin/invitations/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (!res.ok) throw new Error();
+    allInvitations = allInvitations.filter(i => i.id !== id);
+    computeStats();
+    renderTable();
+  } catch {
+    alert('Erreur lors de la suppression.');
+  }
 }
 
 function escHtml(str) {
