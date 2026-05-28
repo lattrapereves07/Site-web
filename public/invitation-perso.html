@@ -51,6 +51,7 @@
       display: block; font-weight: 700; color: #333; margin-bottom: 6px; font-size: 0.95rem;
     }
     .label-note { font-weight: 400; color: #999; font-size: 0.85rem; }
+    .field-hint { margin: 5px 0 0; font-size: 0.82rem; color: #e07a3a; font-style: italic; }
     .field-group input[type="text"],
     .field-group select,
     .field-group textarea {
@@ -152,6 +153,7 @@
       <div class="field-group">
         <label for="nom">Votre nom et prénom *</label>
         <input type="text" id="nom" name="nom" placeholder="Ex : Marie Dupont" autocomplete="name">
+        <p class="field-hint">Ton vrai prénom + nom stp, sinon on ne saura pas qui tu es 😅</p>
       </div>
 
       <!-- Absent -->
