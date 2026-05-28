@@ -143,7 +143,7 @@ app.delete('/api/admin/events/:id/image', requireAuth, async (c) => {
 // Meal counts only — no personal data (public, for kitchen display)
 app.get('/api/cuisine', async (c) => {
   const { results } = await c.env.DB.prepare(
-    `SELECT present, nb_enfants, repas_json FROM invitations`
+    `SELECT present, nb_adultes, nb_enfants, repas_json FROM invitations`
   ).all()
 
   const counts = { cochon: 0, hareng: 0, biquet: 0 }
