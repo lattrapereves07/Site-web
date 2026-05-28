@@ -23,6 +23,7 @@
 
     .big-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .big-card { background: #4E7438; border-radius: 16px; padding: 20px; text-align: center; }
+    .big-card.secondary { background: rgba(255,255,255,0.1); }
     .big-num { font-family: var(--font-title); font-size: 3.8rem; color: white; line-height: 1; }
     .big-label { font-size: 0.82rem; color: rgba(255,255,255,0.85); margin-top: 6px; }
 
@@ -50,15 +51,30 @@
   </div>
   <div class="last-update" id="lastUpdate"></div>
 
-  <!-- Convives -->
+  <!-- Total présents -->
   <div class="section">
-    <div class="section-title">Convives qui mangent</div>
+    <div class="section-title">Total présents (apéro + soirée)</div>
     <div class="big-stats">
       <div class="big-card">
-        <div class="big-num" id="statAdultes">—</div>
+        <div class="big-num" id="totalAdultes">—</div>
         <div class="big-label">Adultes</div>
       </div>
       <div class="big-card">
+        <div class="big-num" id="totalEnfants">—</div>
+        <div class="big-label">Enfants</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Convives qui mangent -->
+  <div class="section">
+    <div class="section-title">Dont mangent un burger</div>
+    <div class="big-stats">
+      <div class="big-card secondary">
+        <div class="big-num" id="statAdultes">—</div>
+        <div class="big-label">Adultes</div>
+      </div>
+      <div class="big-card secondary">
         <div class="big-num" id="statEnfants">—</div>
         <div class="big-label">Enfants</div>
       </div>
@@ -105,8 +121,10 @@ async function loadData() {
     const res = await fetch('/api/cuisine');
     const data = await res.json();
 
-    document.getElementById('statAdultes').textContent = data.adultes;
-    document.getElementById('statEnfants').textContent = data.enfants;
+    document.getElementById('totalAdultes').textContent = data.totalAdultes;
+    document.getElementById('totalEnfants').textContent = data.totalEnfants;
+    document.getElementById('statAdultes').textContent = data.adultesMangent;
+    document.getElementById('statEnfants').textContent = data.enfantsMangent;
     document.getElementById('countCochon').textContent = data.cochon;
     document.getElementById('countHareng').textContent = data.hareng;
     document.getElementById('countBiquet').textContent = data.biquet;

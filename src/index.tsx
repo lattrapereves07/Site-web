@@ -147,11 +147,16 @@ app.get('/api/cuisine', async (c) => {
   ).all()
 
   const counts = { cochon: 0, hareng: 0, biquet: 0 }
+  let totalAdultes = 0
+  let totalEnfants = 0
   let adultesMangent = 0
   let enfantsMangent = 0
 
   for (const inv of results as any[]) {
-    if (!inv.present || !inv.repas_json) continue
+    if (!inv.present) continue
+    totalAdultes += inv.nb_adultes || 0
+    totalEnfants += inv.nb_enfants || 0
+    if (!inv.repas_json) continue
     try {
       const repas = JSON.parse(inv.repas_json)
       if (repas.adulte1 && counts[repas.adulte1] !== undefined) { counts[repas.adulte1]++; adultesMangent++ }
@@ -163,8 +168,10 @@ app.get('/api/cuisine', async (c) => {
   }
 
   return c.json({
-    adultes: adultesMangent,
-    enfants: enfantsMangent,
+    totalAdultes,
+    totalEnfants,
+    adultesMangent,
+    enfantsMangent,
     cochon: counts.cochon,
     hareng: counts.hareng,
     biquet: counts.biquet,
