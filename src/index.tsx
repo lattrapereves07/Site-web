@@ -140,6 +140,38 @@ app.delete('/api/admin/events/:id/image', requireAuth, async (c) => {
 
 // ===== INVITATIONS API =====
 
+// Meal counts only — no personal data (public, for kitchen display)
+app.get('/api/cuisine', async (c) => {
+  const { results } = await c.env.DB.prepare(
+    `SELECT present, nb_enfants, repas_json FROM invitations`
+  ).all()
+
+  const counts = { cochon: 0, hareng: 0, biquet: 0 }
+  let adultesMangent = 0
+  let enfantsMangent = 0
+
+  for (const inv of results as any[]) {
+    if (!inv.present || !inv.repas_json) continue
+    try {
+      const repas = JSON.parse(inv.repas_json)
+      if (repas.adulte1 && counts[repas.adulte1] !== undefined) { counts[repas.adulte1]++; adultesMangent++ }
+      if (repas.adulte2 && counts[repas.adulte2] !== undefined) { counts[repas.adulte2]++; adultesMangent++ }
+      for (const r of (repas.enfants || [])) {
+        if (r && counts[r] !== undefined) { counts[r]++; enfantsMangent++ }
+      }
+    } catch {}
+  }
+
+  return c.json({
+    adultes: adultesMangent,
+    enfants: enfantsMangent,
+    cochon: counts.cochon,
+    hareng: counts.hareng,
+    biquet: counts.biquet,
+    total: counts.cochon + counts.hareng + counts.biquet
+  })
+})
+
 // Submit RSVP (public)
 app.post('/api/invitation', async (c) => {
   const body = await c.req.json()

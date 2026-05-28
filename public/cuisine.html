@@ -9,17 +9,6 @@
   <style>
     body { background: #1a2e13; margin: 0; font-family: var(--font-ui); min-height: 100vh; }
 
-    /* Login */
-    .login-box { max-width: 360px; margin: 100px auto; padding: 36px; background: white; border-radius: 20px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
-    .login-box img { margin-bottom: 10px; }
-    .login-box h1 { font-family: var(--font-title); color: #4E7438; margin-bottom: 18px; font-size: 1.6rem; }
-    .login-box input { width: 100%; padding: 12px 14px; border: 2px solid #e0d8cc; border-radius: 10px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; font-family: var(--font-ui); }
-    .login-box input:focus { outline: none; border-color: #4E7438; }
-    .login-error { color: #c0392b; font-size: 0.88rem; margin-bottom: 8px; }
-    .btn-green { background: #4E7438; color: white; border: none; padding: 13px 32px; border-radius: 30px; font-family: var(--font-ui); font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.2s; }
-    .btn-green:hover { background: #3d5c2c; }
-
-    /* Dashboard */
     .cuisine-wrap { max-width: 540px; margin: 0 auto; padding: 28px 16px 48px; }
 
     .cuisine-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
@@ -29,20 +18,14 @@
 
     .last-update { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 28px; text-align: right; }
 
-    /* Section */
     .section { margin-bottom: 20px; }
     .section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 10px; padding-left: 4px; }
 
-    /* Big stat row */
     .big-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-    .big-card { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; text-align: center; }
-    .big-card.highlight { background: #4E7438; }
+    .big-card { background: #4E7438; border-radius: 16px; padding: 20px; text-align: center; }
     .big-num { font-family: var(--font-title); font-size: 3.8rem; color: white; line-height: 1; }
-    .big-num.muted { color: rgba(255,255,255,0.5); }
-    .big-label { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 6px; }
-    .big-card.highlight .big-label { color: rgba(255,255,255,0.85); }
+    .big-label { font-size: 0.82rem; color: rgba(255,255,255,0.85); margin-top: 6px; }
 
-    /* Dish breakdown */
     .dish-card { background: rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
     .dish-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .dish-row:last-child { border-bottom: none; }
@@ -52,127 +35,87 @@
     .dish-count { font-family: var(--font-title); font-size: 2.8rem; color: #8bc87a; line-height: 1; }
     .dish-count.zero { color: rgba(255,255,255,0.2); }
 
-    /* Total bar */
     .total-bar { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
     .total-bar-label { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
     .total-bar-num { font-family: var(--font-title); font-size: 2rem; color: white; }
-
-    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<!-- Login -->
-<div id="loginScreen" class="login-box">
-  <img src="assets/images/logo.png" alt="Logo" width="50">
-  <h1>Cuisine 👨‍🍳</h1>
-  <div id="loginError" class="login-error hidden"></div>
-  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus
-    onkeydown="if(event.key==='Enter') doLogin()">
-  <button class="btn-green" onclick="doLogin()">Accéder</button>
-</div>
+<div class="cuisine-wrap">
 
-<!-- Dashboard -->
-<div id="dashboard" class="hidden">
-  <div class="cuisine-wrap">
-
-    <div class="cuisine-header">
-      <h1 class="cuisine-title">🍔 Cuisine</h1>
-      <button class="cuisine-refresh" onclick="loadData()">↻ Actualiser</button>
-    </div>
-    <div class="last-update" id="lastUpdate"></div>
-
-    <!-- Convives -->
-    <div class="section">
-      <div class="section-title">Convives qui mangent</div>
-      <div class="big-stats">
-        <div class="big-card highlight">
-          <div class="big-num" id="statAdultes">—</div>
-          <div class="big-label">Adultes</div>
-        </div>
-        <div class="big-card highlight">
-          <div class="big-num" id="statEnfants">—</div>
-          <div class="big-label">Enfants</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Détail plats -->
-    <div class="section">
-      <div class="section-title">Détail des burgers muffin</div>
-      <div class="dish-card">
-        <div class="dish-row">
-          <div class="dish-info">
-            <span class="dish-name">Le cochon</span>
-            <span class="dish-detail">Porc paprika fumé · 10€</span>
-          </div>
-          <span class="dish-count" id="countCochon">0</span>
-        </div>
-        <div class="dish-row">
-          <div class="dish-info">
-            <span class="dish-name">Le hareng</span>
-            <span class="dish-detail">Tartare hareng, granny smith · 10€</span>
-          </div>
-          <span class="dish-count" id="countHareng">0</span>
-        </div>
-        <div class="dish-row">
-          <div class="dish-info">
-            <span class="dish-name">Le pt'i biquet</span>
-            <span class="dish-detail">Chèvre, pesto, légumes confits · végé · 12€</span>
-          </div>
-          <span class="dish-count" id="countBiquet">0</span>
-        </div>
-      </div>
-      <div class="total-bar">
-        <span class="total-bar-label">Total burgers</span>
-        <span class="total-bar-num" id="totalBurgers">—</span>
-      </div>
-    </div>
-
+  <div class="cuisine-header">
+    <h1 class="cuisine-title">🍔 Cuisine</h1>
+    <button class="cuisine-refresh" onclick="loadData()">↻ Actualiser</button>
   </div>
+  <div class="last-update" id="lastUpdate"></div>
+
+  <!-- Convives -->
+  <div class="section">
+    <div class="section-title">Convives qui mangent</div>
+    <div class="big-stats">
+      <div class="big-card">
+        <div class="big-num" id="statAdultes">—</div>
+        <div class="big-label">Adultes</div>
+      </div>
+      <div class="big-card">
+        <div class="big-num" id="statEnfants">—</div>
+        <div class="big-label">Enfants</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Détail plats -->
+  <div class="section">
+    <div class="section-title">Détail des burgers muffin</div>
+    <div class="dish-card">
+      <div class="dish-row">
+        <div class="dish-info">
+          <span class="dish-name">Le cochon</span>
+          <span class="dish-detail">Porc paprika fumé · 10€</span>
+        </div>
+        <span class="dish-count" id="countCochon">—</span>
+      </div>
+      <div class="dish-row">
+        <div class="dish-info">
+          <span class="dish-name">Le hareng</span>
+          <span class="dish-detail">Tartare hareng, granny smith · 10€</span>
+        </div>
+        <span class="dish-count" id="countHareng">—</span>
+      </div>
+      <div class="dish-row">
+        <div class="dish-info">
+          <span class="dish-name">Le pt'i biquet</span>
+          <span class="dish-detail">Chèvre, pesto, légumes confits · végé · 12€</span>
+        </div>
+        <span class="dish-count" id="countBiquet">—</span>
+      </div>
+    </div>
+    <div class="total-bar">
+      <span class="total-bar-label">Total burgers</span>
+      <span class="total-bar-num" id="totalBurgers">—</span>
+    </div>
+  </div>
+
 </div>
 
 <script>
-let token = sessionStorage.getItem('cuisine_token') || '';
-
-async function doLogin() {
-  const pwd = document.getElementById('loginPwd').value;
-  if (!pwd) return;
-  try {
-    const res = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwd })
-    });
-    const data = await res.json();
-    if (data.success) {
-      token = data.token;
-      sessionStorage.setItem('cuisine_token', token);
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-      loadData();
-    } else {
-      document.getElementById('loginError').textContent = 'Mot de passe incorrect';
-      document.getElementById('loginError').classList.remove('hidden');
-    }
-  } catch {
-    document.getElementById('loginError').textContent = 'Erreur de connexion';
-    document.getElementById('loginError').classList.remove('hidden');
-  }
-}
-
 async function loadData() {
   try {
-    const res = await fetch('/api/admin/invitations', {
-      headers: { Authorization: 'Bearer ' + token }
+    const res = await fetch('/api/cuisine');
+    const data = await res.json();
+
+    document.getElementById('statAdultes').textContent = data.adultes;
+    document.getElementById('statEnfants').textContent = data.enfants;
+    document.getElementById('countCochon').textContent = data.cochon;
+    document.getElementById('countHareng').textContent = data.hareng;
+    document.getElementById('countBiquet').textContent = data.biquet;
+    document.getElementById('totalBurgers').textContent = data.total;
+
+    ['countCochon','countHareng','countBiquet'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'dish-count' + (parseInt(el.textContent) === 0 ? ' zero' : '');
     });
-    if (res.status === 401) {
-      sessionStorage.removeItem('cuisine_token');
-      location.reload();
-      return;
-    }
-    const invitations = await res.json();
-    computeStats(invitations);
 
     const now = new Date();
     document.getElementById('lastUpdate').textContent =
@@ -182,48 +125,7 @@ async function loadData() {
   }
 }
 
-function computeStats(invitations) {
-  const presents = invitations.filter(i => i.present);
-  const counts = { cochon: 0, hareng: 0, biquet: 0 };
-  let adultesMangent = 0;
-  let enfantsMangent = 0;
-
-  for (const inv of presents) {
-    if (!inv.repas_json) continue;
-    try {
-      const repas = JSON.parse(inv.repas_json);
-      if (repas.adulte1 && counts[repas.adulte1] !== undefined) { counts[repas.adulte1]++; adultesMangent++; }
-      if (repas.adulte2 && counts[repas.adulte2] !== undefined) { counts[repas.adulte2]++; adultesMangent++; }
-      for (const r of (repas.enfants || [])) {
-        if (r && counts[r] !== undefined) { counts[r]++; enfantsMangent++; }
-      }
-    } catch {}
-  }
-
-  const total = counts.cochon + counts.hareng + counts.biquet;
-
-  document.getElementById('statAdultes').textContent = adultesMangent;
-  document.getElementById('statEnfants').textContent = enfantsMangent;
-  document.getElementById('countCochon').textContent = counts.cochon;
-  document.getElementById('countHareng').textContent = counts.hareng;
-  document.getElementById('countBiquet').textContent = counts.biquet;
-  document.getElementById('totalBurgers').textContent = total;
-
-  // Grise les zéros
-  ['countCochon','countHareng','countBiquet'].forEach(id => {
-    const el = document.getElementById(id);
-    el.className = 'dish-count' + (parseInt(el.textContent) === 0 ? ' zero' : '');
-  });
-}
-
-// Auto-login si token en session
-if (token) {
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  loadData();
-}
-
-// Actualisation automatique toutes les 2 minutes
+loadData();
 setInterval(loadData, 120000);
 </script>
 
