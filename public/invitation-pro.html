@@ -174,13 +174,13 @@
 
         <!-- Repas adulte 1 -->
         <div class="field-group">
-          <div class="repas-section-title">🍔 Votre repas <span class="repas-section-note">(optionnel — réglé sur place le soir)</span></div>
+          <div class="repas-section-title">🍔 Votre burger muffin <span class="repas-section-note">(optionnel — réglé sur place le soir)</span></div>
           <div class="repas-options" id="repasAdulte1"></div>
         </div>
 
         <!-- Repas adulte 2 -->
         <div class="field-group hidden" id="sectionRepasAdulte2">
-          <div class="repas-section-title">🍔 Repas pour votre accompagnant·e</div>
+          <div class="repas-section-title">🍔 Burger muffin pour votre accompagnant·e</div>
           <div class="repas-options" id="repasAdulte2"></div>
         </div>
 
@@ -219,9 +219,9 @@
 <script>
 const REPAS_OPTIONS = [
   { value: '', label: 'Pas de repas', desc: null, price: null, vege: false },
-  { value: 'cochon', label: 'Le cochon', desc: 'Effiloché de porc au paprika fumé et au tandoori, sauce yaourt de brebis, carottes râpées, oignons rouges, salade verte', price: '10€', vege: false },
-  { value: 'hareng', label: 'Le hareng', desc: 'Tartare de hareng aux pommes granny smith, menthe, aneth, gingembre, sauce yaourt de brebis, carottes râpées, salade verte', price: '10€', vege: false },
-  { value: 'biquet', label: "Le pt'i biquet", desc: "Pesto maison, fromage de chèvre, légumes du soleil confits, oignons caramélisés, carottes râpées, noix concassées, salade verte", price: '12€', vege: true }
+  { value: 'cochon', label: 'Le cochon', desc: 'Pain muffin anglais bio · effiloché de porc au paprika fumé et au tandoori, sauce yaourt de brebis, carottes râpées, oignons rouges, salade verte', price: '10€', vege: false },
+  { value: 'hareng', label: 'Le hareng', desc: 'Pain muffin anglais bio · tartare de hareng aux pommes granny smith, menthe, aneth, gingembre, sauce yaourt de brebis, carottes râpées, salade verte', price: '10€', vege: false },
+  { value: 'biquet', label: "Le pt'i biquet", desc: "Pain muffin anglais bio · pesto maison, fromage de chèvre, légumes du soleil confits, oignons caramélisés, carottes râpées, noix concassées, salade verte", price: '12€', vege: true }
 ];
 
 function makeRepasOptions(name) {
