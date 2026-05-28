@@ -31,8 +31,8 @@
     /* Form card */
     .inv-card { background: white; border-radius: 20px; padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
     .inv-card h2 { font-family: var(--font-title); font-size: 1.6rem; color: var(--coral); margin: 0 0 6px; }
-    .inv-deadline { font-size: 0.9rem; color: #888; margin: 0 0 24px; padding: 8px 12px; background: #fff8f0; border-radius: 8px; border-left: 3px solid var(--coral); }
-    .inv-deadline strong { color: var(--coral); }
+    .inv-deadline { font-size: 1rem; font-weight: 700; color: #b85c2a; margin: 0 0 24px; padding: 12px 16px; background: #fff3eb; border-radius: 10px; border: 2px solid var(--coral); text-align: center; }
+    .inv-deadline strong { font-size: 1.1rem; }
 
     /* Fields */
     .field-group { margin-bottom: 20px; }
@@ -116,13 +116,13 @@
 
   <!-- Event info -->
   <div class="inv-event">
-    <div class="inv-date">Samedi 27 juin 2025</div>
+    <div class="inv-date">Samedi 27 juin</div>
     <div class="inv-lieu">514 chemin de la Vernède · Gravières (07140)</div>
     <div class="inv-programme">
-      <div class="inv-programme-line"><span class="inv-programme-heure">17h</span><span class="inv-programme-desc">Accueil</span></div>
-      <div class="inv-programme-line"><span class="inv-programme-heure">18h</span><span class="inv-programme-desc">Apéritif</span></div>
-      <div class="inv-programme-line"><span class="inv-programme-heure">19h</span><span class="inv-programme-desc">Discours & remise des pass et invitations</span></div>
-      <div class="inv-programme-line"><span class="inv-programme-heure">20h30</span><span class="inv-programme-desc">Concert + Foodtruck</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">17h</span><span class="inv-programme-desc">Accueil et visite en libre-accès</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">18h</span><span class="inv-programme-desc">Apéritif offert</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">19h</span><span class="inv-programme-desc">Discours & cadeaux</span></div>
+      <div class="inv-programme-line"><span class="inv-programme-heure">20h30</span><span class="inv-programme-desc">Concert et Fiesta !</span></div>
     </div>
   </div>
 
@@ -131,7 +131,7 @@
   <!-- Form card -->
   <div id="formContainer" class="inv-card">
     <h2>Votre réponse</h2>
-    <p class="inv-deadline">Merci de répondre avant le <strong>14 juin 2025</strong></p>
+    <p class="inv-deadline">⏰ Merci de répondre avant le <strong>14 juin</strong></p>
 
     <form id="invForm" onsubmit="submitForm(event)" novalidate>
 
@@ -353,7 +353,7 @@ async function submitForm(e) {
       document.getElementById('successText').textContent = `Merci ${nom}, votre présence est confirmée.`;
       const repas = JSON.parse(payload.repas_json || '{}');
       let lines = [
-        '📅 Samedi 27 juin · 17h',
+        '📅 Samedi 27 juin · à partir de 17h',
         '📍 514 ch. de la Vernède, Gravières',
         '',
         `🍔 Votre repas : ${repasLabel(repas.adulte1 || '')}`
