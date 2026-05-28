@@ -68,6 +68,13 @@
 
     .btn-del { background: none; border: none; cursor: pointer; color: #ddd; font-size: 1rem; padding: 4px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; line-height: 1; }
     .btn-del:hover { color: #c0392b; background: #fde8e8; }
+    .btn-edit { background: none; border: none; cursor: pointer; color: #ddd; font-size: 0.85rem; padding: 4px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; line-height: 1; margin-left: 4px; }
+    .btn-edit:hover { color: #4E7438; background: #f0f5ed; }
+    .name-edit-wrap { display: flex; align-items: center; gap: 4px; }
+    .name-input { padding: 4px 8px; border: 2px solid #4E7438; border-radius: 6px; font-family: var(--font-ui); font-size: 0.88rem; font-weight: 700; color: #333; width: 160px; }
+    .name-input:focus { outline: none; }
+    .btn-save { background: #4E7438; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: var(--font-ui); font-weight: 700; }
+    .btn-cancel-edit { background: #eee; color: #666; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
     .empty-state { text-align: center; padding: 48px 20px; color: #bbb; font-size: 1rem; }
     .loading { text-align: center; padding: 48px 20px; color: #999; }
 
@@ -314,7 +321,16 @@ function renderTable() {
   tbody.innerHTML = filtered.map(inv => `
     <tr>
       <td style="white-space:nowrap;color:#999;font-size:0.8rem;">${formatDate(inv.submitted_at)}</td>
-      <td style="font-weight:700;color:#333;">${escHtml(inv.nom_prenom)}</td>
+      <td>
+        <span class="name-display" id="name-${inv.id}" style="font-weight:700;color:#333;">${escHtml(inv.nom_prenom)}</span>
+        <button class="btn-edit" onclick="startEdit(${inv.id}, '${escHtml(inv.nom_prenom)}')" id="edit-btn-${inv.id}" title="Modifier le nom">✏️</button>
+        <div class="name-edit-wrap hidden" id="name-edit-${inv.id}">
+          <input class="name-input" id="name-input-${inv.id}" value="${escHtml(inv.nom_prenom)}"
+            onkeydown="if(event.key==='Enter') saveName(${inv.id}); if(event.key==='Escape') cancelEdit(${inv.id});">
+          <button class="btn-save" onclick="saveName(${inv.id})">✓</button>
+          <button class="btn-cancel-edit" onclick="cancelEdit(${inv.id})">✕</button>
+        </div>
+      </td>
       <td><span class="badge badge-${inv.type_invitation}">${inv.type_invitation}</span></td>
       <td><span class="badge badge-${inv.present ? 'present' : 'absent'}">${inv.present ? 'Présent·e' : 'Absent·e'}</span></td>
       <td style="text-align:center;">${inv.present ? (inv.nb_adultes || '—') : '—'}</td>
@@ -324,6 +340,43 @@ function renderTable() {
       <td><button class="btn-del" onclick="deleteInvitation(${inv.id}, '${escHtml(inv.nom_prenom)}')" title="Supprimer">✕</button></td>
     </tr>
   `).join('');
+}
+
+function startEdit(id, currentName) {
+  document.getElementById(`name-display-${id}`)?.classList.add('hidden');
+  document.getElementById(`name-${id}`).classList.add('hidden');
+  document.getElementById(`edit-btn-${id}`).classList.add('hidden');
+  document.getElementById(`name-edit-${id}`).classList.remove('hidden');
+  const input = document.getElementById(`name-input-${id}`);
+  input.focus();
+  input.select();
+}
+
+function cancelEdit(id) {
+  document.getElementById(`name-${id}`).classList.remove('hidden');
+  document.getElementById(`edit-btn-${id}`).classList.remove('hidden');
+  document.getElementById(`name-edit-${id}`).classList.add('hidden');
+}
+
+async function saveName(id) {
+  const input = document.getElementById(`name-input-${id}`);
+  const newName = input.value.trim();
+  if (!newName) return;
+  try {
+    const res = await fetch(`/api/admin/invitations/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ nom_prenom: newName })
+    });
+    if (!res.ok) throw new Error();
+    // Mettre à jour localement
+    const inv = allInvitations.find(i => i.id === id);
+    if (inv) inv.nom_prenom = newName;
+    document.getElementById(`name-${id}`).textContent = newName;
+    cancelEdit(id);
+  } catch {
+    alert('Erreur lors de la modification.');
+  }
 }
 
 async function deleteInvitation(id, nom) {

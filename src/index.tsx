@@ -215,6 +215,16 @@ app.get('/api/admin/invitations', requireAuth, async (c) => {
   return c.json(results)
 })
 
+// Update name of an RSVP (admin)
+app.patch('/api/admin/invitations/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  const { nom_prenom } = await c.req.json()
+  if (!nom_prenom?.trim()) return c.json({ error: 'Nom requis' }, 400)
+  await c.env.DB.prepare('UPDATE invitations SET nom_prenom=? WHERE id=?')
+    .bind(nom_prenom.trim(), id).run()
+  return c.json({ success: true })
+})
+
 // Delete an RSVP (admin)
 app.delete('/api/admin/invitations/:id', requireAuth, async (c) => {
   const id = c.req.param('id')
