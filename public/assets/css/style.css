@@ -1851,6 +1851,55 @@ main {
   margin: 0;
 }
 
+.menu-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.menu-item-head h4 {
+  margin-bottom: 0;
+}
+
+.menu-price {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--coral);
+  white-space: nowrap;
+}
+
+.menu-item-tag {
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--dark-grey);
+  opacity: 0.7;
+}
+
+.menu-item-sub {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--dark-grey);
+  opacity: 0.7;
+  margin: 6px 0 0;
+}
+
+.menu-note {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--dark-grey);
+  opacity: 0.8;
+  margin: 20px 0 0;
+}
+
+.menu-section-card h3:not(:first-child) {
+  margin-top: 32px;
+}
+
 @media (max-width: 600px) {
   .menu-images {
     grid-template-columns: 1fr;
