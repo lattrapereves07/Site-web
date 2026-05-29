@@ -189,7 +189,12 @@
     "foodtruck_carte_title": "Food Truck Menu",
     "foodtruck_carte_placeholder": "Menu coming soon — Opening summer 2026",
     "buvette_title": "The Refreshment Bar",
-    "buvette_subtitle": "Drinks, ice cream & sweets",
+    "buvette_subtitle": "The venue's own refreshment bar",
+    "buvette_soon": "Detailed menu coming soon",
+    "buvette_cat_jus": "Local juices &amp; drinks",
+    "buvette_cat_sirops": "Cordials",
+    "buvette_cat_cafe": "Coffee",
+    "buvette_cat_glaces": "Ice cream",
     "buvette_carte_title": "Refreshment Bar Menu",
     "buvette_carte_placeholder": "Menu coming soon — Opening summer 2026",
     "swim_note": "Swimming spots just a 5-minute walk away!"
