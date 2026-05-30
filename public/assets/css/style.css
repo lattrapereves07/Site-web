@@ -536,15 +536,18 @@ main {
 
 .hero-badge {
   display: inline-block;
-  font-family: var(--font-accent);
-  font-size: 1.05rem;
+  font-family: var(--font-hand);
+  font-size: clamp(1.85rem, 4.5vw, 3rem);
+  font-weight: 700;
   background: var(--coral);
   color: var(--white);
-  padding: 8px 24px;
-  border-radius: 30px;
+  padding: 16px 44px;
+  border-radius: 60px;
   transform: rotate(-2deg);
-  margin-bottom: 24px;
-  box-shadow: 2px 3px 0 var(--brown);
+  margin-bottom: 30px;
+  box-shadow: 5px 6px 0 var(--brown), 0 12px 40px rgba(0,0,0,0.22);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .hero-tagline {
