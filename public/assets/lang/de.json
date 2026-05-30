@@ -196,8 +196,7 @@
     "buvette_cat_cafe": "Kaffee",
     "buvette_cat_glaces": "Eis",
     "buvette_carte_title": "Die Kiosk-Karte",
-    "buvette_carte_placeholder": "Karte folgt — Eröffnung Sommer 2026",
-    "swim_note": "Badestellen in 5 Minuten zu Fuß!"
+    "buvette_carte_placeholder": "Karte folgt — Eröffnung Sommer 2026"
   },
   "infos": {
     "hero_title": "PRAKTISCHE INFOS",
@@ -253,7 +252,7 @@
     "faq14_a": "Ja! Es ist sehr gut möglich, an der Baumette, an der Vernède oder an anderen Stellen in unmittelbarer Nähe des Attrape-Rêves zu schwimmen.",
     "faq15_q": "Ist das Gelände beschattet?",
     "faq15_a": "Das Gelände ist praktisch vollständig beschattet, es ist sehr einfach, Schatten zu finden. Vergessen Sie jedoch nicht, Sonnenschutz mitzunehmen.",
-    "reglement_link": "Hausordnung (PDF)"
+    "swim_note": "Badestellen zu Fuß erreichbar"
   },
   "billetterie": {
     "hero_title": "TICKETS KAUFEN",

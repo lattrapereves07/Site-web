@@ -196,8 +196,7 @@
     "buvette_cat_cafe": "Coffee",
     "buvette_cat_glaces": "Ice cream",
     "buvette_carte_title": "Refreshment Bar Menu",
-    "buvette_carte_placeholder": "Menu coming soon — Opening summer 2026",
-    "swim_note": "Swimming spots just a 5-minute walk away!"
+    "buvette_carte_placeholder": "Menu coming soon — Opening summer 2026"
   },
   "infos": {
     "hero_title": "PRACTICAL INFO",
@@ -249,7 +248,7 @@
     "faq14_a": "Yes! You can swim at La Baumette, La Vernède, or other spots within immediate proximity of L'Attrape-Rêves.",
     "faq15_q": "Is the site shaded?",
     "faq15_a": "The site is almost entirely shaded, making it very easy to find shade. However, don't forget to bring sun protection.",
-    "reglement_link": "Internal regulations (PDF)"
+    "swim_note": "Swimming spots within walking distance"
   },
   "billetterie": {
     "hero_title": "BOOK MY TICKETS",

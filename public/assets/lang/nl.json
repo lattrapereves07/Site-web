@@ -196,8 +196,7 @@
     "buvette_cat_cafe": "Koffie",
     "buvette_cat_glaces": "IJs",
     "buvette_carte_title": "Drankbar Menu",
-    "buvette_carte_placeholder": "Menu volgt binnenkort — Opening zomer 2026",
-    "swim_note": "Zwemplekken op 5 minuten lopen!"
+    "buvette_carte_placeholder": "Menu volgt binnenkort — Opening zomer 2026"
   },
   "infos": {
     "hero_title": "PRAKTISCHE INFO",
@@ -249,7 +248,7 @@
     "faq14_a": "Ja! U kunt zwemmen bij La Baumette, La Vernède, of andere plekken in de directe omgeving van L'Attrape-Rêves.",
     "faq15_q": "Is het terrein beschaduwd?",
     "faq15_a": "Het terrein is vrijwel geheel beschaduwd, dus schaduw vinden is heel gemakkelijk. Vergeet echter niet om zonbescherming mee te nemen.",
-    "reglement_link": "Huisregels (PDF)"
+    "swim_note": "Zwemplekken op loopafstand"
   },
   "billetterie": {
     "hero_title": "MIJN TICKETS BOEKEN",

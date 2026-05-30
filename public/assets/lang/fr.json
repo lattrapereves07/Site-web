@@ -196,8 +196,7 @@
     "buvette_cat_cafe": "Café",
     "buvette_cat_glaces": "Glaces",
     "buvette_carte_title": "La Carte de la Buvette",
-    "buvette_carte_placeholder": "Carte à venir — Ouverture été 2026",
-    "swim_note": "Coins de baignade à 5 minutes à pied !"
+    "buvette_carte_placeholder": "Carte à venir — Ouverture été 2026"
   },
   "infos": {
     "hero_title": "INFOS PRATIQUES",
@@ -253,7 +252,7 @@
     "faq14_a": "Oui ! Il est tout à fait possible de se baigner à la Baumette, à la Vernède, ou sur d'autres espaces à proximité immédiate de l'Attrape-Rêves.",
     "faq15_q": "Le site est-il ombragé ?",
     "faq15_a": "Le site est pratiquement entièrement ombragé, il est très facile d'y trouver de l'ombre. N'oubliez pas cependant de prévoir de quoi vous protéger.",
-    "reglement_link": "Règlement intérieur (PDF)"
+    "swim_note": "Coins de baignade accessibles à pied"
   },
   "billetterie": {
     "hero_title": "RÉSERVER MES BILLETS",

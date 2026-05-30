@@ -1821,42 +1821,94 @@ main {
   display: block;
 }
 
-/* Menu items text — grille de petits encarts */
-.menu-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
-  gap: 12px;
-  margin-top: 14px;
+/* Menu « carte » — colonnes condensées */
+.menu-card {
+  background: var(--white);
+  border: 3px dashed var(--light-beige);
+  border-radius: var(--radius-card);
+  padding: 30px 36px;
+  max-width: 920px;
+  margin: 0 auto;
 }
 
-.menu-item {
-  padding: 11px 13px;
-  background: var(--beige);
-  border-radius: 12px;
-  border: 2px solid var(--light-beige);
-  border-left: 4px solid var(--coral);
+.menu-board {
+  column-count: 2;
+  column-gap: 44px;
 }
 
-/* Variante compacte (boissons) */
-.menu-items--compact {
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+.menu-cat {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 22px;
 }
 
-.menu-items--compact .menu-item {
-  padding: 9px 12px;
+.menu-cat:last-child {
+  margin-bottom: 0;
 }
 
-.menu-items--compact .menu-item h4 {
-  font-size: 1rem;
+.menu-cat h3 {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  color: var(--coral);
+  margin: 0 0 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px dashed var(--light-beige);
+  text-align: left;
 }
 
-.menu-items--compact .menu-item p {
+.dish {
+  margin-bottom: 9px;
+}
+
+.dish:last-child {
+  margin-bottom: 0;
+}
+
+.dish-head {
+  display: flex;
+  align-items: baseline;
+}
+
+.dish-name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--dark-grey);
+  line-height: 1.25;
+}
+
+.dish-lead {
+  flex: 1 1 auto;
+  min-width: 12px;
+  align-self: center;
+  margin: 0 7px;
+  border-bottom: 2px dotted rgba(58, 58, 58, 0.22);
+  transform: translateY(-3px);
+}
+
+.dish-price {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--coral);
+  white-space: nowrap;
+}
+
+.dish-desc {
   font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--dark-grey);
+  opacity: 0.82;
+  margin: 1px 0 0;
 }
 
-.menu-items--compact .menu-price {
-  font-size: 1.1rem;
+.dish-src {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--dark-grey);
+  opacity: 0.6;
+  margin: 2px 0 0;
 }
 
 /* Pré-annonce buvette du lieu */
@@ -1886,57 +1938,12 @@ main {
   margin: 0;
 }
 
-.menu-item h4 {
-  font-family: var(--font-ui);
-  font-size: 1.02rem;
-  color: var(--dark-grey);
-  margin-bottom: 3px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.menu-item p {
-  font-size: 0.86rem;
-  line-height: 1.5;
-  color: var(--dark-grey);
-  opacity: 0.85;
-  margin: 0;
-}
-
-.menu-item-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 4px;
-}
-
-.menu-item-head h4 {
-  margin-bottom: 0;
-}
-
-.menu-price {
-  font-family: var(--font-hand);
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--coral);
-  white-space: nowrap;
-}
-
 .menu-item-tag {
   font-family: var(--font-hand);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 400;
   color: var(--dark-grey);
   opacity: 0.7;
-}
-
-.menu-item-sub {
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--dark-grey);
-  opacity: 0.7;
-  margin: 6px 0 0;
 }
 
 .menu-note {
@@ -1952,6 +1959,12 @@ main {
   margin-top: 32px;
 }
 
+@media (max-width: 720px) {
+  .menu-board {
+    column-count: 1;
+  }
+}
+
 @media (max-width: 600px) {
   .menu-images {
     grid-template-columns: 1fr;
@@ -1960,15 +1973,8 @@ main {
   .menu-section-card {
     padding: 20px 16px;
   }
-  .menu-items {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-  }
-  .menu-items--compact {
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-  }
-  .menu-item {
-    padding: 10px 12px;
+  .menu-card {
+    padding: 24px 20px;
   }
 }
 
