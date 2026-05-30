@@ -1688,6 +1688,37 @@ main {
   transform: translateY(0);
 }
 
+/* --- MODULE STATUT SITE --- */
+.site-status-banner {
+  display: none;
+  width: 100%;
+  padding: 12px 24px;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-bottom: 2px solid transparent;
+}
+.site-status-banner:not([hidden]) {
+  display: block;
+}
+.site-status-banner.status-weather {
+  background: #fff3cd;
+  color: #7a4600;
+  border-color: #f5c842;
+}
+.site-status-banner.status-seasonal {
+  background: #fff8e6;
+  color: #6b4a00;
+  border-color: #f0c060;
+}
+.site-status-banner.status-special {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border-color: #66bb6a;
+}
+
 /* --- UTILITY --- */
 .mb-0 { margin-bottom: 0; }
 .mb-8 { margin-bottom: 8px; }
