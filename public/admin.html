@@ -58,6 +58,23 @@
     .tag-concert { background: #fff3e0; color: #e65100; }
     .tag-evenement { background: #f3e5f5; color: #7b1fa2; }
     
+    /* Status widget */
+    .status-widget { background: var(--beige); border-radius: 16px; padding: 24px; margin-bottom: 32px; }
+    .status-widget h2 { font-family: var(--font-title); color: var(--dark-grey); margin-bottom: 16px; font-size: 1.4rem; }
+    .status-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .status-btn {
+      padding: 14px 10px; border: 2px solid var(--light-beige); border-radius: 12px;
+      background: white; cursor: pointer; font-size: 0.95rem; font-weight: 600;
+      text-align: center; transition: all 0.15s; color: var(--dark-grey); line-height: 1.3;
+    }
+    .status-btn:hover { border-color: var(--coral); }
+    .status-btn.active { background: var(--coral); color: white; border-color: var(--coral); }
+    .status-extra { margin-bottom: 14px; }
+    .status-extra label { display: block; font-weight: 600; margin-bottom: 4px; color: var(--dark-grey); font-size: 0.9rem; }
+    .status-extra input { width: 100%; padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+    .status-save { width: 100%; padding: 14px; font-size: 1.05rem; font-weight: 700; cursor: pointer; border: none; border-radius: 10px; }
+    .status-feedback { display: none; text-align: center; color: #2e7d32; font-weight: 600; margin-top: 10px; font-size: 0.95rem; }
+
     @media (max-width: 600px) {
       .event-item { flex-direction: column; }
       .event-actions { flex-direction: row; }
@@ -82,6 +99,27 @@
     <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
   </div>
   <p style="margin-bottom:24px;color:#888;">Ajouter, modifier ou supprimer des événements et ateliers.</p>
+
+  <!-- Status widget -->
+  <div class="status-widget">
+    <h2>🌦 Statut du site</h2>
+    <div class="status-choices">
+      <button class="status-btn" data-statut="open"     onclick="setStatut('open')">🟢 Ouvert<br><small>normalement</small></button>
+      <button class="status-btn" data-statut="weather"  onclick="setStatut('weather')">⚠️ Fermeture météo</button>
+      <button class="status-btn" data-statut="seasonal" onclick="setStatut('seasonal')">🍂 Fermeture<br><small>période estivale</small></button>
+      <button class="status-btn" data-statut="special"  onclick="setStatut('special')">🎉 Ouverture<br><small>exceptionnelle</small></button>
+    </div>
+    <div id="statusExtraWeather" class="status-extra" style="display:none;">
+      <label>Date(s) de fermeture</label>
+      <input type="text" id="sDates" placeholder="Ex : 18/06, 19/06, du 20/06 au 22/06">
+    </div>
+    <div id="statusExtraSpecial" class="status-extra" style="display:none;">
+      <label>Date d'ouverture exceptionnelle</label>
+      <input type="text" id="sDateSpeciale" placeholder="Ex : 22/06/2026">
+    </div>
+    <button class="status-save btn btn-coral" onclick="saveStatus()">💾 Enregistrer le statut</button>
+    <div id="statusFeedback" class="status-feedback">✓ Statut mis à jour !</div>
+  </div>
 
   <!-- Add/Edit form -->
   <div class="event-form" id="eventForm">
@@ -198,6 +236,7 @@ async function doLogin() {
 function showAdmin() {
   document.getElementById('loginScreen').classList.add('hidden')
   document.getElementById('adminPanel').classList.remove('hidden')
+  loadStatus()
 }
 
 function logout() {
@@ -205,6 +244,61 @@ function logout() {
   localStorage.removeItem('atrv_token')
   location.reload()
 }
+
+// ===== STATUT DU SITE =====
+let currentStatut = 'open'
+
+async function loadStatus() {
+  try {
+    const r = await fetch('/api/site-status')
+    const data = await r.json()
+    currentStatut = data.statut || 'open'
+    document.getElementById('sDates').value = (data.dates_fermeture || []).join(', ')
+    document.getElementById('sDateSpeciale').value = data.date_ouverture_speciale || ''
+    updateStatutUI(currentStatut)
+  } catch(e) {}
+}
+
+function setStatut(s) {
+  currentStatut = s
+  updateStatutUI(s)
+}
+
+function updateStatutUI(s) {
+  document.querySelectorAll('.status-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.statut === s)
+  })
+  document.getElementById('statusExtraWeather').style.display = s === 'weather' ? '' : 'none'
+  document.getElementById('statusExtraSpecial').style.display = s === 'special' ? '' : 'none'
+  document.getElementById('statusFeedback').style.display = 'none'
+}
+
+async function saveStatus() {
+  const dates = document.getElementById('sDates').value
+    .split(',').map(s => s.trim()).filter(Boolean)
+  const body = {
+    statut: currentStatut,
+    dates_fermeture: dates,
+    date_ouverture_speciale: document.getElementById('sDateSpeciale').value.trim()
+  }
+  const r = await fetch('/api/admin/site-status', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  const fb = document.getElementById('statusFeedback')
+  if (r.ok) {
+    fb.textContent = '✓ Statut mis à jour !'
+    fb.style.color = '#2e7d32'
+  } else {
+    fb.textContent = '✗ Erreur lors de la sauvegarde'
+    fb.style.color = '#c0392b'
+  }
+  fb.style.display = 'block'
+  setTimeout(() => { fb.style.display = 'none' }, 3000)
+}
+
+// ===== ÉVÉNEMENTS =====
 
 async function loadEvents() {
   const r = await fetch('/api/admin/events', { headers: { 'Authorization': 'Bearer ' + token } })

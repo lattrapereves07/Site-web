@@ -27,6 +27,41 @@ const requireAuth = async (c: any, next: any) => {
 
 // ===== PUBLIC API =====
 
+// Initialise la table site_config si elle n'existe pas encore
+async function ensureSiteConfig(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS site_config (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      statut TEXT NOT NULL DEFAULT 'open',
+      dates_fermeture TEXT NOT NULL DEFAULT '[]',
+      date_ouverture_speciale TEXT NOT NULL DEFAULT '',
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+  await db.prepare(`
+    INSERT OR IGNORE INTO site_config (id, statut, dates_fermeture, date_ouverture_speciale)
+    VALUES (1, 'open', '[]', '')
+  `).run()
+}
+
+// Get site status (météo / fermetures)
+app.get('/api/site-status', async (c) => {
+  try {
+    await ensureSiteConfig(c.env.DB)
+    const row = await c.env.DB.prepare(
+      'SELECT statut, dates_fermeture, date_ouverture_speciale FROM site_config WHERE id=1'
+    ).first() as any
+    if (!row) return c.json({ statut: 'open', dates_fermeture: [], date_ouverture_speciale: '' })
+    return c.json({
+      statut: row.statut,
+      dates_fermeture: JSON.parse(row.dates_fermeture || '[]'),
+      date_ouverture_speciale: row.date_ouverture_speciale || ''
+    })
+  } catch {
+    return c.json({ statut: 'open', dates_fermeture: [], date_ouverture_speciale: '' })
+  }
+})
+
 // Get all published events
 app.get('/api/events', async (c) => {
   const { results } = await c.env.DB.prepare(`
@@ -51,6 +86,22 @@ app.post('/api/admin/login', async (c) => {
     return c.json({ success: true, token: password })
   }
   return c.json({ error: 'Mot de passe incorrect' }, 401)
+})
+
+// Update site status (météo / fermetures) - admin
+app.post('/api/admin/site-status', requireAuth, async (c) => {
+  const { statut, dates_fermeture, date_ouverture_speciale } = await c.req.json() as any
+  await ensureSiteConfig(c.env.DB)
+  await c.env.DB.prepare(`
+    UPDATE site_config
+    SET statut=?, dates_fermeture=?, date_ouverture_speciale=?, updated_at=datetime('now')
+    WHERE id=1
+  `).bind(
+    statut || 'open',
+    JSON.stringify(dates_fermeture || []),
+    date_ouverture_speciale || ''
+  ).run()
+  return c.json({ success: true })
 })
 
 // Get all events (including unpublished) - admin

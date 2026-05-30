@@ -1,57 +1,39 @@
 /**
- * ================================================================
- *  STATUT DU SITE — L'Attrape-Rêves
- *  Modifiez uniquement la section CONFIG ci-dessous,
- *  puis committez & poussez pour mettre à jour le site.
- * ================================================================
+ * Bandeau statut du site — L'Attrape-Rêves
+ * Le statut est géré depuis /admin (section "Statut du site").
+ * Ce fichier n'a plus besoin d'être édité manuellement.
  */
-
-// ==================== CONFIG ====================
-
-var STATUT = "open";
-// Valeurs possibles :
-//   "open"     → Ouvert normalement (aucun bandeau affiché)
-//   "weather"  → Fermeture exceptionnelle pour cause de météo
-//   "seasonal" → Fermeture pour période estivale
-//   "special"  → Ouverture exceptionnelle
-
-var DATES_FERMETURE = [];
-// Dates de fermeture à afficher dans le bandeau.
-// Exemples :
-//   ["18/06"]                          → une seule date
-//   ["18/06", "19/06", "20/06"]        → plusieurs dates
-//   ["du 18/06 au 22/06"]              → une plage
-
-var DATE_OUVERTURE_SPECIALE = "";
-// Uniquement pour STATUT = "special"
-// Exemple : "22/06/2026"
-
-// ==================== FIN CONFIG ====================
-
 (function () {
-  var banner = document.getElementById("site-status-banner");
-  if (!banner || STATUT === "open") return;
+  var banner = document.getElementById('site-status-banner');
+  if (!banner) return;
 
-  var msg = "";
-  var cls = "";
+  fetch('/api/site-status')
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || data.statut === 'open') return;
 
-  if (STATUT === "weather") {
-    cls = "status-weather";
-    var dates =
-      DATES_FERMETURE.length > 0 ? " — " + DATES_FERMETURE.join(", ") : "";
-    msg = "⚠️  Fermeture exceptionnelle pour cause de météo" + dates;
-  } else if (STATUT === "seasonal") {
-    cls = "status-seasonal";
-    msg = "🍂  Fermeture pour période estivale";
-  } else if (STATUT === "special") {
-    cls = "status-special";
-    msg =
-      "🎉  Ouverture exceptionnelle le " + DATE_OUVERTURE_SPECIALE;
-  }
+      var msg = '';
+      var cls = '';
 
-  if (msg) {
-    banner.textContent = msg;
-    banner.className = "site-status-banner " + cls;
-    banner.removeAttribute("hidden");
-  }
+      if (data.statut === 'weather') {
+        cls = 'status-weather';
+        var dates = (data.dates_fermeture || []).length > 0
+          ? ' — ' + data.dates_fermeture.join(', ')
+          : '';
+        msg = '⚠️  Fermeture exceptionnelle pour cause de météo' + dates;
+      } else if (data.statut === 'seasonal') {
+        cls = 'status-seasonal';
+        msg = '🍂  Fermeture pour période estivale';
+      } else if (data.statut === 'special') {
+        cls = 'status-special';
+        msg = '🎉  Ouverture exceptionnelle le ' + (data.date_ouverture_speciale || '');
+      }
+
+      if (msg) {
+        banner.textContent = msg;
+        banner.className = 'site-status-banner ' + cls;
+        banner.removeAttribute('hidden');
+      }
+    })
+    .catch(function () { /* silencieux — pas de bandeau en cas d'erreur */ });
 })();
