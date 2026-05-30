@@ -61,17 +61,24 @@
     /* Status widget */
     .status-widget { background: var(--beige); border-radius: 16px; padding: 24px; margin-bottom: 32px; }
     .status-widget h2 { font-family: var(--font-title); color: var(--dark-grey); margin-bottom: 16px; font-size: 1.4rem; }
-    .status-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .status-btn {
-      padding: 14px 10px; border: 2px solid var(--light-beige); border-radius: 12px;
-      background: white; cursor: pointer; font-size: 0.95rem; font-weight: 600;
-      text-align: center; transition: all 0.15s; color: var(--dark-grey); line-height: 1.3;
-    }
-    .status-btn:hover { border-color: var(--coral); }
-    .status-btn.active { background: var(--coral); color: white; border-color: var(--coral); }
-    .status-extra { margin-bottom: 14px; }
-    .status-extra label { display: block; font-weight: 600; margin-bottom: 4px; color: var(--dark-grey); font-size: 0.9rem; }
-    .status-extra input { width: 100%; padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+    .status-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .status-card { background: white; border-radius: 12px; padding: 14px 16px; border: 2px solid var(--light-beige); transition: border-color 0.15s; }
+    .status-card.active { border-color: var(--coral); }
+    .sw-row { display: flex; align-items: center; gap: 12px; }
+    .sw-label { flex: 1; font-weight: 700; font-size: 1rem; color: var(--dark-grey); }
+    .sw-toggle { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; }
+    .sw-toggle input { opacity: 0; width: 0; height: 0; }
+    .sw-slider { position: absolute; inset: 0; background: #ccc; border-radius: 26px; cursor: pointer; transition: 0.2s; }
+    .sw-slider:before { content: ''; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+    input:checked + .sw-slider { background: var(--coral); }
+    input:checked + .sw-slider:before { transform: translateX(22px); }
+    .sw-details { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .ftype-choices { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftype-btn { padding: 6px 12px; border: 2px solid var(--light-beige); border-radius: 8px; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--dark-grey); transition: all 0.15s; }
+    .ftype-btn.active { background: var(--coral); color: white; border-color: var(--coral); }
+    .sw-field { display: flex; flex-direction: column; gap: 3px; }
+    .sw-field label { font-size: 0.82rem; font-weight: 600; color: #888; }
+    .sw-field input { padding: 8px 10px; border: 1.5px solid var(--light-beige); border-radius: 7px; font-size: 0.92rem; box-sizing: border-box; width: 100%; }
     .status-save { width: 100%; padding: 14px; font-size: 1.05rem; font-weight: 700; cursor: pointer; border: none; border-radius: 10px; }
     .status-feedback { display: none; text-align: center; color: #2e7d32; font-weight: 600; margin-top: 10px; font-size: 0.95rem; }
 
@@ -103,21 +110,54 @@
   <!-- Status widget -->
   <div class="status-widget">
     <h2>🌦 Statut du site</h2>
-    <div class="status-choices">
-      <button class="status-btn" data-statut="open"     onclick="setStatut('open')">🟢 Ouvert<br><small>normalement</small></button>
-      <button class="status-btn" data-statut="weather"  onclick="setStatut('weather')">⚠️ Fermeture météo</button>
-      <button class="status-btn" data-statut="seasonal" onclick="setStatut('seasonal')">🍂 Fermeture<br><small>période estivale</small></button>
-      <button class="status-btn" data-statut="special"  onclick="setStatut('special')">🎉 Ouverture<br><small>exceptionnelle</small></button>
+    <div class="status-cards">
+      <!-- Card fermeture -->
+      <div class="status-card" id="feCard">
+        <div class="sw-row">
+          <span class="sw-label">⚠️ Fermeture</span>
+          <label class="sw-toggle">
+            <input type="checkbox" id="feActive" onchange="onFeActiveChange()">
+            <span class="sw-slider"></span>
+          </label>
+        </div>
+        <div class="sw-details" id="feDetails" style="display:none;">
+          <div class="ftype-choices">
+            <button class="ftype-btn active" data-type="weather" onclick="setFeType('weather')">🌧 Météo</button>
+            <button class="ftype-btn" data-type="winter" onclick="setFeType('winter')">❄️ Hiver</button>
+            <button class="ftype-btn" data-type="custom" onclick="setFeType('custom')">✏️ Autre motif</button>
+          </div>
+          <div class="sw-field" id="feDatesField">
+            <label>Date(s) de fermeture</label>
+            <input type="text" id="feDates" placeholder="Ex : 18/06, 19/06, du 20/06 au 22/06">
+          </div>
+          <div class="sw-field" id="feMotifField" style="display:none;">
+            <label>Motif</label>
+            <input type="text" id="feMotif" placeholder="Ex : travaux, événement privé…">
+          </div>
+        </div>
+      </div>
+      <!-- Card ouverture exceptionnelle -->
+      <div class="status-card" id="osCard">
+        <div class="sw-row">
+          <span class="sw-label">🎉 Ouverture exceptionnelle</span>
+          <label class="sw-toggle">
+            <input type="checkbox" id="osActive" onchange="onOsActiveChange()">
+            <span class="sw-slider"></span>
+          </label>
+        </div>
+        <div class="sw-details" id="osDetails" style="display:none;">
+          <div class="sw-field">
+            <label>Date</label>
+            <input type="text" id="osDate" placeholder="Ex : 22/06/2026">
+          </div>
+          <div class="sw-field">
+            <label>Motif (facultatif)</label>
+            <input type="text" id="osMotif" placeholder="Ex : anniversaire, portes ouvertes…">
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="statusExtraWeather" class="status-extra" style="display:none;">
-      <label>Date(s) de fermeture</label>
-      <input type="text" id="sDates" placeholder="Ex : 18/06, 19/06, du 20/06 au 22/06">
-    </div>
-    <div id="statusExtraSpecial" class="status-extra" style="display:none;">
-      <label>Date d'ouverture exceptionnelle</label>
-      <input type="text" id="sDateSpeciale" placeholder="Ex : 22/06/2026">
-    </div>
-    <button class="status-save btn btn-coral" onclick="saveStatus()">💾 Enregistrer le statut</button>
+    <button class="status-save btn btn-coral" onclick="saveStatus()">💾 Enregistrer</button>
     <div id="statusFeedback" class="status-feedback">✓ Statut mis à jour !</div>
   </div>
 
@@ -246,40 +286,65 @@ function logout() {
 }
 
 // ===== STATUT DU SITE =====
-let currentStatut = 'open'
+let currentFeType = 'weather'
 
 async function loadStatus() {
   try {
     const r = await fetch('/api/site-status')
     const data = await r.json()
-    currentStatut = data.statut || 'open'
-    document.getElementById('sDates').value = (data.dates_fermeture || []).join(', ')
-    document.getElementById('sDateSpeciale').value = data.date_ouverture_speciale || ''
-    updateStatutUI(currentStatut)
+    const fe = data.fermeture || {}
+    const os = data.ouverture_speciale || {}
+    document.getElementById('feActive').checked = !!fe.actif
+    currentFeType = fe.type || 'weather'
+    document.getElementById('feDates').value = (fe.dates || []).join(', ')
+    document.getElementById('feMotif').value = fe.motif || ''
+    document.getElementById('osActive').checked = !!os.actif
+    document.getElementById('osDate').value = os.date || ''
+    document.getElementById('osMotif').value = os.motif || ''
+    updateStatusUI()
   } catch(e) {}
 }
 
-function setStatut(s) {
-  currentStatut = s
-  updateStatutUI(s)
+function onFeActiveChange() { updateStatusUI() }
+function onOsActiveChange() { updateStatusUI() }
+
+function setFeType(t) {
+  currentFeType = t
+  updateStatusUI()
 }
 
-function updateStatutUI(s) {
-  document.querySelectorAll('.status-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.statut === s)
+function updateStatusUI() {
+  const feActive = document.getElementById('feActive').checked
+  const osActive = document.getElementById('osActive').checked
+  document.getElementById('feCard').classList.toggle('active', feActive)
+  document.getElementById('osCard').classList.toggle('active', osActive)
+  document.getElementById('feDetails').style.display = feActive ? '' : 'none'
+  document.getElementById('osDetails').style.display = osActive ? '' : 'none'
+  document.querySelectorAll('.ftype-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === currentFeType)
   })
-  document.getElementById('statusExtraWeather').style.display = s === 'weather' ? '' : 'none'
-  document.getElementById('statusExtraSpecial').style.display = s === 'special' ? '' : 'none'
+  const showDates = currentFeType !== 'winter'
+  const showMotif = currentFeType === 'custom'
+  document.getElementById('feDatesField').style.display = showDates ? '' : 'none'
+  document.getElementById('feMotifField').style.display = showMotif ? '' : 'none'
   document.getElementById('statusFeedback').style.display = 'none'
 }
 
 async function saveStatus() {
-  const dates = document.getElementById('sDates').value
+  const dates = document.getElementById('feDates').value
     .split(',').map(s => s.trim()).filter(Boolean)
   const body = {
-    statut: currentStatut,
-    dates_fermeture: dates,
-    date_ouverture_speciale: document.getElementById('sDateSpeciale').value.trim()
+    fermeture: {
+      actif: document.getElementById('feActive').checked,
+      type: currentFeType,
+      dates,
+      motif: document.getElementById('feMotif').value.trim()
+    },
+    ouverture_speciale: {
+      actif: document.getElementById('osActive').checked,
+      date: document.getElementById('osDate').value.trim(),
+      motif: document.getElementById('osMotif').value.trim()
+    }
   }
   const r = await fetch('/api/admin/site-status', {
     method: 'POST',

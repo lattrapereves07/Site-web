@@ -1691,8 +1691,13 @@ main {
 /* --- MODULE STATUT SITE --- */
 .site-status-banner {
   display: none;
-  width: 100%;
-  padding: 12px 24px;
+}
+.site-status-banner:not([hidden]) {
+  display: block;
+}
+/* Lignes individuelles (1 ou 2 peuvent coexister) */
+.status-line {
+  padding: 11px 24px;
   text-align: center;
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -1700,20 +1705,22 @@ main {
   letter-spacing: 0.02em;
   border-bottom: 2px solid transparent;
 }
-.site-status-banner:not([hidden]) {
-  display: block;
-}
-.site-status-banner.status-weather {
+.status-line--weather {
   background: #fff3cd;
   color: #7a4600;
   border-color: #f5c842;
 }
-.site-status-banner.status-seasonal {
-  background: #fff8e6;
-  color: #6b4a00;
-  border-color: #f0c060;
+.status-line--winter {
+  background: #e8f0fe;
+  color: #1a3a6b;
+  border-color: #90a8e8;
 }
-.site-status-banner.status-special {
+.status-line--custom {
+  background: #fde8e8;
+  color: #7a0000;
+  border-color: #f87171;
+}
+.status-line--special {
   background: #e8f5e9;
   color: #1b5e20;
   border-color: #66bb6a;

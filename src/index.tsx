@@ -44,21 +44,28 @@ async function ensureSiteConfig(db: D1Database) {
   `).run()
 }
 
+const defaultSiteConfig = () => ({
+  fermeture: { actif: false, type: 'weather', dates: [] as string[], motif: '' },
+  ouverture_speciale: { actif: false, date: '', motif: '' }
+})
+
 // Get site status (météo / fermetures)
 app.get('/api/site-status', async (c) => {
   try {
     await ensureSiteConfig(c.env.DB)
     const row = await c.env.DB.prepare(
-      'SELECT statut, dates_fermeture, date_ouverture_speciale FROM site_config WHERE id=1'
+      'SELECT statut FROM site_config WHERE id=1'
     ).first() as any
-    if (!row) return c.json({ statut: 'open', dates_fermeture: [], date_ouverture_speciale: '' })
-    return c.json({
-      statut: row.statut,
-      dates_fermeture: JSON.parse(row.dates_fermeture || '[]'),
-      date_ouverture_speciale: row.date_ouverture_speciale || ''
-    })
+    if (!row) return c.json(defaultSiteConfig())
+    try {
+      const cfg = JSON.parse(row.statut)
+      if (cfg && typeof cfg === 'object' && 'fermeture' in cfg) {
+        return c.json(cfg)
+      }
+    } catch {}
+    return c.json(defaultSiteConfig())
   } catch {
-    return c.json({ statut: 'open', dates_fermeture: [], date_ouverture_speciale: '' })
+    return c.json(defaultSiteConfig())
   }
 })
 
@@ -90,17 +97,24 @@ app.post('/api/admin/login', async (c) => {
 
 // Update site status (météo / fermetures) - admin
 app.post('/api/admin/site-status', requireAuth, async (c) => {
-  const { statut, dates_fermeture, date_ouverture_speciale } = await c.req.json() as any
+  const body = await c.req.json() as any
+  const cfg = {
+    fermeture: {
+      actif: !!body.fermeture?.actif,
+      type: body.fermeture?.type || 'weather',
+      dates: Array.isArray(body.fermeture?.dates) ? body.fermeture.dates : [],
+      motif: body.fermeture?.motif || ''
+    },
+    ouverture_speciale: {
+      actif: !!body.ouverture_speciale?.actif,
+      date: body.ouverture_speciale?.date || '',
+      motif: body.ouverture_speciale?.motif || ''
+    }
+  }
   await ensureSiteConfig(c.env.DB)
   await c.env.DB.prepare(`
-    UPDATE site_config
-    SET statut=?, dates_fermeture=?, date_ouverture_speciale=?, updated_at=datetime('now')
-    WHERE id=1
-  `).bind(
-    statut || 'open',
-    JSON.stringify(dates_fermeture || []),
-    date_ouverture_speciale || ''
-  ).run()
+    UPDATE site_config SET statut=?, updated_at=datetime('now') WHERE id=1
+  `).bind(JSON.stringify(cfg)).run()
   return c.json({ success: true })
 })
 
