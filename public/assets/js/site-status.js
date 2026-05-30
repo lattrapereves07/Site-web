@@ -48,5 +48,5 @@
         banner.removeAttribute('hidden');
       }
     })
-    .catch(function () { /* silencieux — pas de bandeau en cas d'erreur */ });
+    .catch(function () { /* silencieux en cas d'erreur */ });
 })();

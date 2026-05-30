@@ -54,16 +54,32 @@ app.get('/api/site-status', async (c) => {
   try {
     await ensureSiteConfig(c.env.DB)
     const row = await c.env.DB.prepare(
-      'SELECT statut FROM site_config WHERE id=1'
+      'SELECT statut, dates_fermeture, date_ouverture_speciale FROM site_config WHERE id=1'
     ).first() as any
     if (!row) return c.json(defaultSiteConfig())
+
+    // Nouveau format : JSON objet stocké dans statut
     try {
       const cfg = JSON.parse(row.statut)
       if (cfg && typeof cfg === 'object' && 'fermeture' in cfg) {
         return c.json(cfg)
       }
     } catch {}
-    return c.json(defaultSiteConfig())
+
+    // Rétrocompatibilité : ancien format (string)
+    const cfg = defaultSiteConfig()
+    if (row.statut === 'seasonal') {
+      cfg.fermeture.actif = true
+      cfg.fermeture.type = 'winter'
+    } else if (row.statut === 'weather') {
+      cfg.fermeture.actif = true
+      cfg.fermeture.type = 'weather'
+      try { cfg.fermeture.dates = JSON.parse(row.dates_fermeture || '[]') } catch {}
+    } else if (row.statut === 'special') {
+      cfg.ouverture_speciale.actif = true
+      cfg.ouverture_speciale.date = row.date_ouverture_speciale || ''
+    }
+    return c.json(cfg)
   } catch {
     return c.json(defaultSiteConfig())
   }
