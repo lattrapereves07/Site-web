@@ -313,4 +313,45 @@ app.delete('/api/admin/invitations/:id', requireAuth, async (c) => {
   return c.json({ success: true })
 })
 
+// ===== GUESTS API =====
+
+app.get('/api/admin/guests', requireAuth, async (c) => {
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM guests ORDER BY categorie, nom`
+  ).all()
+  return c.json(results)
+})
+
+app.post('/api/admin/guests', requireAuth, async (c) => {
+  const { nom, categorie, save_the_date, invitation, a_repondu, notes } = await c.req.json()
+  if (!nom?.trim()) return c.json({ error: 'Nom requis' }, 400)
+  const result = await c.env.DB.prepare(
+    `INSERT INTO guests (nom, categorie, save_the_date, invitation, a_repondu, notes) VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(nom.trim(), categorie || 'perso', save_the_date ? 1 : 0, invitation ? 1 : 0, a_repondu ? 1 : 0, notes?.trim() || null).run()
+  return c.json({ success: true, id: result.meta.last_row_id }, 201)
+})
+
+app.patch('/api/admin/guests/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  const body = await c.req.json()
+  const fields: string[] = []
+  const values: any[] = []
+  if (body.nom !== undefined)           { fields.push('nom=?');           values.push(body.nom.trim()) }
+  if (body.categorie !== undefined)     { fields.push('categorie=?');     values.push(body.categorie) }
+  if (body.save_the_date !== undefined) { fields.push('save_the_date=?'); values.push(body.save_the_date ? 1 : 0) }
+  if (body.invitation !== undefined)    { fields.push('invitation=?');    values.push(body.invitation ? 1 : 0) }
+  if (body.a_repondu !== undefined)     { fields.push('a_repondu=?');     values.push(body.a_repondu ? 1 : 0) }
+  if (body.notes !== undefined)         { fields.push('notes=?');         values.push(body.notes?.trim() || null) }
+  if (fields.length === 0) return c.json({ error: 'Rien à mettre à jour' }, 400)
+  values.push(id)
+  await c.env.DB.prepare(`UPDATE guests SET ${fields.join(', ')} WHERE id=?`).bind(...values).run()
+  return c.json({ success: true })
+})
+
+app.delete('/api/admin/guests/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  await c.env.DB.prepare('DELETE FROM guests WHERE id=?').bind(id).run()
+  return c.json({ success: true })
+})
+
 export default app

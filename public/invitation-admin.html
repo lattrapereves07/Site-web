@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Invitations — L'Attrape-Rêves</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260532">
+  <link rel="stylesheet" href="assets/css/style.css">
   <style>
     body { background: #FCF5E9; margin: 0; font-family: var(--font-ui); }
 
@@ -16,169 +16,283 @@
     .login-box input { width: 100%; padding: 12px 16px; border: 2px solid #e8dece; border-radius: 10px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; font-family: var(--font-ui); }
     .login-box input:focus { outline: none; border-color: #4E7438; }
     .login-error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+
+    /* Buttons */
     .btn-green { background: #4E7438; color: white; border: none; padding: 13px 32px; border-radius: 30px; font-family: var(--font-ui); font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .btn-green:hover { background: #3d5c2c; }
-    .btn-green:disabled { background: #9ab88c; cursor: not-allowed; }
     .btn-outline { background: white; color: #4E7438; border: 2px solid #4E7438; padding: 8px 20px; border-radius: 20px; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .btn-outline:hover { background: #4E7438; color: white; }
 
     /* Admin wrap */
-    .admin-wrap { max-width: 960px; margin: 0 auto; padding: 80px 20px 60px; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .admin-wrap { max-width: 980px; margin: 0 auto; padding: 70px 20px 60px; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
     .admin-header h1 { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin: 0; }
-    .admin-actions { display: flex; gap: 10px; align-items: center; }
+    .admin-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    /* Tabs */
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 24px; background: white; padding: 5px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); width: fit-content; }
+    .tab-btn { padding: 9px 22px; border: none; border-radius: 10px; font-family: var(--font-ui); font-size: 0.95rem; font-weight: 700; cursor: pointer; background: transparent; color: #999; transition: all 0.15s; }
+    .tab-btn.active { background: #4E7438; color: white; }
 
     /* Stats grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
-    .stat-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-    .stat-label { font-size: 0.8rem; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .stat-value { font-family: var(--font-title); font-size: 2.2rem; color: #4E7438; line-height: 1; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .stat-card { background: white; border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .stat-label { font-size: 0.78rem; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .stat-value { font-family: var(--font-title); font-size: 2.1rem; color: #4E7438; line-height: 1; }
     .stat-value.coral { color: var(--coral); }
-    .stat-value.grey { color: #aaa; }
+    .stat-value.orange { color: #e07a3a; }
 
-    /* Sandwichs detail */
-    .sandwichs-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 32px; }
-    .sandwichs-card h3 { font-family: var(--font-title); font-size: 1.2rem; color: #333; margin: 0 0 14px; }
-    .sandwich-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f0e8; font-size: 0.95rem; }
+    /* Sandwichs */
+    .sandwichs-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 28px; }
+    .sandwichs-card h3 { font-family: var(--font-title); font-size: 1.1rem; color: #333; margin: 0 0 12px; }
+    .sandwich-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f0e8; font-size: 0.92rem; }
     .sandwich-row:last-child { border-bottom: none; }
-    .sandwich-name { color: #444; }
-    .sandwich-count { font-weight: 700; color: #4E7438; font-size: 1.1rem; }
+    .sandwich-count { font-weight: 700; color: #4E7438; font-size: 1.05rem; }
 
     /* Filters */
-    .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-    .filter-btn { padding: 6px 16px; border-radius: 20px; border: 2px solid #e8dece; background: white; font-family: var(--font-ui); font-size: 0.85rem; cursor: pointer; color: #666; transition: all 0.15s; }
+    .filters { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .filter-btn { padding: 6px 14px; border-radius: 20px; border: 2px solid #e8dece; background: white; font-family: var(--font-ui); font-size: 0.82rem; cursor: pointer; color: #666; transition: all 0.15s; }
     .filter-btn.active { border-color: #4E7438; background: #f0f5ed; color: #2d4a1e; font-weight: 700; }
-    .filter-count { font-size: 0.8rem; color: #999; margin-left: 4px; }
+    .filter-count { font-size: 0.78rem; color: #999; }
 
     /* Table */
     .table-wrap { background: white; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; }
-    .table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    .table-wrap th { background: #f7f3ec; color: #666; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0e8d8; }
-    .table-wrap td { padding: 12px 14px; border-bottom: 1px solid #f9f4ee; color: #444; vertical-align: top; }
+    .table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+    .table-wrap th { background: #f7f3ec; color: #666; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.4px; padding: 11px 13px; text-align: left; border-bottom: 1px solid #f0e8d8; }
+    .table-wrap td { padding: 11px 13px; border-bottom: 1px solid #f9f4ee; color: #444; vertical-align: middle; }
     .table-wrap tr:last-child td { border-bottom: none; }
     .table-wrap tr:hover td { background: #fdfaf5; }
-    .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.73rem; font-weight: 700; white-space: nowrap; }
     .badge-pro { background: #e3f2fd; color: #1565c0; }
     .badge-perso { background: #f3e5f5; color: #7b1fa2; }
     .badge-present { background: #e8f5e0; color: #3a6b20; }
     .badge-absent { background: #fde8e8; color: #c0392b; }
-    .repas-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-    .repas-chip { background: #f0f5ed; color: #2d4a1e; font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; }
-    .message-text { font-style: italic; color: #888; font-size: 0.82rem; max-width: 200px; }
+    .badge-famille { background: #fce4ec; color: #880e4f; }
+    .badge-voisins { background: #e0f7fa; color: #006064; }
+    .badge-elus { background: #fff8e1; color: #e65100; }
+    .badge-presse { background: #f5f5f5; color: #424242; }
+    .badge-partenaires { background: #e8f5e9; color: #1b5e20; }
+    .badge-autre { background: #fafafa; color: #9e9e9e; }
+    .repas-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+    .repas-chip { background: #f0f5ed; color: #2d4a1e; font-size: 0.72rem; padding: 1px 7px; border-radius: 7px; }
+    .message-text { font-style: italic; color: #888; font-size: 0.8rem; max-width: 180px; }
+    .notes-text { font-size: 0.78rem; color: #aaa; max-width: 160px; }
 
-    .btn-del { background: none; border: none; cursor: pointer; color: #ddd; font-size: 1rem; padding: 4px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; line-height: 1; }
+    /* Row actions */
+    .btn-del { background: none; border: none; cursor: pointer; color: #ddd; font-size: 1rem; padding: 3px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .btn-del:hover { color: #c0392b; background: #fde8e8; }
-    .btn-edit { background: none; border: none; cursor: pointer; color: #ddd; font-size: 0.85rem; padding: 4px 6px; border-radius: 6px; transition: color 0.15s, background 0.15s; line-height: 1; margin-left: 4px; }
+    .btn-edit { background: none; border: none; cursor: pointer; color: #ddd; font-size: 0.82rem; padding: 3px 5px; border-radius: 6px; transition: color 0.15s, background 0.15s; margin-left: 3px; }
     .btn-edit:hover { color: #4E7438; background: #f0f5ed; }
-    .name-edit-wrap { display: flex; align-items: center; gap: 4px; }
-    .name-input { padding: 4px 8px; border: 2px solid #4E7438; border-radius: 6px; font-family: var(--font-ui); font-size: 0.88rem; font-weight: 700; color: #333; width: 160px; }
+    .name-edit-wrap { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+    .name-input { padding: 4px 8px; border: 2px solid #4E7438; border-radius: 6px; font-family: var(--font-ui); font-size: 0.86rem; font-weight: 700; color: #333; width: 150px; }
     .name-input:focus { outline: none; }
-    .btn-save { background: #4E7438; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: var(--font-ui); font-weight: 700; }
-    .btn-cancel-edit { background: #eee; color: #666; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
-    .empty-state { text-align: center; padding: 48px 20px; color: #bbb; font-size: 1rem; }
-    .loading { text-align: center; padding: 48px 20px; color: #999; }
+    .btn-save { background: #4E7438; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; font-family: var(--font-ui); font-weight: 700; }
+    .btn-cancel-edit { background: #eee; color: #666; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; }
 
+    /* Status toggles (X/Y/Z) */
+    .toggle-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid; cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: all 0.15s; background: none; }
+    .toggle-btn.on  { background: #4E7438; border-color: #4E7438; color: white; }
+    .toggle-btn.off { background: white; border-color: #ddd; color: #ccc; }
+    .toggle-btn:hover { transform: scale(1.1); }
+    .toggles-cell { display: flex; gap: 6px; align-items: center; }
+
+    /* Guest add form */
+    .add-guest-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .add-guest-form { background: white; border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .add-guest-form .fg { display: flex; flex-direction: column; gap: 4px; }
+    .add-guest-form label { font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; }
+    .add-guest-form input, .add-guest-form select { padding: 8px 10px; border: 2px solid #e8dece; border-radius: 8px; font-family: var(--font-ui); font-size: 0.9rem; }
+    .add-guest-form input:focus, .add-guest-form select:focus { outline: none; border-color: #4E7438; }
+
+    /* Guest status filter bar */
+    .status-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: #bbb; }
+    .loading { text-align: center; padding: 48px 20px; color: #999; }
     .hidden { display: none !important; }
 
     @media (max-width: 700px) {
       .table-wrap { overflow-x: auto; }
-      .table-wrap table { min-width: 600px; }
-      .admin-header { flex-direction: column; align-items: flex-start; }
+      .table-wrap table { min-width: 560px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Login screen -->
+<!-- Login -->
 <div id="loginScreen" class="login-box">
   <img src="assets/images/logo.png" alt="Logo" width="56">
   <h1>Admin Invitations</h1>
   <div id="loginError" class="login-error hidden"></div>
   <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus
     onkeydown="if(event.key==='Enter') doLogin()">
-  <br>
   <button class="btn-green" onclick="doLogin()" style="width:100%;margin-top:4px;">Connexion</button>
 </div>
 
 <!-- Dashboard -->
 <div id="dashboard" class="hidden">
-  <div class="admin-wrap">
+<div class="admin-wrap">
 
-    <div class="admin-header">
-      <h1>Inaugurations — Réponses</h1>
-      <div class="admin-actions">
-        <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
-        <button class="btn-outline" onclick="loadData()">↻ Actualiser</button>
-        <button class="btn-outline" style="color:#c0392b;border-color:#c0392b;" onclick="logout()">Déconnexion</button>
-      </div>
+  <div class="admin-header">
+    <h1>Inaugurations</h1>
+    <div class="admin-actions">
+      <button class="btn-outline" style="color:#c0392b;border-color:#c0392b;" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-btn-responses" onclick="showTab('responses',this)">📋 Réponses formulaire</button>
+    <button class="tab-btn" id="tab-btn-guests" onclick="showTab('guests',this)">👥 Liste invités</button>
+  </div>
+
+  <!-- ========== TAB RÉPONSES ========== -->
+  <div id="tab-responses">
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn-outline" onclick="loadData()">↻ Actualiser</button>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card"><div class="stat-label">Total réponses</div><div class="stat-value" id="statTotal">—</div></div>
       <div class="stat-card"><div class="stat-label">Présents</div><div class="stat-value" id="statPresents">—</div></div>
       <div class="stat-card"><div class="stat-label">Absents</div><div class="stat-value coral" id="statAbsents">—</div></div>
-      <div class="stat-card"><div class="stat-label">Adultes attendus</div><div class="stat-value" id="statAdultes">—</div></div>
-      <div class="stat-card"><div class="stat-label">Enfants attendus</div><div class="stat-value" id="statEnfants">—</div></div>
-      <div class="stat-card"><div class="stat-label">Sandwichs total</div><div class="stat-value" id="statSandwichs">—</div></div>
+      <div class="stat-card"><div class="stat-label">Adultes</div><div class="stat-value" id="statAdultes">—</div></div>
+      <div class="stat-card"><div class="stat-label">Enfants</div><div class="stat-value" id="statEnfants">—</div></div>
+      <div class="stat-card"><div class="stat-label">Sandwichs</div><div class="stat-value" id="statSandwichs">—</div></div>
     </div>
 
-    <!-- Sandwichs detail -->
     <div class="sandwichs-card">
-      <h3>🍔 Détail sandwichs commandés</h3>
-      <div class="sandwich-row"><span class="sandwich-name">Le cochon (10€)</span><span class="sandwich-count" id="countCochon">0</span></div>
-      <div class="sandwich-row"><span class="sandwich-name">Le hareng (10€)</span><span class="sandwich-count" id="countHareng">0</span></div>
-      <div class="sandwich-row"><span class="sandwich-name">Le pt'i biquet végé (12€)</span><span class="sandwich-count" id="countBiquet">0</span></div>
+      <h3>🍔 Détail burgers muffin commandés</h3>
+      <div class="sandwich-row"><span>Le cochon (10€)</span><span class="sandwich-count" id="countCochon">0</span></div>
+      <div class="sandwich-row"><span>Le hareng (10€)</span><span class="sandwich-count" id="countHareng">0</span></div>
+      <div class="sandwich-row"><span>Le pt'i biquet végé (12€)</span><span class="sandwich-count" id="countBiquet">0</span></div>
     </div>
 
-    <!-- Filters -->
     <div class="filters">
-      <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Tous <span class="filter-count" id="fc-all"></span></button>
-      <button class="filter-btn" data-filter="present" onclick="setFilter('present', this)">Présents <span class="filter-count" id="fc-present"></span></button>
-      <button class="filter-btn" data-filter="absent" onclick="setFilter('absent', this)">Absents <span class="filter-count" id="fc-absent"></span></button>
-      <button class="filter-btn" data-filter="pro" onclick="setFilter('pro', this)">Pro <span class="filter-count" id="fc-pro"></span></button>
-      <button class="filter-btn" data-filter="perso" onclick="setFilter('perso', this)">Perso <span class="filter-count" id="fc-perso"></span></button>
+      <button class="filter-btn active" onclick="setFilter('all',this)">Tous <span class="filter-count" id="fc-all"></span></button>
+      <button class="filter-btn" onclick="setFilter('present',this)">Présents <span class="filter-count" id="fc-present"></span></button>
+      <button class="filter-btn" onclick="setFilter('absent',this)">Absents <span class="filter-count" id="fc-absent"></span></button>
+      <button class="filter-btn" onclick="setFilter('pro',this)">Pro <span class="filter-count" id="fc-pro"></span></button>
+      <button class="filter-btn" onclick="setFilter('perso',this)">Perso <span class="filter-count" id="fc-perso"></span></button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrap">
       <div id="loadingState" class="loading">Chargement…</div>
       <div id="emptyState" class="empty-state hidden">Aucune réponse pour l'instant.</div>
       <table id="invTable" class="hidden">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Nom / Prénom</th>
-            <th>Type</th>
-            <th>Présence</th>
-            <th>Adultes</th>
-            <th>Enfants</th>
-            <th>Repas</th>
-            <th>Message</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Date</th><th>Nom / Prénom</th><th>Type</th><th>Présence</th>
+          <th>Adultes</th><th>Enfants</th><th>Repas</th><th>Message</th><th></th>
+        </tr></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
 
-  </div>
-</div>
+  </div><!-- /tab-responses -->
+
+  <!-- ========== TAB INVITÉS ========== -->
+  <div id="tab-guests" class="hidden">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="status-filter">
+        <button class="filter-btn active" onclick="setGuestStatusFilter('all',this)">Tous</button>
+        <button class="filter-btn" onclick="setGuestStatusFilter('relancer',this)">⚠ À relancer <span class="filter-count" id="gfc-relancer"></span></button>
+        <button class="filter-btn" onclick="setGuestStatusFilter('non_invite',this)">Pas encore invités <span class="filter-count" id="gfc-non-invite"></span></button>
+        <button class="filter-btn" onclick="setGuestStatusFilter('repondu',this)">✓ Ont répondu <span class="filter-count" id="gfc-repondu"></span></button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-outline" onclick="toggleAddForm()">+ Ajouter</button>
+        <button class="btn-outline" onclick="loadGuests()">↻ Actualiser</button>
+      </div>
+    </div>
+
+    <!-- Stats invités -->
+    <div class="stats-grid" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-label">Total invités</div><div class="stat-value" id="gStatTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Save the date ✉</div><div class="stat-value" id="gStatStd">—</div></div>
+      <div class="stat-card"><div class="stat-label">Invitation envoyée</div><div class="stat-value" id="gStatInv">—</div></div>
+      <div class="stat-card"><div class="stat-label">Ont répondu ✓</div><div class="stat-value" id="gStatRep">—</div></div>
+      <div class="stat-card"><div class="stat-label">À relancer ⚠</div><div class="stat-value orange" id="gStatRelancer">—</div></div>
+    </div>
+
+    <!-- Filtres catégorie -->
+    <div class="filters" id="catFilters">
+      <button class="filter-btn active" onclick="setGuestCatFilter('all',this)">Tous</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('famille',this)">Famille</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('perso',this)">Perso</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('pro',this)">Pro</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('voisins',this)">Voisins</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('elus',this)">Élus</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('presse',this)">Presse</button>
+      <button class="filter-btn" onclick="setGuestCatFilter('autre',this)">À voir</button>
+    </div>
+
+    <!-- Formulaire ajout -->
+    <div id="addGuestForm" class="add-guest-form hidden">
+      <div class="fg"><label>Nom</label><input type="text" id="addNom" placeholder="Prénom Nom"></div>
+      <div class="fg">
+        <label>Catégorie</label>
+        <select id="addCat">
+          <option value="perso">Perso</option>
+          <option value="famille">Famille</option>
+          <option value="pro">Pro</option>
+          <option value="voisins">Voisins</option>
+          <option value="elus">Élus</option>
+          <option value="presse">Presse</option>
+          <option value="partenaires">Partenaires</option>
+          <option value="autre">À voir</option>
+        </select>
+      </div>
+      <div class="fg"><label>Notes</label><input type="text" id="addNotes" placeholder="Optionnel"></div>
+      <button class="btn-green" style="padding:9px 20px;font-size:0.9rem;" onclick="submitAddGuest()">Ajouter</button>
+      <button class="btn-cancel-edit" style="padding:9px 14px;" onclick="toggleAddForm()">Annuler</button>
+    </div>
+
+    <!-- Légende toggles -->
+    <div style="font-size:0.75rem;color:#aaa;margin-bottom:10px;">
+      Cliquer sur un bouton pour basculer l'état ·
+      <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">STD</span> Save the date &nbsp;
+      <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">INV</span> Invitation &nbsp;
+      <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">REP</span> A répondu
+    </div>
+
+    <div class="table-wrap">
+      <div id="gLoadingState" class="loading">Chargement…</div>
+      <div id="gEmptyState" class="empty-state hidden">Aucun invité.</div>
+      <table id="guestTable" class="hidden">
+        <thead><tr>
+          <th>Nom</th><th>Catégorie</th><th>STD</th><th>INV</th><th>REP</th><th>Notes</th><th></th>
+        </tr></thead>
+        <tbody id="guestTableBody"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-guests -->
+
+</div><!-- /admin-wrap -->
+</div><!-- /dashboard -->
 
 <script>
 let token = sessionStorage.getItem('inv_admin_token') || '';
 let allInvitations = [];
+let allGuests = [];
+let guestsLoaded = false;
 let currentFilter = 'all';
+let guestCatFilter = 'all';
+let guestStatusFilter = 'all';
 
-const REPAS_LABELS = { cochon: 'Cochon', hareng: 'Hareng', biquet: "Pt'i biquet", '': '' };
+const REPAS_LABELS = { cochon: 'Cochon', hareng: 'Hareng', biquet: "Pt'i biquet" };
+const CAT_LABELS = { famille: 'Famille', perso: 'Perso', pro: 'Pro', voisins: 'Voisins', elus: 'Élus', presse: 'Presse', partenaires: 'Partenaires', autre: 'À voir' };
 
+// ===== AUTH =====
 async function doLogin() {
   const pwd = document.getElementById('loginPwd').value;
   if (!pwd) return;
   try {
     const res = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: pwd })
     });
     const data = await res.json();
@@ -189,39 +303,41 @@ async function doLogin() {
       document.getElementById('dashboard').classList.remove('hidden');
       loadData();
     } else {
-      document.getElementById('loginError').textContent = 'Mot de passe incorrect';
-      document.getElementById('loginError').classList.remove('hidden');
+      showLoginError('Mot de passe incorrect');
     }
-  } catch {
-    document.getElementById('loginError').textContent = 'Erreur de connexion';
-    document.getElementById('loginError').classList.remove('hidden');
-  }
+  } catch { showLoginError('Erreur de connexion'); }
 }
-
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg; el.classList.remove('hidden');
+}
 function logout() {
-  sessionStorage.removeItem('inv_admin_token');
-  token = '';
+  sessionStorage.removeItem('inv_admin_token'); token = '';
   document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginPwd').value = '';
 }
 
+// ===== TABS =====
+function showTab(name, btn) {
+  document.getElementById('tab-responses').classList.toggle('hidden', name !== 'responses');
+  document.getElementById('tab-guests').classList.toggle('hidden', name !== 'guests');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name === 'guests' && !guestsLoaded) loadGuests();
+}
+
+// ===== RESPONSES TAB =====
 async function loadData() {
   document.getElementById('loadingState').classList.remove('hidden');
   document.getElementById('invTable').classList.add('hidden');
   document.getElementById('emptyState').classList.add('hidden');
-
   try {
-    const res = await fetch('/api/admin/invitations', {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const res = await fetch('/api/admin/invitations', { headers: { Authorization: 'Bearer ' + token } });
     if (res.status === 401) { logout(); return; }
     allInvitations = await res.json();
-    computeStats();
-    renderTable();
-  } catch {
-    document.getElementById('loadingState').textContent = 'Erreur de chargement.';
-  }
+    computeStats(); renderTable();
+  } catch { document.getElementById('loadingState').textContent = 'Erreur de chargement.'; }
 }
 
 function computeStats() {
@@ -230,50 +346,38 @@ function computeStats() {
   const totalAdultes = presents.reduce((s, i) => s + (i.nb_adultes || 0), 0);
   const totalEnfants = presents.reduce((s, i) => s + (i.nb_enfants || 0), 0);
   const counts = { cochon: 0, hareng: 0, biquet: 0 };
-
   for (const inv of presents) {
     if (!inv.repas_json) continue;
     try {
-      const repas = JSON.parse(inv.repas_json);
-      if (repas.adulte1 && counts[repas.adulte1] !== undefined) counts[repas.adulte1]++;
-      if (repas.adulte2 && counts[repas.adulte2] !== undefined) counts[repas.adulte2]++;
-      for (const r of (repas.enfants || [])) {
-        if (r && counts[r] !== undefined) counts[r]++;
-      }
+      const r = JSON.parse(inv.repas_json);
+      if (r.adulte1 && counts[r.adulte1] !== undefined) counts[r.adulte1]++;
+      if (r.adulte2 && counts[r.adulte2] !== undefined) counts[r.adulte2]++;
+      for (const x of (r.enfants || [])) if (x && counts[x] !== undefined) counts[x]++;
     } catch {}
   }
-
-  const totalSandwichs = counts.cochon + counts.hareng + counts.biquet;
-  const pros = allInvitations.filter(i => i.type_invitation === 'pro');
-  const persos = allInvitations.filter(i => i.type_invitation === 'perso');
-
   document.getElementById('statTotal').textContent = allInvitations.length;
   document.getElementById('statPresents').textContent = presents.length;
   document.getElementById('statAbsents').textContent = absents.length;
   document.getElementById('statAdultes').textContent = totalAdultes;
   document.getElementById('statEnfants').textContent = totalEnfants;
-  document.getElementById('statSandwichs').textContent = totalSandwichs;
-
+  document.getElementById('statSandwichs').textContent = counts.cochon + counts.hareng + counts.biquet;
   document.getElementById('countCochon').textContent = counts.cochon;
   document.getElementById('countHareng').textContent = counts.hareng;
   document.getElementById('countBiquet').textContent = counts.biquet;
-
   document.getElementById('fc-all').textContent = allInvitations.length;
   document.getElementById('fc-present').textContent = presents.length;
   document.getElementById('fc-absent').textContent = absents.length;
-  document.getElementById('fc-pro').textContent = pros.length;
-  document.getElementById('fc-perso').textContent = persos.length;
+  document.getElementById('fc-pro').textContent = allInvitations.filter(i => i.type_invitation === 'pro').length;
+  document.getElementById('fc-perso').textContent = allInvitations.filter(i => i.type_invitation === 'perso').length;
 }
 
 function setFilter(filter, btn) {
   currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
+  document.querySelectorAll('#tab-responses .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderTable();
 }
 
 function getFiltered() {
-  if (currentFilter === 'all') return allInvitations;
   if (currentFilter === 'present') return allInvitations.filter(i => i.present);
   if (currentFilter === 'absent') return allInvitations.filter(i => !i.present);
   if (currentFilter === 'pro') return allInvitations.filter(i => i.type_invitation === 'pro');
@@ -284,49 +388,40 @@ function getFiltered() {
 function repasChips(inv) {
   if (!inv.present || !inv.repas_json) return '';
   try {
-    const repas = JSON.parse(inv.repas_json);
+    const r = JSON.parse(inv.repas_json);
     const chips = [];
-    if (repas.adulte1) chips.push(`<span class="repas-chip">${REPAS_LABELS[repas.adulte1] || repas.adulte1}</span>`);
-    if (repas.adulte2) chips.push(`<span class="repas-chip">${REPAS_LABELS[repas.adulte2] || repas.adulte2}</span>`);
-    for (const r of (repas.enfants || [])) {
-      if (r) chips.push(`<span class="repas-chip">${REPAS_LABELS[r] || r}</span>`);
-    }
-    return chips.length ? `<div class="repas-chips">${chips.join('')}</div>` : '<span style="color:#ccc">—</span>';
-  } catch {
-    return '';
-  }
+    if (r.adulte1) chips.push(REPAS_LABELS[r.adulte1] || r.adulte1);
+    if (r.adulte2) chips.push(REPAS_LABELS[r.adulte2] || r.adulte2);
+    for (const x of (r.enfants || [])) if (x) chips.push(REPAS_LABELS[x] || x);
+    return chips.length ? `<div class="repas-chips">${chips.map(c => `<span class="repas-chip">${c}</span>`).join('')}</div>` : '—';
+  } catch { return ''; }
 }
 
 function formatDate(str) {
   if (!str) return '';
   const d = new Date(str);
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) +
-    ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ' ' +
+    d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function renderTable() {
   const filtered = getFiltered();
   document.getElementById('loadingState').classList.add('hidden');
-
-  if (filtered.length === 0) {
+  if (!filtered.length) {
     document.getElementById('emptyState').classList.remove('hidden');
-    document.getElementById('invTable').classList.add('hidden');
-    return;
+    document.getElementById('invTable').classList.add('hidden'); return;
   }
-
   document.getElementById('emptyState').classList.add('hidden');
   document.getElementById('invTable').classList.remove('hidden');
-
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = filtered.map(inv => `
+  document.getElementById('tableBody').innerHTML = filtered.map(inv => `
     <tr>
-      <td style="white-space:nowrap;color:#999;font-size:0.8rem;">${formatDate(inv.submitted_at)}</td>
+      <td style="white-space:nowrap;color:#999;font-size:0.78rem;">${formatDate(inv.submitted_at)}</td>
       <td>
-        <span class="name-display" id="name-${inv.id}" style="font-weight:700;color:#333;">${escHtml(inv.nom_prenom)}</span>
-        <button class="btn-edit" onclick="startEdit(${inv.id}, '${escHtml(inv.nom_prenom)}')" id="edit-btn-${inv.id}" title="Modifier le nom">✏️</button>
+        <span id="name-${inv.id}" style="font-weight:700;color:#333;">${escHtml(inv.nom_prenom)}</span>
+        <button class="btn-edit" onclick="startEdit(${inv.id},'${escHtml(inv.nom_prenom)}')" id="edit-btn-${inv.id}" title="Modifier">✏️</button>
         <div class="name-edit-wrap hidden" id="name-edit-${inv.id}">
           <input class="name-input" id="name-input-${inv.id}" value="${escHtml(inv.nom_prenom)}"
-            onkeydown="if(event.key==='Enter') saveName(${inv.id}); if(event.key==='Escape') cancelEdit(${inv.id});">
+            onkeydown="if(event.key==='Enter')saveName(${inv.id});if(event.key==='Escape')cancelEdit(${inv.id});">
           <button class="btn-save" onclick="saveName(${inv.id})">✓</button>
           <button class="btn-cancel-edit" onclick="cancelEdit(${inv.id})">✕</button>
         </div>
@@ -337,96 +432,229 @@ function renderTable() {
       <td style="text-align:center;">${inv.present && inv.nb_enfants ? inv.nb_enfants : '—'}</td>
       <td>${repasChips(inv)}</td>
       <td><span class="message-text">${inv.message ? escHtml(inv.message) : ''}</span></td>
-      <td><button class="btn-del" onclick="deleteInvitation(${inv.id}, '${escHtml(inv.nom_prenom)}')" title="Supprimer">✕</button></td>
-    </tr>
-  `).join('');
+      <td><button class="btn-del" onclick="deleteInvitation(${inv.id},'${escHtml(inv.nom_prenom)}')" title="Supprimer">✕</button></td>
+    </tr>`).join('');
 }
 
-function startEdit(id, currentName) {
-  document.getElementById(`name-display-${id}`)?.classList.add('hidden');
+function startEdit(id, nom) {
   document.getElementById(`name-${id}`).classList.add('hidden');
   document.getElementById(`edit-btn-${id}`).classList.add('hidden');
   document.getElementById(`name-edit-${id}`).classList.remove('hidden');
   const input = document.getElementById(`name-input-${id}`);
-  input.focus();
-  input.select();
+  input.focus(); input.select();
 }
-
 function cancelEdit(id) {
   document.getElementById(`name-${id}`).classList.remove('hidden');
   document.getElementById(`edit-btn-${id}`).classList.remove('hidden');
   document.getElementById(`name-edit-${id}`).classList.add('hidden');
 }
-
 async function saveName(id) {
-  const input = document.getElementById(`name-input-${id}`);
-  const newName = input.value.trim();
+  const newName = document.getElementById(`name-input-${id}`).value.trim();
   if (!newName) return;
   try {
     const res = await fetch(`/api/admin/invitations/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({ nom_prenom: newName })
     });
     if (!res.ok) throw new Error();
-    // Mettre à jour localement
     const inv = allInvitations.find(i => i.id === id);
     if (inv) inv.nom_prenom = newName;
     document.getElementById(`name-${id}`).textContent = newName;
     cancelEdit(id);
-  } catch {
-    alert('Erreur lors de la modification.');
-  }
+  } catch { alert('Erreur lors de la modification.'); }
 }
-
 async function deleteInvitation(id, nom) {
   if (!confirm(`Supprimer la réponse de ${nom} ?`)) return;
   try {
-    const res = await fetch(`/api/admin/invitations/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const res = await fetch(`/api/admin/invitations/${id}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
     if (!res.ok) throw new Error();
     allInvitations = allInvitations.filter(i => i.id !== id);
-    computeStats();
-    renderTable();
-  } catch {
-    alert('Erreur lors de la suppression.');
-  }
+    computeStats(); renderTable();
+  } catch { alert('Erreur lors de la suppression.'); }
 }
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 function exportCSV() {
-  const headers = ['Date', 'Nom/Prénom', 'Type', 'Présent', 'Nb Adultes', 'Nb Enfants', 'Repas Adulte 1', 'Repas Adulte 2', 'Repas Enfants', 'Message'];
+  const headers = ['Date','Nom/Prénom','Type','Présent','Nb Adultes','Nb Enfants','Repas Adulte 1','Repas Adulte 2','Repas Enfants','Message'];
   const rows = allInvitations.map(inv => {
-    let repas = {};
-    try { repas = JSON.parse(inv.repas_json || '{}'); } catch {}
+    let r = {};
+    try { r = JSON.parse(inv.repas_json || '{}'); } catch {}
     return [
-      formatDate(inv.submitted_at),
-      inv.nom_prenom,
-      inv.type_invitation,
-      inv.present ? 'Oui' : 'Non',
-      inv.nb_adultes || '',
-      inv.nb_enfants || '',
-      REPAS_LABELS[repas.adulte1] || repas.adulte1 || '',
-      REPAS_LABELS[repas.adulte2] || repas.adulte2 || '',
-      (repas.enfants || []).map(r => REPAS_LABELS[r] || r).join(' / '),
-      inv.message || ''
+      formatDate(inv.submitted_at), inv.nom_prenom, inv.type_invitation,
+      inv.present ? 'Oui' : 'Non', inv.nb_adultes || '', inv.nb_enfants || '',
+      REPAS_LABELS[r.adulte1] || r.adulte1 || '', REPAS_LABELS[r.adulte2] || r.adulte2 || '',
+      (r.enfants || []).map(x => REPAS_LABELS[x] || x).join(' / '), inv.message || ''
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
   });
-
-  const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const blob = new Blob(['﻿' + [headers.join(','), ...rows].join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `reponses-inauguration-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
 }
 
-// Auto-login si token en session
+// ===== GUESTS TAB =====
+async function loadGuests() {
+  document.getElementById('gLoadingState').classList.remove('hidden');
+  document.getElementById('guestTable').classList.add('hidden');
+  document.getElementById('gEmptyState').classList.add('hidden');
+  try {
+    const res = await fetch('/api/admin/guests', { headers: { Authorization: 'Bearer ' + token } });
+    if (res.status === 401) { logout(); return; }
+    allGuests = await res.json();
+    guestsLoaded = true;
+    computeGuestStats(); renderGuestTable();
+  } catch { document.getElementById('gLoadingState').textContent = 'Erreur de chargement.'; }
+}
+
+function computeGuestStats() {
+  const total = allGuests.length;
+  const std = allGuests.filter(g => g.save_the_date).length;
+  const inv = allGuests.filter(g => g.invitation).length;
+  const rep = allGuests.filter(g => g.a_repondu).length;
+  const relancer = allGuests.filter(g => g.invitation && !g.a_repondu).length;
+  const nonInvite = allGuests.filter(g => !g.invitation).length;
+  document.getElementById('gStatTotal').textContent = total;
+  document.getElementById('gStatStd').textContent = std;
+  document.getElementById('gStatInv').textContent = inv;
+  document.getElementById('gStatRep').textContent = rep;
+  document.getElementById('gStatRelancer').textContent = relancer;
+  document.getElementById('gfc-relancer').textContent = relancer;
+  document.getElementById('gfc-repondu').textContent = rep;
+  document.getElementById('gfc-non-invite').textContent = nonInvite;
+}
+
+function setGuestCatFilter(filter, btn) {
+  guestCatFilter = filter;
+  document.querySelectorAll('#catFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderGuestTable();
+}
+function setGuestStatusFilter(filter, btn) {
+  guestStatusFilter = filter;
+  document.querySelectorAll('.status-filter .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderGuestTable();
+}
+
+function getFilteredGuests() {
+  return allGuests.filter(g => {
+    const catOk = guestCatFilter === 'all' || g.categorie === guestCatFilter;
+    let statusOk = true;
+    if (guestStatusFilter === 'relancer') statusOk = g.invitation && !g.a_repondu;
+    if (guestStatusFilter === 'repondu')  statusOk = !!g.a_repondu;
+    if (guestStatusFilter === 'non_invite') statusOk = !g.invitation;
+    return catOk && statusOk;
+  });
+}
+
+function renderGuestTable() {
+  const filtered = getFilteredGuests();
+  document.getElementById('gLoadingState').classList.add('hidden');
+  if (!filtered.length) {
+    document.getElementById('gEmptyState').classList.remove('hidden');
+    document.getElementById('guestTable').classList.add('hidden'); return;
+  }
+  document.getElementById('gEmptyState').classList.add('hidden');
+  document.getElementById('guestTable').classList.remove('hidden');
+  document.getElementById('guestTableBody').innerHTML = filtered.map(g => `
+    <tr>
+      <td>
+        <span id="gname-${g.id}" style="font-weight:700;color:#333;">${escHtml(g.nom)}</span>
+        <button class="btn-edit" onclick="startEditGuest(${g.id},'${escHtml(g.nom)}')" id="gedit-btn-${g.id}" title="Modifier">✏️</button>
+        <div class="name-edit-wrap hidden" id="gname-edit-${g.id}">
+          <input class="name-input" id="gname-input-${g.id}" value="${escHtml(g.nom)}"
+            onkeydown="if(event.key==='Enter')saveGuestName(${g.id});if(event.key==='Escape')cancelEditGuest(${g.id});">
+          <button class="btn-save" onclick="saveGuestName(${g.id})">✓</button>
+          <button class="btn-cancel-edit" onclick="cancelEditGuest(${g.id})">✕</button>
+        </div>
+      </td>
+      <td><span class="badge badge-${g.categorie}">${CAT_LABELS[g.categorie] || g.categorie}</span></td>
+      <td><button class="toggle-btn ${g.save_the_date ? 'on' : 'off'}" id="gtoggle-std-${g.id}"
+            onclick="toggleStatus(${g.id},'save_the_date',${g.save_the_date})">STD</button></td>
+      <td><button class="toggle-btn ${g.invitation ? 'on' : 'off'}" id="gtoggle-inv-${g.id}"
+            onclick="toggleStatus(${g.id},'invitation',${g.invitation})">INV</button></td>
+      <td><button class="toggle-btn ${g.a_repondu ? 'on' : 'off'}" id="gtoggle-rep-${g.id}"
+            onclick="toggleStatus(${g.id},'a_repondu',${g.a_repondu})">REP</button></td>
+      <td><span class="notes-text">${g.notes ? escHtml(g.notes) : ''}</span></td>
+      <td><button class="btn-del" onclick="deleteGuest(${g.id},'${escHtml(g.nom)}')" title="Supprimer">✕</button></td>
+    </tr>`).join('');
+}
+
+async function toggleStatus(id, field, currentVal) {
+  const newVal = !currentVal;
+  const fieldMap = { save_the_date: 'std', invitation: 'inv', a_repondu: 'rep' };
+  const btn = document.getElementById(`gtoggle-${fieldMap[field]}-${id}`);
+  if (btn) { btn.classList.toggle('on', newVal); btn.classList.toggle('off', !newVal); }
+  const g = allGuests.find(x => x.id === id);
+  if (g) g[field] = newVal ? 1 : 0;
+  try {
+    await fetch(`/api/admin/guests/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ [field]: newVal })
+    });
+    computeGuestStats();
+  } catch { alert('Erreur de sauvegarde.'); }
+}
+
+function startEditGuest(id, nom) {
+  document.getElementById(`gname-${id}`).classList.add('hidden');
+  document.getElementById(`gedit-btn-${id}`).classList.add('hidden');
+  document.getElementById(`gname-edit-${id}`).classList.remove('hidden');
+  const input = document.getElementById(`gname-input-${id}`);
+  input.focus(); input.select();
+}
+function cancelEditGuest(id) {
+  document.getElementById(`gname-${id}`).classList.remove('hidden');
+  document.getElementById(`gedit-btn-${id}`).classList.remove('hidden');
+  document.getElementById(`gname-edit-${id}`).classList.add('hidden');
+}
+async function saveGuestName(id) {
+  const newName = document.getElementById(`gname-input-${id}`).value.trim();
+  if (!newName) return;
+  try {
+    await fetch(`/api/admin/guests/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ nom: newName })
+    });
+    const g = allGuests.find(x => x.id === id);
+    if (g) g.nom = newName;
+    document.getElementById(`gname-${id}`).textContent = newName;
+    cancelEditGuest(id);
+  } catch { alert('Erreur lors de la modification.'); }
+}
+async function deleteGuest(id, nom) {
+  if (!confirm(`Supprimer ${nom} de la liste ?`)) return;
+  try {
+    await fetch(`/api/admin/guests/${id}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+    allGuests = allGuests.filter(g => g.id !== id);
+    computeGuestStats(); renderGuestTable();
+  } catch { alert('Erreur lors de la suppression.'); }
+}
+function toggleAddForm() {
+  document.getElementById('addGuestForm').classList.toggle('hidden');
+  document.getElementById('addNom').focus();
+}
+async function submitAddGuest() {
+  const nom = document.getElementById('addNom').value.trim();
+  if (!nom) { alert('Merci de saisir un nom.'); return; }
+  try {
+    const res = await fetch('/api/admin/guests', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({
+        nom, categorie: document.getElementById('addCat').value,
+        notes: document.getElementById('addNotes').value.trim() || null
+      })
+    });
+    const data = await res.json();
+    allGuests.unshift({ id: data.id, nom, categorie: document.getElementById('addCat').value, save_the_date: 0, invitation: 0, a_repondu: 0, notes: document.getElementById('addNotes').value.trim() || null });
+    document.getElementById('addNom').value = '';
+    document.getElementById('addNotes').value = '';
+    document.getElementById('addGuestForm').classList.add('hidden');
+    computeGuestStats(); renderGuestTable();
+  } catch { alert('Erreur lors de l\'ajout.'); }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 if (token) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
