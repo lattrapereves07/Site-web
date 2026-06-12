@@ -341,6 +341,7 @@ app.patch('/api/admin/guests/:id', requireAuth, async (c) => {
   if (body.save_the_date !== undefined) { fields.push('save_the_date=?'); values.push(body.save_the_date ? 1 : 0) }
   if (body.invitation !== undefined)    { fields.push('invitation=?');    values.push(body.invitation ? 1 : 0) }
   if (body.a_repondu !== undefined)     { fields.push('a_repondu=?');     values.push(body.a_repondu ? 1 : 0) }
+  if (body.relance2 !== undefined)      { fields.push('relance2=?');      values.push(body.relance2 ? 1 : 0) }
   if (body.notes !== undefined)         { fields.push('notes=?');         values.push(body.notes?.trim() || null) }
   if (fields.length === 0) return c.json({ error: 'Rien à mettre à jour' }, 400)
   values.push(id)

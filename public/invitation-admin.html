@@ -255,7 +255,8 @@
       Cliquer sur un bouton pour basculer l'état ·
       <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">STD</span> Save the date &nbsp;
       <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">INV</span> Invitation &nbsp;
-      <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">REP</span> A répondu
+      <span style="background:#4E7438;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">REP</span> A répondu &nbsp;
+      <span style="background:#e07a3a;color:white;padding:1px 6px;border-radius:8px;font-weight:700;">REL2</span> 2e relance envoyée
     </div>
 
     <div class="table-wrap">
@@ -263,7 +264,7 @@
       <div id="gEmptyState" class="empty-state hidden">Aucun invité.</div>
       <table id="guestTable" class="hidden">
         <thead><tr>
-          <th>Nom</th><th>Catégorie</th><th>STD</th><th>INV</th><th>REP</th><th>Notes</th><th></th>
+          <th>Nom</th><th>Catégorie</th><th>STD</th><th>INV</th><th>REP</th><th>REL2</th><th>Notes</th><th></th>
         </tr></thead>
         <tbody id="guestTableBody"></tbody>
       </table>
@@ -572,6 +573,8 @@ function renderGuestTable() {
             onclick="toggleStatus(${g.id},'invitation',${g.invitation})">INV</button></td>
       <td><button class="toggle-btn ${g.a_repondu ? 'on' : 'off'}" id="gtoggle-rep-${g.id}"
             onclick="toggleStatus(${g.id},'a_repondu',${g.a_repondu})">REP</button></td>
+      <td><button class="toggle-btn ${g.relance2 ? 'on' : 'off'}" id="gtoggle-rel2-${g.id}"
+            onclick="toggleStatus(${g.id},'relance2',${g.relance2})" style="${g.relance2 ? 'background:#e07a3a;border-color:#e07a3a' : ''}">REL2</button></td>
       <td><span class="notes-text">${g.notes ? escHtml(g.notes) : ''}</span></td>
       <td><button class="btn-del" onclick="deleteGuest(${g.id},'${escHtml(g.nom)}')" title="Supprimer">✕</button></td>
     </tr>`).join('');
@@ -579,9 +582,12 @@ function renderGuestTable() {
 
 async function toggleStatus(id, field, currentVal) {
   const newVal = !currentVal;
-  const fieldMap = { save_the_date: 'std', invitation: 'inv', a_repondu: 'rep' };
+  const fieldMap = { save_the_date: 'std', invitation: 'inv', a_repondu: 'rep', relance2: 'rel2' };
   const btn = document.getElementById(`gtoggle-${fieldMap[field]}-${id}`);
-  if (btn) { btn.classList.toggle('on', newVal); btn.classList.toggle('off', !newVal); }
+  if (btn) {
+    btn.classList.toggle('on', newVal); btn.classList.toggle('off', !newVal);
+    if (field === 'relance2') { btn.style.background = newVal ? '#e07a3a' : ''; btn.style.borderColor = newVal ? '#e07a3a' : ''; }
+  }
   const g = allGuests.find(x => x.id === id);
   if (g) g[field] = newVal ? 1 : 0;
   try {
@@ -643,7 +649,7 @@ async function submitAddGuest() {
       })
     });
     const data = await res.json();
-    allGuests.unshift({ id: data.id, nom, categorie: document.getElementById('addCat').value, save_the_date: 0, invitation: 0, a_repondu: 0, notes: document.getElementById('addNotes').value.trim() || null });
+    allGuests.unshift({ id: data.id, nom, categorie: document.getElementById('addCat').value, save_the_date: 0, invitation: 0, a_repondu: 0, relance2: 0, notes: document.getElementById('addNotes').value.trim() || null });
     document.getElementById('addNom').value = '';
     document.getElementById('addNotes').value = '';
     document.getElementById('addGuestForm').classList.add('hidden');
