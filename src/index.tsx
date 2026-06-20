@@ -194,12 +194,13 @@ app.post('/api/admin/events/:id/image', requireAuth, async (c) => {
   
   if (!file) return c.json({ error: 'Aucune image fournie' }, 400)
   
-  // Convert to base64 data URL
+  // Convert to base64 data URL (chunks pour éviter la limite CPU Cloudflare Workers)
   const arrayBuffer = await file.arrayBuffer()
   const bytes = new Uint8Array(arrayBuffer)
   let binary = ''
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i])
+  const CHUNK = 8192
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK))
   }
   const base64 = btoa(binary)
   const dataUrl = `data:${file.type};base64,${base64}`
