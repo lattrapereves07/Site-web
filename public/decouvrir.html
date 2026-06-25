@@ -16,6 +16,16 @@
   <link rel="alternate" hreflang="x-default" href="https://www.lattrapereves07.fr/decouvrir.html">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <link rel="stylesheet" href="assets/css/style.css?v=20260532">
+  <style>
+    .activity-photo { margin: 24px auto; max-width: 640px; border-radius: 14px; overflow: hidden; }
+    .activity-photo img { width: 100%; height: 420px; object-fit: cover; display: block; }
+    .activity-photo--grid { max-width: 760px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .activity-photo--grid img { height: 300px; border-radius: 12px; }
+    @media (max-width: 580px) {
+      .activity-photo--grid { grid-template-columns: 1fr; }
+      .activity-photo img, .activity-photo--grid img { height: 260px; }
+    }
+  </style>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"TouristAttraction","name":"L'Attrape-Rêves — Ferme de découverte et d'émerveillement","url":"https://www.lattrapereves07.fr","telephone":"+33428400049","email":"contact@lattrapereves07.fr","address":{"@type":"PostalAddress","streetAddress":"514 chemin de la Vernède","addressLocality":"Gravières","postalCode":"07140","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":44.4179088,"longitude":4.1000285},"openingHours":["We,Sa,Su 10:00-18:00"],"priceRange":"€"}
   </script>
@@ -118,7 +128,10 @@
         <div class="activity-intro fade-in">
           <p data-i18n="decouvrir.sensoriel_text">Fermez les yeux. Marchez pieds nus. Écoutez le vent dans les feuilles, touchez l'écorce, sentez la terre. Le parcours sensoriel de l'Attrape-Rêves est une invitation à redécouvrir le monde avec tous vos sens.</p>
         </div>
-        <div class="activity-placeholder fade-in" data-i18n="decouvrir.sensoriel_placeholder">Photo à venir</div>
+        <div class="activity-photo activity-photo--grid fade-in">
+          <img src="assets/images/photo-sensoriel-1.jpg" alt="Chemin de galets du parcours sensoriel de L'Attrape-Rêves" loading="lazy">
+          <img src="assets/images/photo-sensoriel-2.jpg" alt="Chemin de graviers et paille du parcours sensoriel de L'Attrape-Rêves" loading="lazy">
+        </div>
       </div>
     </section>
 
@@ -134,7 +147,9 @@
         <div class="text-center fade-in">
           <div class="sticker-badge" data-i18n="decouvrir.filets_badge">Dès 3 ans • Sans équipement • En toute sécurité</div>
         </div>
-        <div class="activity-placeholder fade-in" data-i18n="decouvrir.filets_placeholder">Photo à venir</div>
+        <div class="activity-photo fade-in">
+          <img src="assets/images/photo-filets.jpg" alt="Enfant sur les filets dans les arbres de L'Attrape-Rêves" loading="lazy">
+        </div>
       </div>
     </section>
 
@@ -147,7 +162,9 @@
         <div class="activity-intro fade-in">
           <p data-i18n="decouvrir.jeux_text">Jeux en bois, installations insolites, merveilles cachées… Ici tout est pensé pour réveiller la part d'enfance, stimuler l'imagination et piquer la curiosité. On ne vous dit pas tout… venez voir !</p>
         </div>
-        <div class="activity-placeholder fade-in" data-i18n="decouvrir.jeux_placeholder">Photo à venir</div>
+        <div class="activity-photo fade-in">
+          <img src="assets/images/photo-champignon.jpg" alt="Champignon musical dans les arbres de L'Attrape-Rêves" loading="lazy">
+        </div>
       </div>
     </section>
 
