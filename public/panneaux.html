@@ -66,6 +66,35 @@
       font-size: 1rem;
       line-height: 1.6;
     }
+    .lang-hero-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      padding: 32px 0 8px;
+    }
+    .lang-hero-btn {
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: 2px solid #ddd;
+      background: #fff;
+      color: #555;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+    }
+    .lang-hero-btn:hover {
+      border-color: var(--color-coral, #e05a3a);
+      color: var(--color-coral, #e05a3a);
+    }
+    .lang-hero-btn.active {
+      background: var(--color-coral, #e05a3a);
+      border-color: var(--color-coral, #e05a3a);
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -107,8 +136,20 @@
       </div>
     </section>
 
+    <!-- Sélecteur de langue -->
+    <section class="section section--beige" style="padding-top: 0; padding-bottom: 0;">
+      <div class="container">
+        <div class="lang-hero-switcher">
+          <button class="lang-hero-btn lang-btn active" data-lang="fr">Français</button>
+          <button class="lang-hero-btn lang-btn" data-lang="en">English</button>
+          <button class="lang-hero-btn lang-btn" data-lang="nl">Nederlands</button>
+          <button class="lang-hero-btn lang-btn" data-lang="de">Deutsch</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Panneaux -->
-    <section class="section section--beige" style="padding-top: 60px; padding-bottom: 80px;">
+    <section class="section section--beige" style="padding-top: 32px; padding-bottom: 80px;">
       <div class="container">
 
         <div class="panneaux-grid fade-in">
