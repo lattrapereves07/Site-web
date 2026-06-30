@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#D57956">
+<meta name="robots" content="noindex, nofollow">
+<title>Tournée Flyers — L'Attrape-Rêves</title>
+<link rel="icon" type="image/png" href="../assets/images/logo.png">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ======== TOURNÉE — styles spécifiques ======== */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* Compensation header fixe */
+.tournee-page { padding-top: var(--header-height); display: flex; flex-direction: column; min-height: 100dvh; }
+
+/* ---- TOOLBAR ---- */
+.t-toolbar {
+  background: var(--white);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--light-beige);
+  position: sticky;
+  top: var(--header-height);
+  z-index: 90;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.t-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+.t-row:last-child { margin-bottom: 0; }
+
+.t-search {
+  flex: 1; min-width: 130px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 30px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  background: var(--beige);
+  color: var(--dark-grey);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.t-search:focus { border-color: var(--coral); }
+
+.t-who {
+  width: 110px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 30px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  background: var(--beige);
+  color: var(--dark-grey);
+  outline: none;
+}
+
+.t-stats {
+  background: var(--yellow);
+  color: var(--dark-grey);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* View toggle */
+.t-view-toggle {
+  display: flex;
+  background: var(--light-beige);
+  border-radius: 20px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.t-view-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 18px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--dark-grey);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.t-view-btn.active {
+  background: var(--white);
+  color: var(--coral);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Boutons toolbar */
+.t-btn {
+  padding: 7px 13px;
+  border: none;
+  border-radius: 20px;
+  background: var(--coral);
+  color: var(--white);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s, background 0.15s;
+}
+.t-btn:active { transform: scale(0.97); }
+.t-btn.sec { background: var(--dark-grey); }
+.t-btn.sm { padding: 6px 10px; font-size: 12px; }
+
+/* Filtres */
+details.t-filters {
+  background: var(--beige);
+  border: 1.5px solid var(--light-beige);
+  border-radius: 12px;
+  margin-top: 6px;
+}
+details.t-filters summary {
+  padding: 9px 12px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--dark-grey);
+  user-select: none;
+}
+.t-filter-grid { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+.t-filter-block { background: var(--white); padding: 8px; border-radius: 8px; }
+.t-filter-title { font-family: var(--font-ui); font-size: 11px; font-weight: 700; color: #78716c; text-transform: uppercase; margin-bottom: 6px; }
+.t-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.t-chip {
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1.5px solid var(--light-beige);
+  background: var(--white);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+  color: var(--dark-grey);
+}
+.t-chip.on { background: var(--coral); color: var(--white); border-color: var(--coral); }
+.t-chip.on.cat-commerce  { background: #9a3412; border-color: #9a3412; }
+.t-chip.on.cat-resto     { background: #991b1b; border-color: #991b1b; }
+.t-chip.on.cat-activite  { background: var(--green); border-color: var(--green); }
+.t-chip.on.cat-camping   { background: #1e40af; border-color: #1e40af; }
+.t-chip.on.cat-hebergement { background: #3730a3; border-color: #3730a3; }
+.t-chip.on.cat-tourisme  { background: var(--brown); border-color: var(--brown); }
+.t-chip.on.cat-autre     { background: var(--dark-grey); border-color: var(--dark-grey); }
+
+/* ---- LISTE ---- */
+#list-view { padding: 12px; padding-bottom: 90px; flex: 1; }
+#list-view.hidden { display: none; }
+
+.t-sector { margin-bottom: 18px; }
+.t-sector-title {
+  background: var(--coral);
+  color: var(--white);
+  padding: 8px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 2px 3px 0 var(--brown);
+}
+
+.t-city { background: var(--white); border-radius: 12px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.t-city-header {
+  padding: 11px 14px;
+  background: #fef3c7;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  border-radius: 12px 12px 0 0;
+}
+.t-city-header:hover { background: #fde68a; }
+.t-city-count { font-size: 12px; color: #78716c; font-weight: 500; }
+.t-city-body { padding: 6px; }
+.t-city.collapsed .t-city-body { display: none; }
+.t-city.collapsed .t-city-header { border-radius: 12px; }
+.t-chev { transition: transform 0.2s; display: inline-block; }
+.t-city.collapsed .t-chev { transform: rotate(-90deg); }
+
+.t-lieu {
+  border: 1.5px solid var(--light-beige);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 6px;
+  background: var(--white);
+}
+.t-lieu.done     { background: #f0fdf4; border-color: #bbf7d0; }
+.t-lieu.refus    { background: #fef2f2; border-color: #fecaca; opacity: 0.75; }
+.t-lieu.repasser { background: #fffbeb; border-color: #fde68a; }
+.t-lieu-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.t-lieu-nom { font-family: var(--font-ui); font-weight: 700; font-size: 15px; flex: 1; line-height: 1.3; color: var(--dark-grey); }
+.t-horaires { font-family: var(--font-ui); font-size: 12px; color: #78716c; margin-bottom: 7px; }
+.t-notes-fixe { font-size: 12px; color: var(--dark-grey); font-style: italic; margin-bottom: 7px; padding: 4px 8px; background: var(--beige); border-left: 3px solid var(--coral); border-radius: 2px; font-family: var(--font-body); }
+
+/* Badges catégorie */
+.cat-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cat-commerce   { background: #fed7aa; color: #9a3412; }
+.cat-resto      { background: #fecaca; color: #991b1b; }
+.cat-activite   { background: #d9f99d; color: #3f6212; }
+.cat-camping    { background: #dbeafe; color: #1e40af; }
+.cat-hebergement{ background: #e0e7ff; color: #3730a3; }
+.cat-tourisme   { background: #fef08a; color: #713f12; }
+.cat-autre      { background: var(--light-beige); color: var(--dark-grey); }
+
+/* Boutons statut */
+.t-statut-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.t-statut-btn {
+  flex: 1; min-width: 66px;
+  padding: 7px 4px;
+  border-radius: 8px;
+  border: 1.5px solid var(--light-beige);
+  background: var(--white);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  min-height: 38px;
+  transition: all 0.15s;
+  color: var(--dark-grey);
+}
+.t-statut-btn.on { color: var(--white); border-color: transparent; }
+.t-statut-btn.on.s-affiche       { background: #16a34a; }
+.t-statut-btn.on.s-flyers        { background: #16a34a; }
+.t-statut-btn.on.s-affiche_flyers{ background: #15803d; }
+.t-statut-btn.on.s-a_repasser    { background: #ca8a04; }
+.t-statut-btn.on.s-refus_total   { background: #dc2626; }
+
+.t-depot-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.t-depot-meta input {
+  padding: 6px 10px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  background: var(--beige);
+  color: var(--dark-grey);
+}
+.t-notes-depot {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 8px;
+  font-size: 12px;
+  resize: vertical;
+  margin-top: 6px;
+  font-family: var(--font-body);
+  background: var(--beige);
+  color: var(--dark-grey);
+}
+.t-lieu-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; }
+
+/* ---- CARTE ---- */
+#map-view { display: none; flex: 1; position: relative; }
+#map-view.active { display: block; }
+#map { background: #e8dfd0; width: 100%; }
+
+.t-map-legend {
+  position: absolute; bottom: 30px; left: 10px; z-index: 1000;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  pointer-events: none;
+  border: 1.5px solid var(--light-beige);
+}
+.t-legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.t-legend-item:last-child { margin-bottom: 0; }
+.t-legend-dot {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1.5px rgba(0,0,0,0.18);
+  flex-shrink: 0;
+}
+.t-geocoding-bar {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;
+  background: #fef3c7;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: #92400e;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  display: none; white-space: nowrap;
+}
+.t-geocoding-bar.visible { display: block; }
+
+/* Popup carte */
+.mp-nom { font-family: var(--font-ui); font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--dark-grey); }
+.mp-meta { font-family: var(--font-ui); font-size: 12px; color: #78716c; margin-bottom: 8px; }
+.mp-statuts { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 7px; }
+.mp-statut-btn {
+  padding: 5px 7px; border-radius: 8px;
+  border: 1.5px solid var(--light-beige);
+  background: var(--white);
+  font-family: var(--font-ui);
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  color: var(--dark-grey);
+}
+.mp-statut-btn.on { color: var(--white); border-color: transparent; }
+.mp-edit-btn {
+  width: 100%; padding: 7px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 8px;
+  background: var(--white);
+  font-family: var(--font-ui);
+  font-size: 12px; cursor: pointer;
+  color: var(--dark-grey);
+}
+.mp-edit-btn:hover { background: var(--beige); }
+
+/* ---- SYNC BADGE ---- */
+.t-sync {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: rgba(255,255,255,0.2);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.t-sync.ok  { background: #16a34a; color: white; }
+.t-sync.err { background: #dc2626; color: white; }
+.t-sync.local { background: var(--yellow); color: var(--dark-grey); }
+
+/* ---- FAB ---- */
+#t-fab {
+  position: fixed;
+  bottom: 20px; right: 16px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--white);
+  border: none;
+  font-size: 28px;
+  box-shadow: 3px 4px 0 var(--brown);
+  cursor: pointer;
+  z-index: 85;
+  font-family: var(--font-ui);
+  transition: transform 0.15s;
+}
+#t-fab:active { transform: scale(0.95); }
+
+/* ---- MODAL ---- */
+.t-modal-bg {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(63,62,62,0.5);
+  z-index: 300;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 12px;
+  overflow-y: auto;
+}
+.t-modal-bg.open { display: flex; }
+.t-modal {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.t-modal h3 {
+  font-family: var(--font-hand);
+  font-size: 1.4rem;
+  color: var(--coral);
+  margin: 0 0 14px;
+}
+.t-modal label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  color: #78716c;
+}
+.t-modal input, .t-modal select, .t-modal textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--light-beige);
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  background: var(--beige);
+  color: var(--dark-grey);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.t-modal input:focus, .t-modal select:focus, .t-modal textarea:focus {
+  border-color: var(--coral);
+}
+.t-modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.t-modal-actions .t-btn { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; }
+.t-modal-actions .t-btn.dan { background: #dc2626; }
+
+.t-empty { text-align: center; padding: 40px 20px; font-family: var(--font-ui); color: #78716c; }
+
+/* ---- PAGE TITLE BAND ---- */
+.t-page-title {
+  background: var(--coral);
+  color: var(--white);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.t-page-title h1 {
+  font-family: var(--font-title);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  margin: 0;
+  line-height: 1.1;
+}
+.t-page-title .t-sub {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  opacity: 0.9;
+  margin-left: 4px;
+}
+
+@media (min-width: 640px) {
+  .t-lieu-nom { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======== HEADER SITE ======== -->
+<header class="site-header" role="banner">
+  <div class="header-inner">
+    <div class="header-logo">
+      <a href="../index.html" aria-label="Accueil L'Attrape-Rêves">
+        <img src="../assets/images/logo.png" alt="Logo L'Attrape-Rêves" width="48" height="48">
+        <span class="header-logo-text">L'Attrape-Rêves</span>
+      </a>
+    </div>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="../le-lieu.html">Le lieu</a>
+      <a href="../decouvrir.html">Animaux et jeux</a>
+      <a href="../manger-et-boire.html">Manger & Boire</a>
+      <a href="../agenda.html">Agenda</a>
+      <a href="../infos-pratiques.html">Infos pratiques</a>
+    </nav>
+    <div class="header-right">
+      <a href="../billetterie.html" class="btn-billetterie">Billetterie</a>
+    </div>
+    <button class="hamburger" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav" aria-label="Navigation mobile">
+  <a href="../le-lieu.html">Le lieu</a>
+  <a href="../decouvrir.html">Animaux et jeux</a>
+  <a href="../manger-et-boire.html">Manger & Boire</a>
+  <a href="../agenda.html">Agenda</a>
+  <a href="../infos-pratiques.html">Infos pratiques</a>
+  <a href="../billetterie.html">Billetterie</a>
+</nav>
+
+<!-- ======== CONTENU TOURNÉE ======== -->
+<div class="tournee-page">
+
+  <!-- Bandeau titre -->
+  <div class="t-page-title">
+    <h1>🎪 Tournée Flyers <span class="t-sync" id="sync">…</span></h1>
+    <span class="t-sub">Outil collaboratif temps réel</span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="t-toolbar">
+    <div class="t-row">
+      <input type="text" id="search" class="t-search" placeholder="🔍 Rechercher lieu, ville…">
+      <div class="t-view-toggle">
+        <button class="t-view-btn active" data-view="list" onclick="switchView('list')">📋 Liste</button>
+        <button class="t-view-btn" data-view="map" onclick="switchView('map')">🗺️ Carte</button>
+      </div>
+    </div>
+    <div class="t-row">
+      <input type="text" id="who" class="t-who" placeholder="Ton prénom">
+      <div class="t-stats" id="stats">0 / 0</div>
+      <button class="t-btn sm" onclick="expandAll(true)">Déplier</button>
+      <button class="t-btn sm sec" onclick="expandAll(false)">Replier</button>
+      <button class="t-btn sm sec" onclick="exportJSON()" title="Exporter JSON">💾</button>
+      <button class="t-btn sm sec" onclick="document.getElementById('importFile').click()" title="Importer JSON">📥</button>
+      <input type="file" id="importFile" style="display:none" accept=".json">
+    </div>
+    <details class="t-filters" id="filtersBlock">
+      <summary>🎛️ Filtres <span id="filterCount" style="font-weight:400;font-size:12px;color:#78716c"></span></summary>
+      <div class="t-filter-grid">
+        <div class="t-filter-block">
+          <div class="t-filter-title">Catégories</div>
+          <div class="t-chips" id="catChips"></div>
+        </div>
+        <div class="t-filter-block">
+          <div class="t-filter-title">Statut</div>
+          <div class="t-chips" id="statutChips"></div>
+        </div>
+        <div class="t-filter-block">
+          <div class="t-filter-title">Villes</div>
+          <div class="t-chips" id="villeChips"></div>
+        </div>
+        <div class="t-filter-block">
+          <div class="t-filter-title">Affichage</div>
+          <div class="t-chips">
+            <span class="t-chip" data-show="archive" onclick="toggleShowArchived()">Voir les archivés</span>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Vue liste -->
+  <div id="list-view"></div>
+
+  <!-- Vue carte -->
+  <div id="map-view">
+    <div id="map"></div>
+    <div class="t-map-legend" id="mapLegend"></div>
+    <div class="t-geocoding-bar" id="geocodingBar"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button id="t-fab" onclick="openAddModal()" title="Ajouter un lieu">+</button>
+
+<!-- Modal ajout/édition -->
+<div class="t-modal-bg" id="modal">
+  <div class="t-modal">
+    <h3 id="modalTitle">Ajouter un lieu</h3>
+    <input type="hidden" id="m-id">
+    <label>Secteur</label>
+    <select id="m-secteur"></select>
+    <label>Ville</label>
+    <select id="m-ville-sel" onchange="onVilleSelChange()"></select>
+    <input type="text" id="m-ville-new" placeholder="Nom de la nouvelle ville" style="display:none;margin-top:6px">
+    <label>Catégorie</label>
+    <select id="m-cat">
+      <option value="commerce">Commerce</option>
+      <option value="resto">Resto</option>
+      <option value="activite">Activité</option>
+      <option value="camping">Camping</option>
+      <option value="hebergement">Hébergement</option>
+      <option value="tourisme">Office tourisme / Mairie</option>
+      <option value="autre">Autre</option>
+    </select>
+    <label>Nom du lieu *</label>
+    <input type="text" id="m-nom" placeholder="Ex: Camping Le Pradal">
+    <label>Adresse (optionnel — améliore la précision sur la carte)</label>
+    <input type="text" id="m-adresse" placeholder="Ex: 12 rue des Cévennes">
+    <label>Horaires</label>
+    <input type="text" id="m-hor" placeholder="Ex: Lun-Sam 9h-19h">
+    <label>Notes fixes sur le lieu</label>
+    <textarea id="m-notes" rows="2" placeholder="Ex: Demander Sophie. Préfère affiche grand format."></textarea>
+    <div class="t-modal-actions">
+      <button class="t-btn sec" onclick="closeModal()">Annuler</button>
+      <button class="t-btn dan" id="m-delete" onclick="deleteFromModal()" style="display:none">Supprimer</button>
+      <button class="t-btn" onclick="saveFromModal()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- JS site (hamburger menu) -->
+<script src="../assets/js/main.js"></script>
+
+<script>
+// ============ CONFIG ============
+const SUPABASE_URL = 'https://sahryjogambzsbfmsfga.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Op3f6V4pJ9tRcpOgF-fQVQ_GBgQZgtN';
+
+const CATEGORIES = {
+  commerce: 'Commerce', resto: 'Resto', activite: 'Activité',
+  camping: 'Camping', hebergement: 'Hébergement', tourisme: 'Tourisme/Mairie', autre: 'Autre'
+};
+
+const STATUTS = {
+  non_visite:    { lbl: '⚪ Non visité',       short: 'Non visité' },
+  affiche:       { lbl: '🟢 Affiche',          short: 'Affiche' },
+  flyers:        { lbl: '🟢 Flyers',           short: 'Flyers' },
+  affiche_flyers:{ lbl: '🟢 Affiche + Flyers', short: 'A+F' },
+  a_repasser:    { lbl: '🟡 À repasser',       short: 'À repasser' },
+  refus_total:   { lbl: '🔴 Refus total',      short: 'Refus' }
+};
+
+const STATUS_COLORS = {
+  non_visite:    '#9ca3af',
+  affiche:       '#16a34a',
+  flyers:        '#16a34a',
+  affiche_flyers:'#15803d',
+  a_repasser:    '#d97706',
+  refus_total:   '#dc2626'
+};
+
+const SECTEURS = [
+  'Secteur 1 — Comcom des Vans + Joyeuse',
+  'Secteur 2 — Vallon/Barjac/St-Ambroix/Villefort/Largentière/Ruoms',
+  'Secteur 3 — Aubenas/Bessèges/Alès'
+];
+
+// ============ STATE ============
+let sb = null, lieux = [], useSupabase = false;
+let filterCat = new Set(Object.keys(CATEGORIES));
+let filterStatut = new Set(Object.keys(STATUTS));
+let filterVille = new Set();
+let showArchived = false;
+let collapsedCities = new Set(JSON.parse(localStorage.getItem('ar_collapsed') || '[]'));
+let currentView = 'list';
+let map = null, markerCluster = null, mapInitialized = false;
+
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============ INIT ============
+async function init() {
+  document.getElementById('who').value = localStorage.getItem('ar_who') || '';
+  document.getElementById('who').addEventListener('input', e => localStorage.setItem('ar_who', e.target.value));
+  document.getElementById('search').addEventListener('input', render);
+  document.getElementById('importFile').addEventListener('change', handleImport);
+
+  try {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await sb.from('tournee_lieux').select('*').order('secteur').order('ville').order('nom');
+    if (error) throw error;
+    lieux = data || [];
+    useSupabase = true;
+    setSync('ok', '☁ Synchro');
+    sb.channel('tournee').on('postgres_changes', { event: '*', schema: 'public', table: 'tournee_lieux' }, payload => {
+      if (payload.eventType === 'INSERT') {
+        if (!lieux.find(l => l.id === payload.new.id)) lieux.push(payload.new);
+      } else if (payload.eventType === 'UPDATE') {
+        const i = lieux.findIndex(l => l.id === payload.new.id);
+        if (i >= 0) lieux[i] = payload.new;
+      } else if (payload.eventType === 'DELETE') {
+        lieux = lieux.filter(l => l.id !== payload.old.id);
+      }
+      render();
+    }).subscribe();
+  } catch(e) {
+    console.error(e);
+    useSupabase = false;
+    setSync('local', '⚠ Local');
+    lieux = JSON.parse(localStorage.getItem('ar_lieux_fallback') || '[]');
+  }
+  buildFilterChips();
+  render();
+}
+
+function setSync(cls, txt) {
+  const el = document.getElementById('sync');
+  el.className = 't-sync ' + cls;
+  el.textContent = txt;
+}
+
+function saveLocalFallback() {
+  if (!useSupabase) localStorage.setItem('ar_lieux_fallback', JSON.stringify(lieux));
+}
+
+// ============ VUES ============
+function switchView(view) {
+  currentView = view;
+  document.querySelector('[data-view="list"]').classList.toggle('active', view === 'list');
+  document.querySelector('[data-view="map"]').classList.toggle('active', view === 'map');
+  document.getElementById('list-view').classList.toggle('hidden', view === 'map');
+  document.getElementById('map-view').classList.toggle('active', view === 'map');
+  if (view === 'map') {
+    if (!mapInitialized) { initMap(); mapInitialized = true; }
+    updateMapHeight();
+    renderMap();
+    geocodeMissing();
+  }
+}
+
+// ============ CARTE ============
+function initMap() {
+  map = L.map('map', { zoomControl: true }).setView([44.38, 4.12], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+  markerCluster = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 40 });
+  map.addLayer(markerCluster);
+  buildMapLegend();
+  window.addEventListener('resize', updateMapHeight);
+}
+
+function updateMapHeight() {
+  const headerH = document.querySelector('.site-header').offsetHeight;
+  const titleH  = document.querySelector('.t-page-title').offsetHeight;
+  const toolbarH = document.querySelector('.t-toolbar').offsetHeight;
+  const h = window.innerHeight - headerH - titleH - toolbarH;
+  document.getElementById('map').style.height = Math.max(h, 200) + 'px';
+  if (map) setTimeout(() => map.invalidateSize(), 50);
+}
+
+function buildMapLegend() {
+  const items = [
+    { color: '#9ca3af', label: 'Non visité' },
+    { color: '#16a34a', label: 'Affiche / Flyers déposés' },
+    { color: '#d97706', label: 'À repasser' },
+    { color: '#dc2626', label: 'Refus' }
+  ];
+  document.getElementById('mapLegend').innerHTML = items.map(i =>
+    `<div class="t-legend-item">
+       <div class="t-legend-dot" style="background:${i.color}"></div>
+       <span>${i.label}</span>
+     </div>`
+  ).join('');
+}
+
+function renderMap() {
+  if (!map || !mapInitialized) return;
+  markerCluster.clearLayers();
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  lieux.filter(l => {
+    if (!showArchived && l.archive) return false;
+    if (!filterCat.has(l.categorie)) return false;
+    if (!filterStatut.has(l.statut || 'non_visite')) return false;
+    if (filterVille.size > 0 && !filterVille.has(l.ville)) return false;
+    if (search && !(l.nom.toLowerCase().includes(search) || l.ville.toLowerCase().includes(search))) return false;
+    return l.lat && l.lng;
+  }).forEach(l => {
+    const color = STATUS_COLORS[l.statut || 'non_visite'] || '#9ca3af';
+    const marker = L.circleMarker([l.lat, l.lng], {
+      radius: 10, fillColor: color, color: 'white', weight: 2.5, opacity: 1, fillOpacity: 0.9
+    });
+    marker.bindPopup(buildPopup(l), { maxWidth: 270, minWidth: 210 });
+    markerCluster.addLayer(marker);
+  });
+}
+
+function buildPopup(l) {
+  const st = l.statut || 'non_visite';
+  const btns = Object.entries(STATUTS).filter(([k]) => k !== 'non_visite').map(([k, v]) => {
+    const on = st === k;
+    return `<button class="mp-statut-btn${on?' on':''}" style="${on?`background:${STATUS_COLORS[k]};`:''}"
+      onclick="popupSetStatut('${l.id}','${k}')">${v.short}</button>`;
+  }).join('');
+  return `<div>
+    <div class="mp-nom">${escHtml(l.nom)}</div>
+    <div class="mp-meta">
+      <span class="cat-badge cat-${l.categorie}">${CATEGORIES[l.categorie]||l.categorie}</span>
+      &nbsp;📍 ${escHtml(l.ville)}
+      ${l.horaires ? `<br>🕐 ${escHtml(l.horaires)}` : ''}
+    </div>
+    <div class="mp-statuts">${btns}</div>
+    <button class="mp-edit-btn" onclick="popupEdit('${l.id}')">✏️ Modifier</button>
+  </div>`;
+}
+
+async function popupSetStatut(id, statut) { await setStatut(id, statut); renderMap(); }
+function popupEdit(id) { if (map) map.closePopup(); openEditModal(id); }
+
+// ============ GÉOCODAGE ============
+async function geocode(nom, adresse, ville) {
+  for (const q of [[nom, adresse, ville].filter(Boolean).join(' '), ville]) {
+    try {
+      const r = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=1`);
+      const d = await r.json();
+      if (d.features?.length > 0) {
+        const [lng, lat] = d.features[0].geometry.coordinates;
+        return { lat, lng };
+      }
+    } catch { /* continue */ }
+  }
+  return null;
+}
+
+async function geocodeMissing() {
+  const todo = lieux.filter(l => !l.lat || !l.lng);
+  if (!todo.length) return;
+  const bar = document.getElementById('geocodingBar');
+  bar.classList.add('visible');
+  for (let i = 0; i < todo.length; i++) {
+    bar.textContent = `📍 Géolocalisation ${i+1}/${todo.length}…`;
+    const coords = await geocode(todo[i].nom, todo[i].adresse, todo[i].ville);
+    if (coords) {
+      Object.assign(todo[i], coords);
+      if (useSupabase) await sb.from('tournee_lieux').update(coords).eq('id', todo[i].id);
+      renderMap();
+    }
+    await new Promise(r => setTimeout(r, 220));
+  }
+  bar.classList.remove('visible');
+}
+
+// ============ FILTRES ============
+function buildFilterChips() {
+  const catEl = document.getElementById('catChips');
+  catEl.innerHTML = '';
+  for (const [k, v] of Object.entries(CATEGORIES)) {
+    const c = document.createElement('span');
+    c.className = 't-chip on cat-' + k;
+    c.textContent = v;
+    c.onclick = () => { toggleSet(filterCat, k); c.classList.toggle('on'); render(); };
+    catEl.appendChild(c);
+  }
+  const stEl = document.getElementById('statutChips');
+  stEl.innerHTML = '';
+  for (const [k, v] of Object.entries(STATUTS)) {
+    const c = document.createElement('span');
+    c.className = 't-chip on';
+    c.textContent = v.short;
+    c.onclick = () => { toggleSet(filterStatut, k); c.classList.toggle('on'); render(); };
+    stEl.appendChild(c);
+  }
+  refreshVilleChips();
+}
+
+function refreshVilleChips() {
+  const villes = [...new Set(lieux.map(l => l.ville))].sort();
+  const el = document.getElementById('villeChips');
+  el.innerHTML = '';
+  const all = document.createElement('span');
+  all.className = 't-chip' + (filterVille.size === 0 ? ' on' : '');
+  all.textContent = 'Toutes';
+  all.onclick = () => { filterVille.clear(); refreshVilleChips(); render(); };
+  el.appendChild(all);
+  villes.forEach(v => {
+    const c = document.createElement('span');
+    c.className = 't-chip' + (filterVille.has(v) ? ' on' : '');
+    c.textContent = v;
+    c.onclick = () => { toggleSet(filterVille, v); c.classList.toggle('on'); all.classList.toggle('on', filterVille.size===0); render(); };
+    el.appendChild(c);
+  });
+}
+
+function toggleSet(s, v) { s.has(v) ? s.delete(v) : s.add(v); }
+function toggleShowArchived() {
+  showArchived = !showArchived;
+  document.querySelector('[data-show="archive"]').classList.toggle('on', showArchived);
+  render();
+}
+
+// ============ RENDU LISTE ============
+function render() {
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  const content = document.getElementById('list-view');
+  content.innerHTML = '';
+
+  const filtered = lieux.filter(l => {
+    if (!showArchived && l.archive) return false;
+    if (!filterCat.has(l.categorie)) return false;
+    if (!filterStatut.has(l.statut || 'non_visite')) return false;
+    if (filterVille.size > 0 && !filterVille.has(l.ville)) return false;
+    if (search && !(l.nom.toLowerCase().includes(search) || l.ville.toLowerCase().includes(search))) return false;
+    return true;
+  });
+
+  const total = lieux.filter(l => !l.archive).length;
+  const done  = lieux.filter(l => !l.archive && ['affiche','flyers','affiche_flyers'].includes(l.statut)).length;
+  document.getElementById('stats').textContent = `${done} / ${total}`;
+
+  const fc = [];
+  if (filterCat.size < Object.keys(CATEGORIES).length) fc.push(`${filterCat.size} cat.`);
+  if (filterStatut.size < Object.keys(STATUTS).length) fc.push(`${filterStatut.size} statuts`);
+  if (filterVille.size > 0) fc.push(`${filterVille.size} villes`);
+  document.getElementById('filterCount').textContent = fc.length ? `(${fc.join(', ')})` : '';
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="t-empty">Aucun lieu ne correspond aux filtres.</div>';
+    if (currentView === 'map' && mapInitialized) renderMap();
+    return;
+  }
+
+  const groups = {};
+  filtered.forEach(l => {
+    if (!groups[l.secteur]) groups[l.secteur] = {};
+    if (!groups[l.secteur][l.ville]) groups[l.secteur][l.ville] = [];
+    groups[l.secteur][l.ville].push(l);
+  });
+
+  for (const sec of Object.keys(groups).sort()) {
+    const sDiv = document.createElement('div');
+    sDiv.className = 't-sector';
+    sDiv.innerHTML = `<div class="t-sector-title">${sec}</div>`;
+    for (const ville of Object.keys(groups[sec]).sort()) {
+      const cKey = sec + '|' + ville;
+      const collapsed = collapsedCities.has(cKey);
+      const items = groups[sec][ville];
+      const doneCount = items.filter(l => ['affiche','flyers','affiche_flyers'].includes(l.statut)).length;
+      const cDiv = document.createElement('div');
+      cDiv.className = 't-city' + (collapsed ? ' collapsed' : '');
+      cDiv.innerHTML = `
+        <div class="t-city-header" onclick="toggleCity('${cKey.replace(/'/g,"\\'")}')">
+          <span><span class="t-chev">▼</span> 📍 ${ville}</span>
+          <span class="t-city-count">${doneCount}/${items.length}</span>
+        </div>
+        <div class="t-city-body"></div>`;
+      const body = cDiv.querySelector('.t-city-body');
+      items.forEach(l => body.appendChild(renderLieu(l)));
+      sDiv.appendChild(cDiv);
+    }
+    content.appendChild(sDiv);
+  }
+  refreshVilleChips();
+  if (currentView === 'map' && mapInitialized) renderMap();
+}
+
+function renderLieu(l) {
+  const div = document.createElement('div');
+  const st = l.statut || 'non_visite';
+  let cls = 't-lieu';
+  if (['affiche','flyers','affiche_flyers'].includes(st)) cls += ' done';
+  if (st === 'refus_total') cls += ' refus';
+  if (st === 'a_repasser') cls += ' repasser';
+  div.className = cls;
+  div.innerHTML = `
+    <div class="t-lieu-head">
+      <div class="t-lieu-nom">${escHtml(l.nom)}</div>
+      <span class="cat-badge cat-${l.categorie}">${CATEGORIES[l.categorie]||l.categorie}</span>
+    </div>
+    ${l.horaires ? `<div class="t-horaires">🕐 ${escHtml(l.horaires)}</div>` : ''}
+    ${l.notes_lieu ? `<div class="t-notes-fixe">${escHtml(l.notes_lieu)}</div>` : ''}
+    <div class="t-statut-row">
+      ${Object.entries(STATUTS).filter(([k]) => k !== 'non_visite').map(([k,v]) =>
+        `<button class="t-statut-btn s-${k} ${st===k?'on':''}" onclick="setStatut('${l.id}','${k}')">${v.short}</button>`
+      ).join('')}
+    </div>
+    <div class="t-depot-meta">
+      <input type="text" placeholder="Par qui" value="${escHtml(l.qui||'')}" onchange="setField('${l.id}','qui',this.value)" style="flex:1;min-width:90px">
+      <input type="date" value="${l.date_depot||''}" onchange="setField('${l.id}','date_depot',this.value||null)">
+    </div>
+    <textarea class="t-notes-depot" placeholder="Notes du passage…" onchange="setField('${l.id}','notes_depot',this.value)">${escHtml(l.notes_depot||'')}</textarea>
+    <div class="t-lieu-actions">
+      <button class="t-btn sm sec" onclick="openEditModal('${l.id}')">✏️ Modifier</button>
+      ${l.archive
+        ? `<button class="t-btn sm" onclick="setField('${l.id}','archive',false)">↩️ Restaurer</button>`
+        : `<button class="t-btn sm sec" onclick="setField('${l.id}','archive',true)">📦 Archiver</button>`}
+    </div>`;
+  return div;
+}
+
+function toggleCity(key) {
+  collapsedCities.has(key) ? collapsedCities.delete(key) : collapsedCities.add(key);
+  localStorage.setItem('ar_collapsed', JSON.stringify([...collapsedCities]));
+  render();
+}
+
+function expandAll(expand) {
+  if (expand) { collapsedCities.clear(); }
+  else { lieux.forEach(l => { if (l.secteur && l.ville) collapsedCities.add(l.secteur+'|'+l.ville); }); }
+  localStorage.setItem('ar_collapsed', JSON.stringify([...collapsedCities]));
+  render();
+}
+
+// ============ MISES À JOUR ============
+async function setStatut(id, statut) {
+  const l = lieux.find(x => x.id === id);
+  if (!l) return;
+  if (l.statut === statut) statut = 'non_visite';
+  const who = document.getElementById('who').value.trim();
+  const updates = { statut };
+  if (statut !== 'non_visite') {
+    if (who && !l.qui) updates.qui = who;
+    if (!l.date_depot) updates.date_depot = new Date().toISOString().slice(0,10);
+  }
+  await updateLieu(id, updates);
+}
+
+async function setField(id, field, value) { await updateLieu(id, { [field]: value }); }
+
+async function updateLieu(id, updates) {
+  const l = lieux.find(x => x.id === id);
+  if (!l) return;
+  Object.assign(l, updates);
+  if (useSupabase) {
+    const { error } = await sb.from('tournee_lieux').update(updates).eq('id', id);
+    if (error) { console.error(error); alert('Erreur sync : ' + error.message); }
+  } else { saveLocalFallback(); }
+  render();
+}
+
+// ============ MODAL ============
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Ajouter un lieu';
+  document.getElementById('m-id').value = '';
+  document.getElementById('m-delete').style.display = 'none';
+  fillSecteurSelect(); fillVilleSelect();
+  ['m-nom','m-adresse','m-hor','m-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-cat').value = 'commerce';
+  document.getElementById('modal').classList.add('open');
+}
+
+function openEditModal(id) {
+  const l = lieux.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('modalTitle').textContent = 'Modifier le lieu';
+  document.getElementById('m-id').value = id;
+  document.getElementById('m-delete').style.display = 'block';
+  fillSecteurSelect(l.secteur); fillVilleSelect(l.ville);
+  document.getElementById('m-cat').value = l.categorie;
+  document.getElementById('m-nom').value = l.nom;
+  document.getElementById('m-adresse').value = l.adresse || '';
+  document.getElementById('m-hor').value = l.horaires || '';
+  document.getElementById('m-notes').value = l.notes_lieu || '';
+  document.getElementById('modal').classList.add('open');
+}
+
+function fillSecteurSelect(sel) {
+  document.getElementById('m-secteur').innerHTML = SECTEURS.map(s => `<option ${s===sel?'selected':''}>${s}</option>`).join('');
+}
+
+function fillVilleSelect(sel) {
+  const villes = [...new Set(lieux.map(l => l.ville))].sort();
+  document.getElementById('m-ville-sel').innerHTML =
+    villes.map(v => `<option ${v===sel?'selected':''}>${v}</option>`).join('') +
+    '<option value="__new__">➕ Nouvelle ville…</option>';
+  document.getElementById('m-ville-new').style.display = 'none';
+  document.getElementById('m-ville-new').value = '';
+}
+
+function onVilleSelChange() {
+  document.getElementById('m-ville-new').style.display =
+    document.getElementById('m-ville-sel').value === '__new__' ? 'block' : 'none';
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+async function saveFromModal() {
+  const id = document.getElementById('m-id').value;
+  const secteur = document.getElementById('m-secteur').value;
+  let ville = document.getElementById('m-ville-sel').value;
+  if (ville === '__new__') ville = document.getElementById('m-ville-new').value.trim();
+  const nom = document.getElementById('m-nom').value.trim();
+  const adresse = document.getElementById('m-adresse').value.trim();
+  if (!nom || !ville) { alert('Nom et ville requis'); return; }
+  const payload = {
+    secteur, ville, adresse,
+    categorie: document.getElementById('m-cat').value, nom,
+    horaires: document.getElementById('m-hor').value.trim(),
+    notes_lieu: document.getElementById('m-notes').value.trim()
+  };
+  const existing = id ? lieux.find(x => x.id === id) : null;
+  if (!existing || existing.nom !== nom || (existing.adresse||'') !== adresse || existing.ville !== ville) {
+    const coords = await geocode(nom, adresse, ville);
+    if (coords) { payload.lat = coords.lat; payload.lng = coords.lng; }
+  }
+  if (id) {
+    await updateLieu(id, payload);
+  } else {
+    if (useSupabase) {
+      const { error } = await sb.from('tournee_lieux').insert(payload);
+      if (error) { alert('Erreur : ' + error.message); return; }
+    } else {
+      lieux.push({ ...payload, id: 'local-'+Date.now(), statut: 'non_visite' });
+      saveLocalFallback(); render();
+    }
+  }
+  closeModal();
+}
+
+async function deleteFromModal() {
+  const id = document.getElementById('m-id').value;
+  if (!id) return;
+  if (!confirm('Supprimer définitivement ce lieu ?\n(Préfère "Archiver" pour le garder en mémoire)')) return;
+  if (useSupabase) {
+    const { error } = await sb.from('tournee_lieux').delete().eq('id', id);
+    if (error) { alert(error.message); return; }
+  }
+  lieux = lieux.filter(l => l.id !== id);
+  saveLocalFallback(); closeModal(); render();
+}
+
+// ============ IMPORT / EXPORT ============
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(lieux, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `tournee-${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+
+async function handleImport(e) {
+  const f = e.target.files[0]; if (!f) return;
+  let arr; try { arr = JSON.parse(await f.text()); } catch { alert('JSON invalide'); return; }
+  if (!Array.isArray(arr)) { alert('Format attendu : tableau de lieux'); return; }
+  if (!confirm(`Importer ${arr.length} lieux ?`)) return;
+  const existing = new Set(lieux.map(l => (l.nom+'|'+l.ville).toLowerCase()));
+  const toInsert = arr.filter(l => !existing.has((l.nom+'|'+l.ville).toLowerCase()))
+    .map(l => ({
+      secteur: l.secteur, ville: l.ville, adresse: l.adresse||'',
+      categorie: l.categorie, nom: l.nom, horaires: l.horaires||'',
+      notes_lieu: l.notes_lieu||'', statut: l.statut||'non_visite',
+      qui: l.qui||'', date_depot: l.date_depot||null, notes_depot: l.notes_depot||'',
+      archive: !!l.archive, lat: l.lat||null, lng: l.lng||null
+    }));
+  if (useSupabase && toInsert.length) {
+    const { data, error } = await sb.from('tournee_lieux').insert(toInsert).select();
+    if (error) { alert(error.message); return; }
+    data.forEach(d => { if (!lieux.find(x => x.id === d.id)) lieux.push(d); });
+  } else {
+    toInsert.forEach(l => lieux.push({ ...l, id: 'local-'+Math.random() }));
+    saveLocalFallback();
+  }
+  alert(`${toInsert.length} lieux importés`);
+  render(); e.target.value = '';
+}
+
+init();
+</script>
+</body>
+</html>
