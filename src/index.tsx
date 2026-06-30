@@ -4,6 +4,7 @@ import { cors } from 'hono/cors'
 type Bindings = {
   DB: D1Database
   ADMIN_PASSWORD?: string
+  OWNER_PASSWORD?: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -23,6 +24,68 @@ const requireAuth = async (c: any, next: any) => {
     return c.json({ error: 'Mot de passe incorrect' }, 401)
   }
   await next()
+}
+
+// Accès caisse : staff (ADMIN_PASSWORD) ou propriétaire (OWNER_PASSWORD)
+const requireCaisse = async (c: any, next: any) => {
+  const auth = c.req.header('Authorization')
+  if (!auth || !auth.startsWith('Bearer ')) return c.json({ error: 'Non autorisé' }, 401)
+  const token = auth.replace('Bearer ', '')
+  const admin = c.env.ADMIN_PASSWORD
+  const owner = c.env.OWNER_PASSWORD
+  if (token !== admin && token !== owner) return c.json({ error: 'Mot de passe incorrect' }, 401)
+  c.set('isOwner', token === owner)
+  await next()
+}
+
+// Accès propriétaire uniquement
+const requireOwner = async (c: any, next: any) => {
+  const auth = c.req.header('Authorization')
+  if (!auth || !auth.startsWith('Bearer ')) return c.json({ error: 'Non autorisé' }, 401)
+  const token = auth.replace('Bearer ', '')
+  const owner = c.env.OWNER_PASSWORD
+  if (!owner || token !== owner) return c.json({ error: 'Accès propriétaire requis' }, 403)
+  await next()
+}
+
+async function ensureCaisseTable(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS caisse_comptages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      caisse TEXT NOT NULL,
+      comptage_date TEXT NOT NULL,
+      comptage_heure TEXT NOT NULL,
+      billet_500 INTEGER NOT NULL DEFAULT 0,
+      billet_200 INTEGER NOT NULL DEFAULT 0,
+      billet_100 INTEGER NOT NULL DEFAULT 0,
+      billet_50  INTEGER NOT NULL DEFAULT 0,
+      billet_20  INTEGER NOT NULL DEFAULT 0,
+      billet_10  INTEGER NOT NULL DEFAULT 0,
+      billet_5   INTEGER NOT NULL DEFAULT 0,
+      piece_200  INTEGER NOT NULL DEFAULT 0,
+      piece_100  INTEGER NOT NULL DEFAULT 0,
+      piece_050  INTEGER NOT NULL DEFAULT 0,
+      piece_020  INTEGER NOT NULL DEFAULT 0,
+      piece_010  INTEGER NOT NULL DEFAULT 0,
+      piece_005  INTEGER NOT NULL DEFAULT 0,
+      piece_002  INTEGER NOT NULL DEFAULT 0,
+      piece_001  INTEGER NOT NULL DEFAULT 0,
+      total_centimes INTEGER NOT NULL DEFAULT 0,
+      note TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS caisse_retraits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      caisse TEXT NOT NULL,
+      montant_centimes INTEGER NOT NULL,
+      note TEXT,
+      depose_banque INTEGER NOT NULL DEFAULT 0,
+      depose_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
 }
 
 // ===== PUBLIC API =====
@@ -217,6 +280,111 @@ app.delete('/api/admin/events/:id/image', requireAuth, async (c) => {
   await c.env.DB.prepare('UPDATE events SET image_data=NULL, updated_at=datetime(\'now\') WHERE id=?')
     .bind(id).run()
 
+  return c.json({ success: true })
+})
+
+// ===== CAISSE API =====
+
+// Login caisse (retourne le rôle : 'staff' ou 'owner')
+app.post('/api/caisse/login', async (c) => {
+  const { password } = await c.req.json()
+  const admin = c.env.ADMIN_PASSWORD
+  const owner = c.env.OWNER_PASSWORD
+  if (password === owner) return c.json({ success: true, token: password, role: 'owner' })
+  if (password === admin) return c.json({ success: true, token: password, role: 'staff' })
+  return c.json({ error: 'Mot de passe incorrect' }, 401)
+})
+
+// Saisir un comptage (staff ou owner)
+app.post('/api/caisse/comptages', requireCaisse, async (c) => {
+  await ensureCaisseTable(c.env.DB)
+  const b = await c.req.json() as any
+  const coupures = [
+    ['billet_500', 50000], ['billet_200', 20000], ['billet_100', 10000],
+    ['billet_50', 5000], ['billet_20', 2000], ['billet_10', 1000], ['billet_5', 500],
+    ['piece_200', 200], ['piece_100', 100], ['piece_050', 50],
+    ['piece_020', 20], ['piece_010', 10], ['piece_005', 5], ['piece_002', 2], ['piece_001', 1]
+  ]
+  let total = 0
+  for (const [key, val] of coupures) total += (parseInt(b[key]) || 0) * (val as number)
+
+  const result = await c.env.DB.prepare(`
+    INSERT INTO caisse_comptages
+      (caisse, comptage_date, comptage_heure,
+       billet_500, billet_200, billet_100, billet_50, billet_20, billet_10, billet_5,
+       piece_200, piece_100, piece_050, piece_020, piece_010, piece_005, piece_002, piece_001,
+       total_centimes, note)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  `).bind(
+    b.caisse, b.comptage_date, b.comptage_heure,
+    parseInt(b.billet_500)||0, parseInt(b.billet_200)||0, parseInt(b.billet_100)||0,
+    parseInt(b.billet_50)||0, parseInt(b.billet_20)||0, parseInt(b.billet_10)||0, parseInt(b.billet_5)||0,
+    parseInt(b.piece_200)||0, parseInt(b.piece_100)||0, parseInt(b.piece_050)||0,
+    parseInt(b.piece_020)||0, parseInt(b.piece_010)||0, parseInt(b.piece_005)||0,
+    parseInt(b.piece_002)||0, parseInt(b.piece_001)||0,
+    total, b.note || null
+  ).run()
+  return c.json({ success: true, id: result.meta.last_row_id, total_centimes: total }, 201)
+})
+
+// Historique des comptages (staff ou owner)
+app.get('/api/caisse/comptages', requireCaisse, async (c) => {
+  await ensureCaisseTable(c.env.DB)
+  const caisse = c.req.query('caisse')
+  const limit = parseInt(c.req.query('limit') || '50')
+  const query = caisse
+    ? `SELECT * FROM caisse_comptages WHERE caisse=? ORDER BY comptage_date DESC, comptage_heure DESC LIMIT ?`
+    : `SELECT * FROM caisse_comptages ORDER BY comptage_date DESC, comptage_heure DESC LIMIT ?`
+  const { results } = caisse
+    ? await c.env.DB.prepare(query).bind(caisse, limit).all()
+    : await c.env.DB.prepare(query).bind(limit).all()
+  return c.json(results)
+})
+
+// Supprimer un comptage (owner uniquement)
+app.delete('/api/caisse/comptages/:id', requireOwner, async (c) => {
+  await c.env.DB.prepare('DELETE FROM caisse_comptages WHERE id=?').bind(c.req.param('id')).run()
+  return c.json({ success: true })
+})
+
+// Enregistrer un retrait (owner uniquement)
+app.post('/api/caisse/retraits', requireOwner, async (c) => {
+  await ensureCaisseTable(c.env.DB)
+  const { caisse, montant_centimes, note } = await c.req.json() as any
+  const result = await c.env.DB.prepare(
+    `INSERT INTO caisse_retraits (caisse, montant_centimes, note) VALUES (?,?,?)`
+  ).bind(caisse, montant_centimes, note || null).run()
+  return c.json({ success: true, id: result.meta.last_row_id }, 201)
+})
+
+// Lister les retraits (owner uniquement)
+app.get('/api/caisse/retraits', requireOwner, async (c) => {
+  await ensureCaisseTable(c.env.DB)
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM caisse_retraits ORDER BY created_at DESC`
+  ).all()
+  return c.json(results)
+})
+
+// Marquer un retrait comme déposé en banque (owner uniquement)
+app.patch('/api/caisse/retraits/:id/depose', requireOwner, async (c) => {
+  await c.env.DB.prepare(
+    `UPDATE caisse_retraits SET depose_banque=1, depose_at=datetime('now') WHERE id=?`
+  ).bind(c.req.param('id')).run()
+  return c.json({ success: true })
+})
+
+// Annuler le dépôt banque (owner uniquement)
+app.patch('/api/caisse/retraits/:id/annule-depose', requireOwner, async (c) => {
+  await c.env.DB.prepare(
+    `UPDATE caisse_retraits SET depose_banque=0, depose_at=NULL WHERE id=?`
+  ).bind(c.req.param('id')).run()
+  return c.json({ success: true })
+})
+
+// Supprimer un retrait (owner uniquement)
+app.delete('/api/caisse/retraits/:id', requireOwner, async (c) => {
+  await c.env.DB.prepare('DELETE FROM caisse_retraits WHERE id=?').bind(c.req.param('id')).run()
   return c.json({ success: true })
 })
 
