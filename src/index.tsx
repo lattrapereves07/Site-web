@@ -482,6 +482,214 @@ app.delete('/api/admin/invitations/:id', requireAuth, async (c) => {
   return c.json({ success: true })
 })
 
+// ===== CERCLE ANIMÔ API =====
+
+async function ensureCercleAnimoTables(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS cercle_animo_schedule (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      day_of_week INTEGER NOT NULL DEFAULT 1,
+      time TEXT,
+      activity_type TEXT NOT NULL DEFAULT 'Nourrissage',
+      description TEXT,
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'available',
+      volunteer_name TEXT,
+      volunteers TEXT NOT NULL DEFAULT '[]',
+      is_urgent_when_free INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS cercle_animo_audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp TEXT DEFAULT (datetime('now')),
+      action_type TEXT NOT NULL,
+      actor_name TEXT,
+      slot_id INTEGER,
+      slot_date TEXT,
+      slot_activity TEXT,
+      details TEXT
+    )
+  `).run()
+}
+
+// GET /api/schedule — liste complète
+app.get('/api/schedule', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM cercle_animo_schedule ORDER BY date ASC, activity_type ASC`
+  ).all()
+  return c.json(results.map((r: any) => ({
+    ...r,
+    volunteers: (() => { try { return JSON.parse(r.volunteers) } catch { return [] } })(),
+    is_urgent_when_free: r.is_urgent_when_free === 1
+  })))
+})
+
+// POST /api/schedule — remplace tout le planning
+app.post('/api/schedule', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const items = await c.req.json() as any[]
+  if (!Array.isArray(items)) return c.json({ error: 'Array attendu' }, 400)
+
+  await c.env.DB.prepare(`DELETE FROM cercle_animo_schedule`).run()
+
+  const stmts = items.map((item: any) =>
+    c.env.DB.prepare(`
+      INSERT INTO cercle_animo_schedule
+        (id, date, day_of_week, time, activity_type, description, notes, status, volunteer_name, volunteers, is_urgent_when_free, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      item.id ?? null,
+      item.date,
+      item.day_of_week ?? 1,
+      item.time ?? null,
+      item.activity_type ?? 'Nourrissage',
+      item.description ?? null,
+      item.notes ?? null,
+      item.status ?? 'available',
+      item.volunteer_name ?? null,
+      JSON.stringify(Array.isArray(item.volunteers) ? item.volunteers : []),
+      item.is_urgent_when_free ? 1 : 0,
+      item.created_at ?? null,
+      item.updated_at ?? null
+    )
+  )
+
+  if (stmts.length > 0) await c.env.DB.batch(stmts)
+
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM cercle_animo_schedule ORDER BY date ASC, activity_type ASC`
+  ).all()
+  return c.json(results.map((r: any) => ({
+    ...r,
+    volunteers: (() => { try { return JSON.parse(r.volunteers) } catch { return [] } })(),
+    is_urgent_when_free: r.is_urgent_when_free === 1
+  })))
+})
+
+// PUT /api/schedule/:id — mise à jour ciblée
+app.put('/api/schedule/:id', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const id = c.req.param('id')
+  const body = await c.req.json() as any
+
+  const fields: string[] = []
+  const values: any[] = []
+
+  if (body.notes !== undefined)               { fields.push('notes=?');               values.push(body.notes) }
+  if (body.status !== undefined)              { fields.push('status=?');              values.push(body.status) }
+  if (body.volunteer_name !== undefined)      { fields.push('volunteer_name=?');      values.push(body.volunteer_name) }
+  if (body.volunteers !== undefined)          { fields.push('volunteers=?');          values.push(JSON.stringify(body.volunteers)) }
+  if (body.is_urgent_when_free !== undefined) { fields.push('is_urgent_when_free=?'); values.push(body.is_urgent_when_free ? 1 : 0) }
+  if (body.date !== undefined)               { fields.push('date=?');               values.push(body.date) }
+  if (body.day_of_week !== undefined)        { fields.push('day_of_week=?');        values.push(body.day_of_week) }
+  if (body.activity_type !== undefined)      { fields.push('activity_type=?');      values.push(body.activity_type) }
+
+  if (fields.length === 0) return c.json({ error: 'Rien à mettre à jour' }, 400)
+  fields.push("updated_at=datetime('now')")
+  values.push(id)
+
+  await c.env.DB.prepare(`UPDATE cercle_animo_schedule SET ${fields.join(', ')} WHERE id=?`).bind(...values).run()
+  return c.json({ success: true })
+})
+
+// DELETE /api/schedule/:id — suppression d'un créneau
+app.delete('/api/schedule/:id', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  await c.env.DB.prepare(`DELETE FROM cercle_animo_schedule WHERE id=?`).bind(c.req.param('id')).run()
+  return c.json({ success: true })
+})
+
+// POST /api/schedule/:id/assign — inscription bénévole
+app.post('/api/schedule/:id/assign', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const id = c.req.param('id')
+  const { volunteer_name } = await c.req.json() as any
+
+  const row = await c.env.DB.prepare(`SELECT * FROM cercle_animo_schedule WHERE id=?`).bind(id).first() as any
+  if (!row) return c.json({ error: 'Créneau non trouvé' }, 404)
+
+  const volunteers: string[] = (() => { try { return JSON.parse(row.volunteers) } catch { return [] } })()
+  if (!volunteers.includes(volunteer_name)) volunteers.push(volunteer_name)
+
+  const newStatus = 'assigned'
+  const newVolunteerName = row.activity_type === 'Nourrissage' ? volunteer_name : row.volunteer_name
+
+  await c.env.DB.prepare(`
+    UPDATE cercle_animo_schedule SET volunteers=?, status=?, volunteer_name=?, updated_at=datetime('now') WHERE id=?
+  `).bind(JSON.stringify(volunteers), newStatus, newVolunteerName, id).run()
+
+  return c.json({ success: true })
+})
+
+// POST /api/schedule/:id/unassign — désinscription bénévole
+app.post('/api/schedule/:id/unassign', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const id = c.req.param('id')
+  const { volunteer_name } = await c.req.json() as any
+
+  const row = await c.env.DB.prepare(`SELECT * FROM cercle_animo_schedule WHERE id=?`).bind(id).first() as any
+  if (!row) return c.json({ error: 'Créneau non trouvé' }, 404)
+
+  let volunteers: string[] = (() => { try { return JSON.parse(row.volunteers) } catch { return [] } })()
+  volunteers = volunteers.filter((v: string) => v !== volunteer_name)
+
+  const newStatus = volunteers.length === 0
+    ? (row.is_urgent_when_free ? 'urgent' : 'available')
+    : 'assigned'
+  const newVolunteerName = row.activity_type === 'Nourrissage' ? null : row.volunteer_name
+
+  await c.env.DB.prepare(`
+    UPDATE cercle_animo_schedule SET volunteers=?, status=?, volunteer_name=?, updated_at=datetime('now') WHERE id=?
+  `).bind(JSON.stringify(volunteers), newStatus, volunteers.length > 0 ? row.volunteer_name : newVolunteerName, id).run()
+
+  return c.json({ success: true })
+})
+
+// GET /api/audit-log — journal paginé avec filtres
+app.get('/api/audit-log', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const limit = parseInt(c.req.query('limit') || '20')
+  const offset = parseInt(c.req.query('offset') || '0')
+  const actionType = c.req.query('action_type') || ''
+  const actorName = c.req.query('actor_name') || ''
+
+  let where = ''
+  const params: any[] = []
+
+  if (actionType) { where += (where ? ' AND ' : ' WHERE ') + 'action_type=?'; params.push(actionType) }
+  if (actorName)  { where += (where ? ' AND ' : ' WHERE ') + 'actor_name LIKE ?'; params.push(`%${actorName}%`) }
+
+  const total = (await c.env.DB.prepare(`SELECT COUNT(*) as count FROM cercle_animo_audit_log${where}`).bind(...params).first() as any).count
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM cercle_animo_audit_log${where} ORDER BY id DESC LIMIT ? OFFSET ?`
+  ).bind(...params, limit, offset).all()
+
+  return c.json({ success: true, entries: results, total, limit, offset })
+})
+
+// POST /api/audit-log/record — enregistrement d'une action
+app.post('/api/audit-log/record', async (c) => {
+  await ensureCercleAnimoTables(c.env.DB)
+  const body = await c.req.json() as any
+  await c.env.DB.prepare(`
+    INSERT INTO cercle_animo_audit_log (action_type, actor_name, slot_id, slot_date, slot_activity, details)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).bind(
+    body.action_type,
+    body.actor_name ?? null,
+    body.slot_id ?? null,
+    body.slot_date ?? null,
+    body.slot_activity ?? null,
+    body.details ?? null
+  ).run()
+  return c.json({ success: true })
+})
+
 // ===== GUESTS API =====
 
 app.get('/api/admin/guests', requireAuth, async (c) => {
