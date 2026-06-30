@@ -341,8 +341,8 @@
         <div>
           <label>Caisse</label>
           <select id="c-caisse">
-            <option value="A">Caisse A</option>
-            <option value="B">Caisse B</option>
+            <option value="A">Roulotte</option>
+            <option value="B">Buvette / Boutique</option>
           </select>
         </div>
         <div>
@@ -393,8 +393,8 @@
         <div>
           <label>Caisse</label>
           <select id="r-caisse">
-            <option value="A">Caisse A</option>
-            <option value="B">Caisse B</option>
+            <option value="A">Roulotte</option>
+            <option value="B">Buvette / Boutique</option>
           </select>
         </div>
         <div>
@@ -456,6 +456,9 @@ const PIECES = [
 
 function fmtEuros(centimes) {
   return (centimes / 100).toFixed(2).replace('.', ',') + ' €'
+}
+function fmtCaisse(c) {
+  return c === 'A' ? 'Roulotte' : 'Buvette / Boutique'
 }
 function fmtDate(str) {
   if (!str) return ''
@@ -633,7 +636,7 @@ async function loadHistorique(caisse) {
     <div class="entry-card">
       <div class="entry-header">
         <div>
-          <span class="entry-caisse">Caisse ${c.caisse}</span>
+          <span class="entry-caisse">${fmtCaisse(c.caisse)}</span>
           <div class="entry-date">${fmtDate(c.comptage_date)} à ${c.comptage_heure}</div>
         </div>
         <span class="entry-total">${fmtEuros(c.total_centimes)}</span>
@@ -683,7 +686,7 @@ async function loadRetraits() {
     <div class="retrait-card ${r.depose_banque ? 'depose' : ''}">
       <div class="entry-header">
         <div>
-          <span class="entry-caisse">Caisse ${r.caisse}</span>
+          <span class="entry-caisse">${fmtCaisse(r.caisse)}</span>
           ${r.depose_banque
             ? `<span class="badge-depose" style="margin-left:6px">✓ Déposé banque</span>`
             : `<span class="badge-attente" style="margin-left:6px">En attente</span>`}
@@ -738,22 +741,22 @@ async function loadTotaux() {
 
   document.getElementById('totaux-grid').innerHTML = `
     <div class="total-box">
-      <div class="box-label">Dernier comptage A</div>
+      <div class="box-label">Dernier comptage Roulotte</div>
       <div class="box-value">${dernierA ? fmtEuros(dernierA.total_centimes) : '—'}</div>
       <div class="box-sub">${dernierA ? fmtDate(dernierA.comptage_date) + ' ' + dernierA.comptage_heure : 'Aucun'}</div>
     </div>
     <div class="total-box">
-      <div class="box-label">Dernier comptage B</div>
+      <div class="box-label">Dernier comptage Buvette</div>
       <div class="box-value">${dernierB ? fmtEuros(dernierB.total_centimes) : '—'}</div>
       <div class="box-sub">${dernierB ? fmtDate(dernierB.comptage_date) + ' ' + dernierB.comptage_heure : 'Aucun'}</div>
     </div>
     <div class="total-box">
-      <div class="box-label">Retraits en attente A</div>
+      <div class="box-label">Retraits en attente Roulotte</div>
       <div class="box-value" style="color:#c0392b">${totalAttenteA ? fmtEuros(totalAttenteA) : '—'}</div>
       <div class="box-sub">${enAttente.filter(r => r.caisse === 'A').length} retrait(s)</div>
     </div>
     <div class="total-box">
-      <div class="box-label">Retraits en attente B</div>
+      <div class="box-label">Retraits en attente Buvette</div>
       <div class="box-value" style="color:#c0392b">${totalAttenteB ? fmtEuros(totalAttenteB) : '—'}</div>
       <div class="box-sub">${enAttente.filter(r => r.caisse === 'B').length} retrait(s)</div>
     </div>
@@ -763,7 +766,7 @@ async function loadTotaux() {
   document.getElementById('totaux-recent').innerHTML = recent.length
     ? recent.map(c => `
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0e8df;">
-        <span><span class="entry-caisse">Caisse ${c.caisse}</span> <span style="font-size:12px;color:#999;margin-left:6px">${fmtDate(c.comptage_date)} ${c.comptage_heure}</span></span>
+        <span><span class="entry-caisse">${fmtCaisse(c.caisse)}</span> <span style="font-size:12px;color:#999;margin-left:6px">${fmtDate(c.comptage_date)} ${c.comptage_heure}</span></span>
         <strong>${fmtEuros(c.total_centimes)}</strong>
       </div>`).join('')
     : '<div class="empty-state">Aucun comptage</div>'
