@@ -362,8 +362,43 @@
       <div class="coupures-grid" id="pieces-grid"></div>
 
       <div class="total-display">
-        <span>Total comptage</span>
+        <span>Total compté (espèces + chèques vac. + chèques)</span>
         <span class="total-amount" id="total-live">0,00 €</span>
+      </div>
+
+      <div class="section-sep">Autres moyens présents dans la caisse</div>
+      <div class="form-row">
+        <div>
+          <label>Chèques vacances reçus (€)</label>
+          <input type="number" id="c-cheques-vacances" value="0" min="0" step="0.01" oninput="updateTotal()" onfocus="this.select()" />
+        </div>
+        <div>
+          <label>Chèques reçus (€)</label>
+          <input type="number" id="c-cheques" value="0" min="0" step="0.01" oninput="updateTotal()" onfocus="this.select()" />
+        </div>
+      </div>
+
+      <div class="section-sep">Fond de caisse</div>
+      <div class="form-row">
+        <div>
+          <label>Fond de caisse (€)</label>
+          <input type="number" id="c-fond" value="200" min="0" step="0.01" oninput="updateTotal()" onfocus="this.select()" />
+        </div>
+      </div>
+
+      <div class="section-sep">Rapprochement Square</div>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:10px" onclick="syncSquare()" id="btn-sync-square">📡 Charger les ventes Square du jour</button>
+      <div id="square-sync-result" style="display:none;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;">
+          <span style="color:#888">Espèces encaissées (Square)</span><strong id="square-cash-display">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;">
+          <span style="color:#888">Carte encaissée (Square)</span><strong id="square-card-display">—</strong>
+        </div>
+      </div>
+      <div class="total-display" id="ecart-display" style="display:none;background:#f9f6f2;color:#3d2b1f;">
+        <span>Écart caisse</span>
+        <span class="total-amount" id="ecart-live">—</span>
       </div>
 
       <div style="margin-bottom:12px;">
@@ -388,8 +423,15 @@
   <!-- TAB RETRAITS (owner) -->
   <div class="tab-content" id="tab-retraits">
     <div class="card">
-      <h3>Enregistrer un retrait</h3>
+      <h3>Enregistrer un retrait / dépôt</h3>
       <div class="form-row">
+        <div>
+          <label>Type</label>
+          <select id="r-type">
+            <option value="retrait">Retrait espèces (→ banque)</option>
+            <option value="cheque_vacances">Chèques vacances (→ ANCV)</option>
+          </select>
+        </div>
         <div>
           <label>Caisse</label>
           <select id="r-caisse">
@@ -397,6 +439,8 @@
             <option value="B">Buvette / Boutique</option>
           </select>
         </div>
+      </div>
+      <div class="form-row">
         <div>
           <label>Montant (€)</label>
           <input type="number" id="r-montant" placeholder="0,00" step="0.01" min="0" />
@@ -406,7 +450,7 @@
         <label>Note (optionnel)</label>
         <textarea id="r-note" placeholder="Ex : dépôt banque du lundi…"></textarea>
       </div>
-      <button class="btn btn-primary" onclick="submitRetrait()">Enregistrer le retrait</button>
+      <button class="btn btn-primary" onclick="submitRetrait()">Enregistrer</button>
     </div>
 
     <div id="retraits-list"><div class="empty-state">Chargement…</div></div>
@@ -548,6 +592,8 @@ function buildCoupuresGrid() {
   })
 }
 
+let lastSquareSync = null // { cash_centimes, card_centimes }
+
 function updateTotal() {
   let total = 0
   for (const c of [...BILLETS, ...PIECES]) {
@@ -557,7 +603,50 @@ function updateTotal() {
     const el = document.getElementById(`sub_${c.key}`)
     if (el) el.textContent = fmtEuros(sub)
   }
+  const chequesVacances = Math.round((parseFloat(document.getElementById('c-cheques-vacances').value) || 0) * 100)
+  const cheques = Math.round((parseFloat(document.getElementById('c-cheques').value) || 0) * 100)
+  total += chequesVacances + cheques
   document.getElementById('total-live').textContent = fmtEuros(total)
+  updateEcart()
+}
+
+function updateEcart() {
+  if (!lastSquareSync) return
+  let especes = 0
+  for (const c of BILLETS.concat(PIECES)) {
+    const n = parseInt(document.getElementById(c.key)?.value) || 0
+    especes += n * c.val
+  }
+  const fond = Math.round((parseFloat(document.getElementById('c-fond').value) || 0) * 100)
+  const ecart = especes - fond - lastSquareSync.cash_centimes
+  const el = document.getElementById('ecart-live')
+  el.textContent = (ecart >= 0 ? '+' : '') + fmtEuros(ecart)
+  document.getElementById('ecart-display').style.background = ecart === 0 ? '#d5f0e0' : (Math.abs(ecart) <= 100 ? '#fef3cd' : '#f8d7d5')
+}
+
+async function syncSquare() {
+  const btn = document.getElementById('btn-sync-square')
+  btn.textContent = 'Chargement…'
+  btn.disabled = true
+  try {
+    const caisse = document.getElementById('c-caisse').value
+    const date = document.getElementById('c-date').value
+    const res = await api('GET', `/api/caisse/square-sync?caisse=${caisse}&date=${date}`)
+    const data = await res.json()
+    if (!res.ok) { toast(data.error || 'Erreur de synchronisation Square'); return }
+    lastSquareSync = data
+    document.getElementById('square-sync-result').style.display = 'block'
+    document.getElementById('square-cash-display').textContent = fmtEuros(data.cash_centimes)
+    document.getElementById('square-card-display').textContent = fmtEuros(data.card_centimes)
+    document.getElementById('ecart-display').style.display = 'flex'
+    updateEcart()
+    toast('Ventes Square chargées ✓')
+  } catch {
+    toast('Erreur de connexion à Square')
+  } finally {
+    btn.textContent = '📡 Charger les ventes Square du jour'
+    btn.disabled = false
+  }
 }
 
 function initDateHeure() {
@@ -602,6 +691,11 @@ async function submitComptage() {
     caisse: document.getElementById('c-caisse').value,
     comptage_date: document.getElementById('c-date').value,
     comptage_heure: document.getElementById('c-heure').value,
+    fond_caisse_centimes: Math.round((parseFloat(document.getElementById('c-fond').value) || 0) * 100),
+    cheques_vacances_centimes: Math.round((parseFloat(document.getElementById('c-cheques-vacances').value) || 0) * 100),
+    cheques_centimes: Math.round((parseFloat(document.getElementById('c-cheques').value) || 0) * 100),
+    square_cash_centimes: lastSquareSync ? lastSquareSync.cash_centimes : null,
+    square_card_centimes: lastSquareSync ? lastSquareSync.card_centimes : null,
     note: document.getElementById('c-note').value.trim() || null
   }
   for (const c of [...BILLETS, ...PIECES]) {
@@ -616,7 +710,13 @@ async function submitComptage() {
       document.getElementById(`sub_${c.key}`).textContent = '0,00 €'
     }
     document.getElementById('total-live').textContent = '0,00 €'
+    document.getElementById('c-cheques-vacances').value = 0
+    document.getElementById('c-cheques').value = 0
+    document.getElementById('c-fond').value = 200
     document.getElementById('c-note').value = ''
+    lastSquareSync = null
+    document.getElementById('square-sync-result').style.display = 'none'
+    document.getElementById('ecart-display').style.display = 'none'
     initDateHeure()
     loadHistorique()
     if (ROLE === 'owner') loadTotaux()
@@ -641,6 +741,15 @@ async function loadHistorique(caisse) {
         </div>
         <span class="entry-total">${fmtEuros(c.total_centimes)}</span>
       </div>
+      ${(c.cheques_vacances_centimes || c.cheques_centimes) ? `
+        <div style="font-size:12px;color:#888;margin-top:4px;">
+          ${c.cheques_vacances_centimes ? `Chèques vacances : ${fmtEuros(c.cheques_vacances_centimes)}` : ''}
+          ${c.cheques_centimes ? ` · Chèques : ${fmtEuros(c.cheques_centimes)}` : ''}
+        </div>` : ''}
+      ${c.ecart_centimes != null ? `
+        <div style="font-size:13px;margin-top:6px;font-weight:600;color:${c.ecart_centimes === 0 ? '#27ae60' : (Math.abs(c.ecart_centimes) <= 100 ? '#856404' : '#c0392b')}">
+          Écart : ${c.ecart_centimes >= 0 ? '+' : ''}${fmtEuros(c.ecart_centimes)}
+        </div>` : ''}
       ${c.note ? `<div class="entry-note">${escHtml(c.note)}</div>` : ''}
       ${ROLE === 'owner' ? `
         <div class="entry-actions">
@@ -657,17 +766,25 @@ async function deleteComptage(id) {
 }
 
 // ---- RETRAITS ----
+function labelDepot(type) {
+  return type === 'cheque_vacances' ? 'Envoyé à l\'ANCV' : 'Déposé banque'
+}
+function labelType(type) {
+  return type === 'cheque_vacances' ? 'Chèques vacances' : 'Retrait espèces'
+}
+
 async function submitRetrait() {
   const montantEuros = parseFloat(document.getElementById('r-montant').value)
   if (!montantEuros || montantEuros <= 0) { toast('Montant invalide'); return }
   const payload = {
     caisse: document.getElementById('r-caisse').value,
+    type: document.getElementById('r-type').value,
     montant_centimes: Math.round(montantEuros * 100),
     note: document.getElementById('r-note').value.trim() || null
   }
   const res = await api('POST', '/api/caisse/retraits', payload)
   if (res.ok) {
-    toast('Retrait enregistré ✓')
+    toast('Enregistré ✓')
     document.getElementById('r-montant').value = ''
     document.getElementById('r-note').value = ''
     loadRetraits()
@@ -687,8 +804,9 @@ async function loadRetraits() {
       <div class="entry-header">
         <div>
           <span class="entry-caisse">${fmtCaisse(r.caisse)}</span>
+          <span class="entry-caisse" style="background:#eee;margin-left:4px">${labelType(r.type)}</span>
           ${r.depose_banque
-            ? `<span class="badge-depose" style="margin-left:6px">✓ Déposé banque</span>`
+            ? `<span class="badge-depose" style="margin-left:6px">✓ ${labelDepot(r.type)}</span>`
             : `<span class="badge-attente" style="margin-left:6px">En attente</span>`}
           <div class="entry-date">${fmtDate(r.created_at)}</div>
         </div>
@@ -697,8 +815,8 @@ async function loadRetraits() {
       ${r.note ? `<div class="entry-note">${escHtml(r.note)}</div>` : ''}
       <div class="entry-actions">
         ${!r.depose_banque
-          ? `<button class="btn btn-success btn-small" onclick="marquerDepose(${r.id})">✓ Déposé en banque</button>`
-          : `<button class="btn btn-outline btn-small" onclick="annulerDepose(${r.id})">Annuler dépôt</button>`}
+          ? `<button class="btn btn-success btn-small" onclick="marquerDepose(${r.id})">✓ ${labelDepot(r.type)}</button>`
+          : `<button class="btn btn-outline btn-small" onclick="annulerDepose(${r.id})">Annuler</button>`}
         <button class="btn btn-danger btn-small" onclick="deleteRetrait(${r.id})">Supprimer</button>
       </div>
     </div>
@@ -734,10 +852,14 @@ async function loadTotaux() {
   const dernierA = comptages.find(c => c.caisse === 'A')
   const dernierB = comptages.find(c => c.caisse === 'B')
 
-  // Retraits en attente de dépôt
-  const enAttente = retraits.filter(r => !r.depose_banque)
+  // Retraits espèces en attente de dépôt banque
+  const enAttente = retraits.filter(r => !r.depose_banque && r.type !== 'cheque_vacances')
   const totalAttenteA = enAttente.filter(r => r.caisse === 'A').reduce((s, r) => s + r.montant_centimes, 0)
   const totalAttenteB = enAttente.filter(r => r.caisse === 'B').reduce((s, r) => s + r.montant_centimes, 0)
+
+  // Chèques vacances en attente d'envoi ANCV (toutes caisses confondues)
+  const chequesVacancesAttente = retraits.filter(r => r.type === 'cheque_vacances' && !r.depose_banque)
+  const totalChequesVacancesAttente = chequesVacancesAttente.reduce((s, r) => s + r.montant_centimes, 0)
 
   document.getElementById('totaux-grid').innerHTML = `
     <div class="total-box">
@@ -759,6 +881,11 @@ async function loadTotaux() {
       <div class="box-label">Retraits en attente Buvette</div>
       <div class="box-value" style="color:#c0392b">${totalAttenteB ? fmtEuros(totalAttenteB) : '—'}</div>
       <div class="box-sub">${enAttente.filter(r => r.caisse === 'B').length} retrait(s)</div>
+    </div>
+    <div class="total-box" style="grid-column:span 2">
+      <div class="box-label">Chèques vacances en attente d'envoi ANCV</div>
+      <div class="box-value" style="color:#c0392b">${totalChequesVacancesAttente ? fmtEuros(totalChequesVacancesAttente) : '—'}</div>
+      <div class="box-sub">${chequesVacancesAttente.length} lot(s)</div>
     </div>
   `
 

@@ -5,7 +5,10 @@ type Bindings = {
   DB: D1Database
   ADMIN_PASSWORD?: string
   OWNER_PASSWORD?: string
+  SQUARE_ACCESS_TOKEN?: string
 }
+
+const SQUARE_LOCATION_ID = 'L1QHZTGHT0PC7' // LA FABRIQUE AUX MERVEILLES
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -71,6 +74,12 @@ async function ensureCaisseTable(db: D1Database) {
       piece_002  INTEGER NOT NULL DEFAULT 0,
       piece_001  INTEGER NOT NULL DEFAULT 0,
       total_centimes INTEGER NOT NULL DEFAULT 0,
+      fond_caisse_centimes INTEGER NOT NULL DEFAULT 20000,
+      cheques_vacances_centimes INTEGER NOT NULL DEFAULT 0,
+      cheques_centimes INTEGER NOT NULL DEFAULT 0,
+      square_cash_centimes INTEGER,
+      square_card_centimes INTEGER,
+      ecart_centimes INTEGER,
       note TEXT,
       created_at TEXT DEFAULT (datetime('now'))
     )
@@ -79,6 +88,7 @@ async function ensureCaisseTable(db: D1Database) {
     CREATE TABLE IF NOT EXISTS caisse_retraits (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       caisse TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'retrait',
       montant_centimes INTEGER NOT NULL,
       note TEXT,
       depose_banque INTEGER NOT NULL DEFAULT 0,
@@ -86,6 +96,35 @@ async function ensureCaisseTable(db: D1Database) {
       created_at TEXT DEFAULT (datetime('now'))
     )
   `).run()
+}
+
+// Mapping des appareils Square par caisse (carte = Terminal, espèces = Redmi Pad / Square POS)
+const SQUARE_DEVICE_MAP: Record<string, { card: string; cash: string }> = {
+  A: { card: '549CS145C5000087', cash: 'DEVICE_INSTALLATION_ID:cdf5564b-0308-4646-b10c-a1dbd56d02b6' }, // Roulotte
+  B: { card: '549CS145C5000140', cash: 'DEVICE_INSTALLATION_ID:912e77bc-53b9-4969-a078-fb1be20f4b5f' }, // Buvette / Boutique
+}
+
+// Calcule le décalage horaire Paris (UTC+1 hiver / UTC+2 été, règle UE : dernier dimanche mars-octobre)
+function parisOffsetHours(date: Date): number {
+  const year = date.getUTCFullYear()
+  const lastSunday = (month: number) => {
+    const d = new Date(Date.UTC(year, month + 1, 0, 1, 0, 0)) // dernier jour du mois à 01:00 UTC
+    d.setUTCDate(d.getUTCDate() - d.getUTCDay())
+    return d
+  }
+  const dstStart = lastSunday(2) // mars
+  const dstEnd = lastSunday(9)   // octobre
+  return (date >= dstStart && date < dstEnd) ? 2 : 1
+}
+
+// Convertit une date locale Paris (YYYY-MM-DD) en plage UTC [début, fin[ pour l'API Square
+function parisDayRangeUTC(dateStr: string): { begin: string; end: string } {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const noonUTCGuess = new Date(Date.UTC(y, m - 1, d, 12, 0, 0))
+  const offset = parisOffsetHours(noonUTCGuess)
+  const begin = new Date(Date.UTC(y, m - 1, d, 0 - offset, 0, 0))
+  const end = new Date(Date.UTC(y, m - 1, d + 1, 0 - offset, 0, 0))
+  return { begin: begin.toISOString(), end: end.toISOString() }
 }
 
 // ===== PUBLIC API =====
@@ -308,13 +347,24 @@ app.post('/api/caisse/comptages', requireCaisse, async (c) => {
   let total = 0
   for (const [key, val] of coupures) total += (parseInt(b[key]) || 0) * (val as number)
 
+  const fondCaisse = b.fond_caisse_centimes != null ? parseInt(b.fond_caisse_centimes) || 0 : 20000
+  const chequesVacances = parseInt(b.cheques_vacances_centimes) || 0
+  const cheques = parseInt(b.cheques_centimes) || 0
+  const squareCash = b.square_cash_centimes != null ? parseInt(b.square_cash_centimes) : null
+  const squareCard = b.square_card_centimes != null ? parseInt(b.square_card_centimes) : null
+  // Écart = espèces comptées (hors chèques vacances/chèques) - fond de caisse - espèces Square attendues
+  const ecart = squareCash != null
+    ? (total - chequesVacances - cheques) - fondCaisse - squareCash
+    : null
+
   const result = await c.env.DB.prepare(`
     INSERT INTO caisse_comptages
       (caisse, comptage_date, comptage_heure,
        billet_500, billet_200, billet_100, billet_50, billet_20, billet_10, billet_5,
        piece_200, piece_100, piece_050, piece_020, piece_010, piece_005, piece_002, piece_001,
-       total_centimes, note)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+       total_centimes, fond_caisse_centimes, cheques_vacances_centimes, cheques_centimes,
+       square_cash_centimes, square_card_centimes, ecart_centimes, note)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `).bind(
     b.caisse, b.comptage_date, b.comptage_heure,
     parseInt(b.billet_500)||0, parseInt(b.billet_200)||0, parseInt(b.billet_100)||0,
@@ -322,9 +372,60 @@ app.post('/api/caisse/comptages', requireCaisse, async (c) => {
     parseInt(b.piece_200)||0, parseInt(b.piece_100)||0, parseInt(b.piece_050)||0,
     parseInt(b.piece_020)||0, parseInt(b.piece_010)||0, parseInt(b.piece_005)||0,
     parseInt(b.piece_002)||0, parseInt(b.piece_001)||0,
-    total, b.note || null
+    total, fondCaisse, chequesVacances, cheques, squareCash, squareCard, ecart, b.note || null
   ).run()
-  return c.json({ success: true, id: result.meta.last_row_id, total_centimes: total }, 201)
+  return c.json({ success: true, id: result.meta.last_row_id, total_centimes: total, ecart_centimes: ecart }, 201)
+})
+
+// Récupérer les totaux Square (espèces/carte) pour une caisse et une date donnée
+app.get('/api/caisse/square-sync', requireCaisse, async (c) => {
+  const caisse = c.req.query('caisse')
+  const date = c.req.query('date')
+  const token = c.env.SQUARE_ACCESS_TOKEN
+  if (!caisse || !date) return c.json({ error: 'Paramètres caisse et date requis' }, 400)
+  if (!token) return c.json({ error: 'Intégration Square non configurée' }, 500)
+  const devices = SQUARE_DEVICE_MAP[caisse]
+  if (!devices) return c.json({ error: 'Caisse inconnue' }, 400)
+
+  const { begin, end } = parisDayRangeUTC(date)
+  let cashCentimes = 0
+  let cardCentimes = 0
+  let cursor: string | undefined
+  try {
+    do {
+      const url = new URL('https://connect.squareup.com/v2/payments')
+      url.searchParams.set('location_id', SQUARE_LOCATION_ID)
+      url.searchParams.set('begin_time', begin)
+      url.searchParams.set('end_time', end)
+      url.searchParams.set('limit', '100')
+      url.searchParams.set('sort_order', 'ASC')
+      if (cursor) url.searchParams.set('cursor', cursor)
+
+      const res = await fetch(url.toString(), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Square-Version': '2025-01-23'
+        }
+      })
+      if (!res.ok) {
+        const errBody = await res.text()
+        return c.json({ error: 'Erreur Square API', details: errBody }, 502)
+      }
+      const data = await res.json() as any
+      for (const p of (data.payments || [])) {
+        if (p.status !== 'COMPLETED') continue
+        const deviceId = p.device_details?.device_id
+        const amount = p.total_money?.amount || 0
+        if (p.source_type === 'CASH' && deviceId === devices.cash) cashCentimes += amount
+        if (p.source_type === 'CARD' && deviceId === devices.card) cardCentimes += amount
+      }
+      cursor = data.cursor
+    } while (cursor)
+  } catch (e: any) {
+    return c.json({ error: 'Erreur lors de la synchronisation Square', details: e.message }, 502)
+  }
+
+  return c.json({ cash_centimes: cashCentimes, card_centimes: cardCentimes })
 })
 
 // Historique des comptages (staff ou owner)
@@ -347,13 +448,14 @@ app.delete('/api/caisse/comptages/:id', requireOwner, async (c) => {
   return c.json({ success: true })
 })
 
-// Enregistrer un retrait (owner uniquement)
+// Enregistrer un retrait ou un dépôt de chèques vacances (owner uniquement)
 app.post('/api/caisse/retraits', requireOwner, async (c) => {
   await ensureCaisseTable(c.env.DB)
-  const { caisse, montant_centimes, note } = await c.req.json() as any
+  const { caisse, montant_centimes, note, type } = await c.req.json() as any
+  const t = type === 'cheque_vacances' ? 'cheque_vacances' : 'retrait'
   const result = await c.env.DB.prepare(
-    `INSERT INTO caisse_retraits (caisse, montant_centimes, note) VALUES (?,?,?)`
-  ).bind(caisse, montant_centimes, note || null).run()
+    `INSERT INTO caisse_retraits (caisse, montant_centimes, note, type) VALUES (?,?,?,?)`
+  ).bind(caisse, montant_centimes, note || null, t).run()
   return c.json({ success: true, id: result.meta.last_row_id }, 201)
 })
 
