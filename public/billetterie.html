@@ -15,7 +15,7 @@
   <link rel="alternate" hreflang="nl" href="https://www.lattrapereves07.fr/nl/billetterie.html">
   <link rel="alternate" hreflang="x-default" href="https://www.lattrapereves07.fr/billetterie.html">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260706">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260706b">
   <script src="https://web.squarecdn.com/v1/square.js"></script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"TouristAttraction","name":"L'Attrape-Rêves — Ferme de découverte et d'émerveillement","url":"https://www.lattrapereves07.fr","telephone":"+33428400049","email":"contact@lattrapereves07.fr","address":{"@type":"PostalAddress","streetAddress":"514 chemin de la Vernède","addressLocality":"Gravières","postalCode":"07140","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":44.4179088,"longitude":4.1000285},"openingHours":["We,Sa,Su 10:00-18:00"],"priceRange":"€"}
@@ -288,6 +288,17 @@
       });
     });
 
+    // ── Bouton payer : état occupé / repos ─────────────────────────────────────
+    function setPayBtnBusy(busy) {
+      const btn = document.getElementById('pay-btn');
+      if (busy) {
+        btn.disabled = true;
+        btn.textContent = 'Traitement en cours…';
+      } else {
+        btn.innerHTML = 'Payer <span id="pay-btn-amount"></span>';
+      }
+    }
+
     // ── Message d'état ─────────────────────────────────────────────────────────
     function showMessage(type, html) {
       const el = document.getElementById('billet-message');
@@ -325,7 +336,16 @@
       }
       try {
         const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
-        squareCard = await payments.card();
+        squareCard = await payments.card({
+          style: {
+            '.input-container': { borderColor: 'rgba(0,0,0,0.2)', borderRadius: '10px' },
+            '.input-container.is-focus': { borderColor: '#D57956' },
+            '.input-container.is-error': { borderColor: '#c0392b' },
+            'input': { fontSize: '16px', color: '#3F3E3E' },
+            '.message-text': { color: '#c0392b' },
+            '.message-icon': { color: '#c0392b' }
+          }
+        });
         await squareCard.attach('#card-container');
         update();
       } catch (e) {
@@ -363,16 +383,20 @@
 
       // Tokenisation de la carte
       paying = true;
-      document.getElementById('pay-btn').disabled = true;
-      document.getElementById('pay-btn').textContent = 'Traitement en cours…';
+      setPayBtnBusy(true);
+
+      function fail(msg) {
+        showMessage('error', msg);
+        paying = false;
+        setPayBtnBusy(false);
+        update();
+      }
 
       let tokenResult;
       try {
         tokenResult = await squareCard.tokenize();
       } catch (e) {
-        showMessage('error', 'Erreur lors de la lecture de la carte. Veuillez réessayer.');
-        paying = false;
-        update();
+        fail('Erreur lors de la lecture de la carte. Veuillez réessayer.');
         return;
       }
 
@@ -380,9 +404,7 @@
         const errMsg = tokenResult.errors && tokenResult.errors[0]
           ? tokenResult.errors[0].message
           : 'Informations de carte invalides.';
-        showMessage('error', errMsg);
-        paying = false;
-        update();
+        fail(errMsg);
         return;
       }
 
@@ -393,8 +415,9 @@
 
       const idempotencyKey = 'blt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
 
+      let resp;
       try {
-        const resp = await fetch('/api/billetterie/pay', {
+        resp = await fetch('/api/billetterie/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -404,22 +427,23 @@
             idempotencyKey
           })
         });
-        const data = await resp.json();
-
-        if (!resp.ok) {
-          showMessage('error', data.error || 'Paiement refusé. Veuillez réessayer ou contacter la billetterie.');
-          paying = false;
-          update();
-          return;
-        }
-
-        showSuccess(data);
-
       } catch (e) {
-        showMessage('error', 'Erreur réseau. Vérifiez votre connexion et réessayez.');
-        paying = false;
-        update();
+        fail('Impossible de joindre le serveur. Vérifiez votre connexion et réessayez — vous n\'avez pas été débité.');
+        return;
       }
+
+      let data = null;
+      try { data = await resp.json(); } catch (e) {}
+
+      if (!resp.ok || !data || !data.success) {
+        const msg = (data && data.error)
+          ? data.error
+          : 'Le paiement n\'a pas pu être traité (erreur ' + resp.status + '). Réessayez ou contactez-nous au 04 28 40 00 49.';
+        fail(msg);
+        return;
+      }
+
+      showSuccess(data);
     });
 
     // ── Démarrage ──────────────────────────────────────────────────────────────

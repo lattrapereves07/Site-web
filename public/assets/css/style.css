@@ -1540,14 +1540,9 @@ main {
 }
 .billet-card-label svg { width: 14px; height: 14px; opacity: 0.7; }
 #card-container {
-  border: 1.5px solid rgba(0,0,0,0.14);
-  border-radius: 10px;
-  padding: 12px 14px;
-  min-height: 48px;
-  background: white;
-  transition: border-color .15s;
+  /* Le cadre est dessiné par l'iframe Square (option style de payments.card) */
+  min-height: 56px;
 }
-#card-container.sq-focus { border-color: var(--coral); }
 
 .billet-pay-btn {
   display: block;
