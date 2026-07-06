@@ -6,6 +6,7 @@ type Bindings = {
   ADMIN_PASSWORD?: string
   OWNER_PASSWORD?: string
   SQUARE_ACCESS_TOKEN?: string
+  BREVO_API_KEY?: string
 }
 
 const SQUARE_LOCATION_ID = 'L1QHZTGHT0PC7' // LA FABRIQUE AUX MERVEILLES
@@ -138,6 +139,77 @@ const TARIFS: Record<string, { name: string; price: number; variationId: string 
   'pass-reduit': { name: 'Pass saison tarif réduit',    price: 2500, variationId: 'O3KVWZFEVR33JO3FF7RA6BCZ' },
 }
 
+// Référence courte lisible (sans caractères ambigus O/0/I/1)
+function genReference(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = new Uint8Array(6)
+  crypto.getRandomValues(bytes)
+  let ref = ''
+  for (const b of bytes) ref += alphabet[b % alphabet.length]
+  return 'AR-' + ref
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// Email de confirmation via Brevo (best effort : un échec n'annule pas le paiement)
+async function sendConfirmationEmail(
+  apiKey: string,
+  params: {
+    buyerInfo: { nom: string; prenom: string; email: string }
+    lines: { name: string; qty: number; price: number }[]
+    totalCentimes: number
+    reference: string
+    receiptUrl?: string
+  }
+): Promise<boolean> {
+  const { buyerInfo, lines, totalCentimes, reference, receiptUrl } = params
+  const fmtEur = (cts: number) => (cts / 100).toFixed(2).replace('.', ',') + ' €'
+  const rows = lines.map(l =>
+    `<tr><td style="padding:6px 0;">${escapeHtml(l.name)} × ${l.qty}</td><td style="padding:6px 0;text-align:right;">${l.price === 0 ? 'Gratuit' : fmtEur(l.price * l.qty)}</td></tr>`
+  ).join('')
+
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
+    <h1 style="color:#D57956;font-size:22px;">Merci ${escapeHtml(buyerInfo.prenom)}, vos billets sont réservés !</h1>
+    <p>Voici le récapitulatif de votre commande à <strong>L'Attrape-Rêves</strong>, ferme de découverte et d'émerveillement à Gravières (Ardèche).</p>
+    <div style="background:#FDF3E7;border-radius:12px;padding:16px 20px;margin:20px 0;text-align:center;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.6;">Référence de commande</div>
+      <div style="font-size:26px;font-weight:bold;color:#D57956;letter-spacing:2px;">${reference}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;">
+      ${rows}
+      <tr><td style="padding:10px 0;border-top:2px solid #D57956;font-weight:bold;">Total</td><td style="padding:10px 0;border-top:2px solid #D57956;text-align:right;font-weight:bold;">${fmtEur(totalCentimes)}</td></tr>
+    </table>
+    <p style="margin-top:20px;">Le jour de votre visite, donnez simplement votre nom ou votre référence à l'accueil. Les billets sont valables à la journée — vous pouvez sortir et revenir librement.</p>
+    ${receiptUrl ? `<p><a href="${receiptUrl}" style="color:#D57956;">Voir le reçu de paiement</a></p>` : ''}
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+    <p style="font-size:13px;opacity:.7;">
+      L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
+      04 28 40 00 49 · contact@lattrapereves07.fr · lattrapereves07.fr
+    </p>
+  </div>`
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: { name: "L'Attrape-Rêves", email: 'contact@lattrapereves07.fr' },
+        to: [{ email: buyerInfo.email, name: `${buyerInfo.prenom} ${buyerInfo.nom}` }],
+        bcc: [{ email: 'contact@lattrapereves07.fr' }],
+        replyTo: { email: 'contact@lattrapereves07.fr' },
+        subject: `Vos billets L'Attrape-Rêves — ${reference}`,
+        htmlContent: html
+      })
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
 app.post('/api/billetterie/pay', async (c) => {
   const token = c.env.SQUARE_ACCESS_TOKEN
   if (!token) return c.json({ error: 'Paiement non configuré' }, 500)
@@ -153,6 +225,7 @@ app.post('/api/billetterie/pay', async (c) => {
   }
 
   const lineItems: any[] = []
+  const emailLines: { name: string; qty: number; price: number }[] = []
   let expectedTotal = 0
 
   for (const item of items) {
@@ -162,15 +235,19 @@ app.post('/api/billetterie/pay', async (c) => {
     if (isNaN(qty) || qty < 0 || qty > 50) return c.json({ error: 'Quantité invalide' }, 400)
     if (qty === 0) continue
     lineItems.push({ catalog_object_id: tarif.variationId, quantity: String(qty) })
+    emailLines.push({ name: tarif.name, qty, price: tarif.price })
     expectedTotal += tarif.price * qty
   }
 
   if (lineItems.length === 0) return c.json({ error: 'Panier vide' }, 400)
   if (expectedTotal === 0) return c.json({ error: 'Montant nul — pas de paiement requis' }, 400)
 
+  const reference = genReference()
+
   const orderBody: any = {
     order: {
       location_id: SQUARE_LOCATION_ID,
+      reference_id: reference,
       line_items: lineItems,
       metadata: { buyer_nom: buyerInfo.nom, buyer_prenom: buyerInfo.prenom, buyer_email: buyerInfo.email }
     },
@@ -219,7 +296,28 @@ app.post('/api/billetterie/pay', async (c) => {
   const payData = await payRes.json() as any
   const payment = payData.payment
 
-  return c.json({ success: true, orderId, paymentId: payment.id, receiptUrl: payment.receipt_url, totalCentimes: orderTotal })
+  // Email de confirmation (best effort)
+  let emailSent = false
+  if (c.env.BREVO_API_KEY) {
+    emailSent = await sendConfirmationEmail(c.env.BREVO_API_KEY, {
+      buyerInfo: { nom: buyerInfo.nom.trim(), prenom: buyerInfo.prenom.trim(), email: buyerInfo.email.trim() },
+      lines: emailLines,
+      totalCentimes: orderTotal,
+      reference,
+      receiptUrl: payment.receipt_url
+    })
+  }
+
+  return c.json({
+    success: true,
+    reference,
+    orderId,
+    paymentId: payment.id,
+    receiptUrl: payment.receipt_url,
+    totalCentimes: orderTotal,
+    emailSent,
+    email: buyerInfo.email.trim()
+  })
 })
 
 // ===== PUBLIC API =====

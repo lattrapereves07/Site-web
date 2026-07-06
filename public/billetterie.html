@@ -314,18 +314,29 @@
     }
 
     // ── Succès ─────────────────────────────────────────────────────────────────
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function showSuccess(data) {
       const shop = document.getElementById('billet-shop');
+      const ref = data.reference || data.orderId;
       shop.innerHTML = `
         <div class="billet-success-screen">
           <div style="font-size:2.8rem;margin-bottom:14px;">🎉</div>
           <h3>Paiement confirmé !</h3>
-          <p style="margin:8px 0;">Vos billets sont réservés. Présentez ce numéro à l'entrée.</p>
-          <p class="billet-success-ref">Référence commande : <strong>${data.orderId}</strong></p>
+          <p style="margin:8px 0;">Vos billets sont réservés.</p>
+          <div style="background:var(--light-beige);border-radius:12px;padding:14px 28px;margin:18px auto 6px;display:inline-block;">
+            <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;opacity:.55;">Référence de commande</div>
+            <div style="font-size:1.7rem;font-weight:800;color:var(--coral);letter-spacing:.1em;">${esc(ref)}</div>
+          </div>
+          <p style="margin:10px 0 0;">Le jour de votre visite, donnez simplement votre nom<br>ou cette référence à l'accueil.</p>
+          ${data.emailSent
+            ? `<p style="margin-top:16px;font-size:.92rem;">Un email de confirmation a été envoyé à <strong>${esc(data.email)}</strong>.</p>`
+            : `<p style="margin-top:16px;font-size:.92rem;opacity:.75;">Pensez à noter votre référence de commande.</p>`}
           ${data.receiptUrl
-            ? `<p style="margin-top:14px;"><a href="${data.receiptUrl}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:600;">Voir le reçu Square →</a></p>`
+            ? `<p style="margin-top:12px;"><a href="${data.receiptUrl}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:600;">Voir le reçu de paiement →</a></p>`
             : ''}
-          <p style="margin-top:20px;font-size:.9rem;opacity:.6;">Un email de confirmation vous a été envoyé si vous avez renseigné votre adresse.</p>
         </div>`;
     }
 
