@@ -143,7 +143,7 @@ app.post('/api/billetterie/pay', async (c) => {
   if (!token) return c.json({ error: 'Paiement non configuré' }, 500)
 
   const body = await c.req.json() as any
-  const { sourceId, items, buyerInfo, idempotencyKey } = body
+  const { sourceId, verificationToken, items, buyerInfo, idempotencyKey } = body
 
   if (!sourceId || !Array.isArray(items) || !idempotencyKey) {
     return c.json({ error: 'Données manquantes' }, 400)
@@ -197,6 +197,7 @@ app.post('/api/billetterie/pay', async (c) => {
     order_id: orderId,
     location_id: SQUARE_LOCATION_ID,
   }
+  if (verificationToken) paymentBody.verification_token = verificationToken
   paymentBody.buyer_email_address = buyerInfo.email.trim()
   paymentBody.note = `${buyerInfo.prenom} ${buyerInfo.nom}`
 
@@ -209,6 +210,7 @@ app.post('/api/billetterie/pay', async (c) => {
     const err = await payRes.json() as any
     const code = err?.errors?.[0]?.code || ''
     const detail = err?.errors?.[0]?.detail || 'Paiement refusé'
+    if (code === 'CARD_DECLINED_VERIFICATION_REQUIRED') return c.json({ error: 'Votre banque exige une vérification 3D Secure qui n\'a pas abouti. Rechargez la page et réessayez.' }, 402)
     if (code === 'CARD_DECLINED') return c.json({ error: 'Carte refusée — vérifiez vos informations bancaires' }, 402)
     if (code === 'INSUFFICIENT_FUNDS') return c.json({ error: 'Fonds insuffisants' }, 402)
     if (code === 'CVV_FAILURE') return c.json({ error: 'Code CVV incorrect' }, 402)

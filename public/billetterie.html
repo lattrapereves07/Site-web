@@ -236,6 +236,7 @@
     const PRICES = { plein: 1100, reduit: 900, enfant: 0, 'pass-plein': 3000, 'pass-reduit': 2500 };
 
     const qty = { plein: 0, reduit: 0, enfant: 0, 'pass-plein': 0, 'pass-reduit': 0 };
+    let squarePayments = null;
     let squareCard = null;
     let paying = false;
 
@@ -335,8 +336,8 @@
         return;
       }
       try {
-        const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
-        squareCard = await payments.card({
+        squarePayments = Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
+        squareCard = await squarePayments.card({
           style: {
             '.input-container': { borderColor: 'rgba(0,0,0,0.2)', borderRadius: '10px' },
             '.input-container.is-focus': { borderColor: '#D57956' },
@@ -408,6 +409,27 @@
         return;
       }
 
+      // Vérification 3D Secure (authentification forte, obligatoire en Europe).
+      // Peut ouvrir une fenêtre de validation de la banque.
+      let verificationToken = null;
+      try {
+        const verification = await squarePayments.verifyBuyer(tokenResult.token, {
+          amount: (total / 100).toFixed(2),
+          currencyCode: 'EUR',
+          intent: 'CHARGE',
+          billingContact: {
+            givenName: buyerInfo.prenom,
+            familyName: buyerInfo.nom,
+            email: buyerInfo.email,
+            countryCode: 'FR'
+          }
+        });
+        verificationToken = verification && verification.token;
+      } catch (e) {
+        fail('La vérification bancaire (3D Secure) a échoué ou a été annulée. Veuillez réessayer.');
+        return;
+      }
+
       // Envoi au backend
       const items = Object.keys(qty)
         .filter(id => qty[id] > 0)
@@ -422,6 +444,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sourceId: tokenResult.token,
+            verificationToken,
             items,
             buyerInfo,
             idempotencyKey
