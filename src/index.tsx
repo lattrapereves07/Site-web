@@ -127,6 +127,102 @@ function parisDayRangeUTC(dateStr: string): { begin: string; end: string } {
   return { begin: begin.toISOString(), end: end.toISOString() }
 }
 
+// ===== BILLETTERIE SQUARE =====
+
+// Articles Square existants dans le catalogue (variation IDs)
+const TARIFS: Record<string, { name: string; price: number; variationId: string }> = {
+  'plein':       { name: 'Billet plein tarif',              price: 1100, variationId: 'OBQDPUSZV2KUFECXYRMGR6SB' },
+  'reduit':      { name: 'Billet tarif réduit 3 à 12 ans',  price: 900,  variationId: 'VYOH7TXPOJ4QM325K6SGNRH2' },
+  'enfant':      { name: 'Billet enfants de moins de 3 ans', price: 0,    variationId: 'DQS557AAPP6TITV3YIFCQKWM' },
+  'pass-plein':  { name: 'Pass saison plein tarif',          price: 3000, variationId: 'WH7V3I3NIHVWJPWQOWE7CQ73' },
+  'pass-reduit': { name: 'Pass saison tarif réduit',    price: 2500, variationId: 'O3KVWZFEVR33JO3FF7RA6BCZ' },
+}
+
+app.post('/api/billetterie/pay', async (c) => {
+  const token = c.env.SQUARE_ACCESS_TOKEN
+  if (!token) return c.json({ error: 'Paiement non configuré' }, 500)
+
+  const body = await c.req.json() as any
+  const { sourceId, items, passInfo, email, idempotencyKey } = body
+
+  if (!sourceId || !Array.isArray(items) || !idempotencyKey) {
+    return c.json({ error: 'Données manquantes' }, 400)
+  }
+
+  const lineItems: any[] = []
+  let expectedTotal = 0
+  let hasPass = false
+
+  for (const item of items) {
+    const tarif = TARIFS[item.id]
+    if (!tarif) return c.json({ error: `Tarif inconnu: ${item.id}` }, 400)
+    const qty = parseInt(item.qty)
+    if (isNaN(qty) || qty < 0 || qty > 50) return c.json({ error: 'Quantité invalide' }, 400)
+    if (qty === 0) continue
+    if (item.id === 'pass-plein' || item.id === 'pass-reduit') hasPass = true
+    lineItems.push({ catalog_object_id: tarif.variationId, quantity: String(qty) })
+    expectedTotal += tarif.price * qty
+  }
+
+  if (lineItems.length === 0) return c.json({ error: 'Panier vide' }, 400)
+  if (expectedTotal === 0) return c.json({ error: 'Montant nul — pas de paiement requis' }, 400)
+  if (hasPass && (!passInfo?.nom?.trim() || !passInfo?.prenom?.trim() || !passInfo?.email?.trim())) {
+    return c.json({ error: 'Nom, prénom et email requis pour le Pass Saison' }, 400)
+  }
+
+  const orderBody: any = {
+    order: {
+      location_id: SQUARE_LOCATION_ID,
+      line_items: lineItems,
+      ...(passInfo ? { metadata: { pass_nom: passInfo.nom, pass_prenom: passInfo.prenom, pass_email: passInfo.email } } : {})
+    },
+    idempotency_key: idempotencyKey + '-order'
+  }
+
+  const orderRes = await fetch('https://connect.squareup.com/v2/orders', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Square-Version': '2025-01-23' },
+    body: JSON.stringify(orderBody)
+  })
+  if (!orderRes.ok) {
+    const err = await orderRes.json() as any
+    return c.json({ error: 'Erreur création commande', details: err?.errors?.[0]?.detail }, 502)
+  }
+  const orderData = await orderRes.json() as any
+  const orderId = orderData.order.id
+  const orderTotal = orderData.order.total_money?.amount ?? expectedTotal
+
+  const paymentBody: any = {
+    source_id: sourceId,
+    idempotency_key: idempotencyKey,
+    amount_money: { amount: orderTotal, currency: 'EUR' },
+    order_id: orderId,
+    location_id: SQUARE_LOCATION_ID,
+  }
+  const buyerEmail = passInfo?.email?.trim() || email?.trim()
+  if (buyerEmail) paymentBody.buyer_email_address = buyerEmail
+  if (passInfo) paymentBody.note = `Pass Saison — ${passInfo.prenom} ${passInfo.nom}`
+
+  const payRes = await fetch('https://connect.squareup.com/v2/payments', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Square-Version': '2025-01-23' },
+    body: JSON.stringify(paymentBody)
+  })
+  if (!payRes.ok) {
+    const err = await payRes.json() as any
+    const code = err?.errors?.[0]?.code || ''
+    const detail = err?.errors?.[0]?.detail || 'Paiement refusé'
+    if (code === 'CARD_DECLINED') return c.json({ error: 'Carte refusée — vérifiez vos informations bancaires' }, 402)
+    if (code === 'INSUFFICIENT_FUNDS') return c.json({ error: 'Fonds insuffisants' }, 402)
+    if (code === 'CVV_FAILURE') return c.json({ error: 'Code CVV incorrect' }, 402)
+    return c.json({ error: detail }, 402)
+  }
+  const payData = await payRes.json() as any
+  const payment = payData.payment
+
+  return c.json({ success: true, orderId, paymentId: payment.id, receiptUrl: payment.receipt_url, totalCentimes: orderTotal })
+})
+
 // ===== PUBLIC API =====
 
 // Initialise la table site_config si elle n'existe pas encore

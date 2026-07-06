@@ -1404,17 +1404,219 @@ main {
 .billetterie-box {
   background: var(--white);
   border-radius: 20px;
-  padding: 48px;
+  padding: 32px 40px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  max-width: 700px;
+  max-width: 660px;
   margin: 0 auto;
-  text-align: center;
 }
 
-.billetterie-box p {
+.billet-section-title {
   font-family: var(--font-hand);
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: var(--dark-grey);
+  margin: 0 0 16px;
+  opacity: 0.7;
+}
+
+.billet-tarif {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  gap: 12px;
+}
+.billet-tarif:last-child { border-bottom: none; }
+
+.billet-tarif-info { flex: 1; min-width: 0; }
+.billet-tarif-name { font-weight: 600; font-size: 1rem; color: var(--dark-grey); }
+.billet-tarif-desc { font-size: 0.8rem; opacity: 0.55; margin-top: 2px; }
+
+.billet-tarif-price {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--coral);
+  min-width: 62px;
+  text-align: right;
+  margin-right: 14px;
+  white-space: nowrap;
+}
+
+.billet-qty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.billet-qty button {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--coral);
+  background: transparent;
+  color: var(--coral);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.billet-qty button:hover { background: var(--coral); color: white; }
+.billet-qty button:disabled { opacity: 0.3; cursor: default; }
+.billet-qty-value {
+  min-width: 22px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.billet-total-bar {
+  background: var(--beige);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin: 18px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.billet-total-label {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  opacity: 0.75;
+}
+.billet-total-amount {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--coral);
+}
+
+.billet-pass-block {
+  background: var(--light-beige);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 18px 0 0;
+}
+.billet-pass-block h4 {
+  font-family: var(--font-hand);
+  font-size: 1rem;
+  margin: 0 0 14px;
+  opacity: 0.75;
+}
+.billet-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.billet-form-full { margin-top: 10px; }
+.billet-field { display: flex; flex-direction: column; gap: 4px; }
+.billet-field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.55;
+}
+.billet-field input[type="text"],
+.billet-field input[type="email"] {
+  padding: 9px 12px;
+  border: 1.5px solid rgba(0,0,0,0.14);
+  border-radius: 8px;
+  font-size: 0.97rem;
+  background: white;
+  font-family: var(--font-ui);
+  transition: border-color .15s;
+}
+.billet-field input:focus { outline: none; border-color: var(--coral); }
+
+.billet-email-block { margin-top: 14px; }
+
+.billet-card-wrapper { margin: 18px 0 0; }
+.billet-card-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.55;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.billet-card-label svg { width: 14px; height: 14px; opacity: 0.7; }
+#card-container {
+  border: 1.5px solid rgba(0,0,0,0.14);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 48px;
+  background: white;
+  transition: border-color .15s;
+}
+#card-container.sq-focus { border-color: var(--coral); }
+
+.billet-pay-btn {
+  display: block;
+  width: 100%;
+  background: var(--coral);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  margin-top: 18px;
+  transition: all .18s;
+}
+.billet-pay-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.15);
+}
+.billet-pay-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+.billet-secure-note {
+  text-align: center;
+  font-size: 0.78rem;
+  opacity: 0.45;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.billet-message {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+.billet-message--error {
+  background: #fdf2f0;
+  color: #c0392b;
+  border: 1px solid #f5c6c0;
+}
+.billet-message--success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.billet-success-screen {
+  text-align: center;
+  padding: 24px 0 8px;
+}
+.billet-success-screen h3 {
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: #166534;
+  margin: 0 0 8px;
+}
+.billet-success-ref {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  margin: 6px 0 0;
+}
+
+@media (max-width: 500px) {
+  .billetterie-box { padding: 24px 20px; }
+  .billet-form-row { grid-template-columns: 1fr; }
+  .billet-tarif-price { min-width: 50px; margin-right: 8px; }
 }
 
 /* --- LEGAL PAGES --- */

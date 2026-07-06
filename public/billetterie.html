@@ -15,7 +15,8 @@
   <link rel="alternate" hreflang="nl" href="https://www.lattrapereves07.fr/nl/billetterie.html">
   <link rel="alternate" hreflang="x-default" href="https://www.lattrapereves07.fr/billetterie.html">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260532">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260706">
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"TouristAttraction","name":"L'Attrape-Rêves — Ferme de découverte et d'émerveillement","url":"https://www.lattrapereves07.fr","telephone":"+33428400049","email":"contact@lattrapereves07.fr","address":{"@type":"PostalAddress","streetAddress":"514 chemin de la Vernède","addressLocality":"Gravières","postalCode":"07140","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":44.4179088,"longitude":4.1000285},"openingHours":["We,Sa,Su 10:00-18:00"],"priceRange":"€"}
   </script>
@@ -67,8 +68,142 @@
           <p style="font-size: 1.1rem;" data-i18n="billetterie.text">Achetez vos billets d'entrée en ligne pour profiter dès votre arrivée !</p>
         </div>
 
-        <div class="billetterie-box fade-in">
-          <a title="Vente de billets en ligne" href="https://www.billetweb.fr/shop.php?event=lattrape-reves2" class="shop_frame" target="_blank" data-src="https://www.billetweb.fr/shop.php?event=lattrape-reves2" data-max-width="100%" data-initial-height="600" data-scrolling="no" data-id="lattrape-reves2" data-resize="1">Vente de billets en ligne</a>
+        <div class="billetterie-box fade-in" id="billet-shop">
+
+          <!-- Tarifs -->
+          <p class="billet-section-title">Choisissez vos billets</p>
+
+          <div id="tarifs-list">
+            <!-- plein -->
+            <div class="billet-tarif">
+              <div class="billet-tarif-info">
+                <div class="billet-tarif-name">Billet plein tarif</div>
+                <div class="billet-tarif-desc">Valable à la journée — entrées/sorties libres</div>
+              </div>
+              <div class="billet-tarif-price">11,00 €</div>
+              <div class="billet-qty">
+                <button class="qty-minus" data-id="plein" aria-label="Diminuer" disabled>−</button>
+                <span class="billet-qty-value" id="qty-plein">0</span>
+                <button class="qty-plus" data-id="plein" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+
+            <!-- réduit -->
+            <div class="billet-tarif">
+              <div class="billet-tarif-info">
+                <div class="billet-tarif-name">Billet tarif réduit <small style="font-weight:400">(3–12 ans)</small></div>
+                <div class="billet-tarif-desc">Valable à la journée — entrées/sorties libres</div>
+              </div>
+              <div class="billet-tarif-price">9,00 €</div>
+              <div class="billet-qty">
+                <button class="qty-minus" data-id="reduit" aria-label="Diminuer" disabled>−</button>
+                <span class="billet-qty-value" id="qty-reduit">0</span>
+                <button class="qty-plus" data-id="reduit" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+
+            <!-- enfant gratuit -->
+            <div class="billet-tarif">
+              <div class="billet-tarif-info">
+                <div class="billet-tarif-name">Billet enfants <small style="font-weight:400">(moins de 3 ans)</small></div>
+                <div class="billet-tarif-desc">Entrée gratuite</div>
+              </div>
+              <div class="billet-tarif-price" style="color: var(--dark-grey); opacity: .55;">Gratuit</div>
+              <div class="billet-qty">
+                <button class="qty-minus" data-id="enfant" aria-label="Diminuer" disabled>−</button>
+                <span class="billet-qty-value" id="qty-enfant">0</span>
+                <button class="qty-plus" data-id="enfant" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+
+            <!-- pass plein -->
+            <div class="billet-tarif">
+              <div class="billet-tarif-info">
+                <div class="billet-tarif-name">Pass saison plein tarif</div>
+                <div class="billet-tarif-desc">Entrées illimitées de Pâques à la Toussaint</div>
+              </div>
+              <div class="billet-tarif-price">30,00 €</div>
+              <div class="billet-qty">
+                <button class="qty-minus" data-id="pass-plein" aria-label="Diminuer" disabled>−</button>
+                <span class="billet-qty-value" id="qty-pass-plein">0</span>
+                <button class="qty-plus" data-id="pass-plein" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+
+            <!-- pass réduit -->
+            <div class="billet-tarif">
+              <div class="billet-tarif-info">
+                <div class="billet-tarif-name">Pass saison tarif réduit <small style="font-weight:400">(3–12 ans)</small></div>
+                <div class="billet-tarif-desc">Entrées illimitées de Pâques à la Toussaint</div>
+              </div>
+              <div class="billet-tarif-price">25,00 €</div>
+              <div class="billet-qty">
+                <button class="qty-minus" data-id="pass-reduit" aria-label="Diminuer" disabled>−</button>
+                <span class="billet-qty-value" id="qty-pass-reduit">0</span>
+                <button class="qty-plus" data-id="pass-reduit" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="billet-total-bar">
+            <span class="billet-total-label">Total</span>
+            <span class="billet-total-amount" id="billet-total">0,00 €</span>
+          </div>
+
+          <!-- Zone de paiement (cachée jusqu'à ce qu'il y ait un total > 0) -->
+          <div id="payment-zone" style="display:none">
+
+            <!-- Infos Pass Saison (conditionnelles) -->
+            <div class="billet-pass-block" id="pass-info-block" style="display:none">
+              <h4>Titulaire du Pass Saison</h4>
+              <div class="billet-form-row">
+                <div class="billet-field">
+                  <label for="pass-nom">Nom</label>
+                  <input type="text" id="pass-nom" name="pass-nom" autocomplete="family-name" placeholder="Dupont">
+                </div>
+                <div class="billet-field">
+                  <label for="pass-prenom">Prénom</label>
+                  <input type="text" id="pass-prenom" name="pass-prenom" autocomplete="given-name" placeholder="Marie">
+                </div>
+              </div>
+              <div class="billet-form-full">
+                <div class="billet-field">
+                  <label for="pass-email">Adresse email</label>
+                  <input type="email" id="pass-email" name="pass-email" autocomplete="email" placeholder="marie.dupont@exemple.fr">
+                </div>
+              </div>
+            </div>
+
+            <!-- Email pour reçu (billets simples) -->
+            <div class="billet-email-block" id="email-block" style="display:none">
+              <div class="billet-field">
+                <label for="buyer-email">Email pour reçu <span style="opacity:.5;font-weight:400;">(facultatif)</span></label>
+                <input type="email" id="buyer-email" name="buyer-email" autocomplete="email" placeholder="votre@email.fr">
+              </div>
+            </div>
+
+            <!-- Formulaire de carte Square -->
+            <div class="billet-card-wrapper">
+              <p class="billet-card-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Paiement par carte
+              </p>
+              <div id="card-container"></div>
+            </div>
+
+            <div id="billet-message" class="billet-message" style="display:none"></div>
+
+            <button class="billet-pay-btn" id="pay-btn" disabled>
+              Payer <span id="pay-btn-amount">0,00 €</span>
+            </button>
+
+            <p class="billet-secure-note">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Paiement sécurisé par Square · Vos données bancaires ne transitent pas par nos serveurs
+            </p>
+          </div>
+
         </div>
 
         <div class="text-center fade-in mt-32">
@@ -97,7 +232,224 @@
     </div>
     <div class="footer-bottom"><div class="container"><p data-i18n="footer.bottom">&copy; 2026 L'Attrape-Rêves — La Fabrique aux Merveilles — Tous droits réservés</p></div></div>
   </footer>
-  <script type="text/javascript" src="https://www.billetweb.fr/js/export.js"></script>
+
   <script src="assets/js/main.js"></script>
+  <script>
+  (function () {
+    // ── Configuration ──────────────────────────────────────────────────────────
+    // Remplacer par l'Application ID Square (developer.squareup.com → My Apps → Application ID)
+    const SQUARE_APP_ID   = 'sq0idp-p58kY6MKr-Pp_i2clbnPrg';
+    const SQUARE_LOC_ID   = 'L1QHZTGHT0PC7';
+
+    const PRICES = { plein: 1100, reduit: 900, enfant: 0, 'pass-plein': 3000, 'pass-reduit': 2500 };
+    const PASS_IDS = ['pass-plein', 'pass-reduit'];
+
+    const qty = { plein: 0, reduit: 0, enfant: 0, 'pass-plein': 0, 'pass-reduit': 0 };
+    let squareCard = null;
+    let paying = false;
+
+    // ── Formatage prix ──────────────────────────────────────────────────────────
+    function fmt(centimes) {
+      return (centimes / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    }
+
+    // ── Calcul total ───────────────────────────────────────────────────────────
+    function totalCentimes() {
+      return Object.keys(PRICES).reduce((acc, id) => acc + PRICES[id] * qty[id], 0);
+    }
+
+    function hasPass() {
+      return PASS_IDS.some(id => qty[id] > 0);
+    }
+
+    // ── Mise à jour UI ─────────────────────────────────────────────────────────
+    function update() {
+      const total = totalCentimes();
+      document.getElementById('billet-total').textContent = fmt(total);
+      document.getElementById('pay-btn-amount').textContent = fmt(total);
+
+      const hasItems = Object.values(qty).some(v => v > 0);
+      const paymentZone = document.getElementById('payment-zone');
+      paymentZone.style.display = hasItems ? '' : 'none';
+
+      document.getElementById('pass-info-block').style.display = hasPass() ? '' : 'none';
+      document.getElementById('email-block').style.display = hasPass() ? 'none' : (hasItems ? '' : 'none');
+
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.disabled = total === 0 || !squareCard || paying;
+
+      // Boutons −
+      Object.keys(qty).forEach(id => {
+        const minusBtn = document.querySelector(`.qty-minus[data-id="${id}"]`);
+        if (minusBtn) minusBtn.disabled = qty[id] === 0;
+      });
+    }
+
+    // ── Contrôles quantité ─────────────────────────────────────────────────────
+    document.querySelectorAll('.qty-plus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if (qty[id] < 20) qty[id]++;
+        document.getElementById('qty-' + id).textContent = qty[id];
+        update();
+      });
+    });
+
+    document.querySelectorAll('.qty-minus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if (qty[id] > 0) qty[id]--;
+        document.getElementById('qty-' + id).textContent = qty[id];
+        update();
+      });
+    });
+
+    // ── Message d'état ─────────────────────────────────────────────────────────
+    function showMessage(type, html) {
+      const el = document.getElementById('billet-message');
+      el.style.display = '';
+      el.className = 'billet-message billet-message--' + type;
+      el.innerHTML = html;
+    }
+
+    function hideMessage() {
+      const el = document.getElementById('billet-message');
+      el.style.display = 'none';
+    }
+
+    // ── Succès ─────────────────────────────────────────────────────────────────
+    function showSuccess(data) {
+      const shop = document.getElementById('billet-shop');
+      shop.innerHTML = `
+        <div class="billet-success-screen">
+          <div style="font-size:2.8rem;margin-bottom:14px;">🎉</div>
+          <h3>Paiement confirmé !</h3>
+          <p style="margin:8px 0;">Vos billets sont réservés. Présentez ce numéro à l'entrée.</p>
+          <p class="billet-success-ref">Référence commande : <strong>${data.orderId}</strong></p>
+          ${data.receiptUrl
+            ? `<p style="margin-top:14px;"><a href="${data.receiptUrl}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:600;">Voir le reçu Square →</a></p>`
+            : ''}
+          <p style="margin-top:20px;font-size:.9rem;opacity:.6;">Un email de confirmation vous a été envoyé si vous avez renseigné votre adresse.</p>
+        </div>`;
+    }
+
+    // ── Initialisation Square ──────────────────────────────────────────────────
+    async function initSquare() {
+      if (typeof Square === 'undefined') {
+        showMessage('error', 'Impossible de charger le formulaire de paiement. Vérifiez votre connexion et rechargez la page.');
+        return;
+      }
+      try {
+        const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOC_ID);
+        squareCard = await payments.card();
+        await squareCard.attach('#card-container');
+        update();
+      } catch (e) {
+        showMessage('error', 'Erreur lors du chargement du formulaire de paiement. Veuillez recharger la page.');
+        console.error('Square init error:', e);
+      }
+    }
+
+    // ── Paiement ───────────────────────────────────────────────────────────────
+    document.getElementById('pay-btn').addEventListener('click', async () => {
+      if (paying || !squareCard) return;
+      hideMessage();
+
+      const total = totalCentimes();
+      if (total === 0) {
+        showMessage('error', 'Veuillez sélectionner au moins un billet payant.');
+        return;
+      }
+
+      // Validation pass saison
+      let passInfo = null;
+      if (hasPass()) {
+        const nom    = document.getElementById('pass-nom').value.trim();
+        const prenom = document.getElementById('pass-prenom').value.trim();
+        const email  = document.getElementById('pass-email').value.trim();
+        if (!nom || !prenom) {
+          showMessage('error', 'Veuillez renseigner le nom et le prénom du titulaire du Pass Saison.');
+          document.getElementById(nom ? 'pass-prenom' : 'pass-nom').focus();
+          return;
+        }
+        if (!email || !email.includes('@')) {
+          showMessage('error', 'Veuillez renseigner une adresse email valide pour le Pass Saison.');
+          document.getElementById('pass-email').focus();
+          return;
+        }
+        passInfo = { nom, prenom, email };
+      }
+
+      const buyerEmail = !hasPass()
+        ? document.getElementById('buyer-email').value.trim()
+        : null;
+
+      // Tokenisation de la carte
+      paying = true;
+      document.getElementById('pay-btn').disabled = true;
+      document.getElementById('pay-btn').textContent = 'Traitement en cours…';
+
+      let tokenResult;
+      try {
+        tokenResult = await squareCard.tokenize();
+      } catch (e) {
+        showMessage('error', 'Erreur lors de la lecture de la carte. Veuillez réessayer.');
+        paying = false;
+        update();
+        return;
+      }
+
+      if (tokenResult.status !== 'OK') {
+        const errMsg = tokenResult.errors && tokenResult.errors[0]
+          ? tokenResult.errors[0].message
+          : 'Informations de carte invalides.';
+        showMessage('error', errMsg);
+        paying = false;
+        update();
+        return;
+      }
+
+      // Envoi au backend
+      const items = Object.keys(qty)
+        .filter(id => qty[id] > 0)
+        .map(id => ({ id, qty: qty[id] }));
+
+      const idempotencyKey = 'blt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+
+      try {
+        const resp = await fetch('/api/billetterie/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sourceId: tokenResult.token,
+            items,
+            passInfo: passInfo || undefined,
+            email: buyerEmail || undefined,
+            idempotencyKey
+          })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          showMessage('error', data.error || 'Paiement refusé. Veuillez réessayer ou contacter la billetterie.');
+          paying = false;
+          update();
+          return;
+        }
+
+        showSuccess(data);
+
+      } catch (e) {
+        showMessage('error', 'Erreur réseau. Vérifiez votre connexion et réessayez.');
+        paying = false;
+        update();
+      }
+    });
+
+    // ── Démarrage ──────────────────────────────────────────────────────────────
+    update();
+    initSquare();
+  })();
+  </script>
 </body>
 </html>
