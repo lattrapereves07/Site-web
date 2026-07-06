@@ -196,8 +196,8 @@ async function sendConfirmationEmail(
       method: 'POST',
       headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        // Expéditeur vérifié dans Brevo (contact@ n'y est pas vérifié)
-        sender: { name: "L'Attrape-Rêves", email: 'louis.pick@lattrapereves07.fr' },
+        // Expéditeur : doit être vérifié dans Brevo (Expéditeurs → contact@)
+        sender: { name: "L'Attrape-Rêves", email: 'contact@lattrapereves07.fr' },
         to: [{ email: buyerInfo.email, name: `${buyerInfo.prenom} ${buyerInfo.nom}` }],
         bcc: [{ email: 'contact@lattrapereves07.fr' }],
         replyTo: { email: 'contact@lattrapereves07.fr' },
