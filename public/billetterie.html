@@ -154,32 +154,24 @@
           <!-- Zone de paiement (cachée jusqu'à ce qu'il y ait un total > 0) -->
           <div id="payment-zone" style="display:none">
 
-            <!-- Infos Pass Saison (conditionnelles) -->
-            <div class="billet-pass-block" id="pass-info-block" style="display:none">
-              <h4>Titulaire du Pass Saison</h4>
+            <!-- Coordonnées acheteur (toujours requises) -->
+            <div class="billet-pass-block" id="buyer-info-block">
+              <h4>Vos coordonnées</h4>
               <div class="billet-form-row">
                 <div class="billet-field">
-                  <label for="pass-nom">Nom</label>
-                  <input type="text" id="pass-nom" name="pass-nom" autocomplete="family-name" placeholder="Dupont">
+                  <label for="buyer-nom">Nom</label>
+                  <input type="text" id="buyer-nom" name="buyer-nom" autocomplete="family-name" placeholder="Dupont" required>
                 </div>
                 <div class="billet-field">
-                  <label for="pass-prenom">Prénom</label>
-                  <input type="text" id="pass-prenom" name="pass-prenom" autocomplete="given-name" placeholder="Marie">
+                  <label for="buyer-prenom">Prénom</label>
+                  <input type="text" id="buyer-prenom" name="buyer-prenom" autocomplete="given-name" placeholder="Marie" required>
                 </div>
               </div>
               <div class="billet-form-full">
                 <div class="billet-field">
-                  <label for="pass-email">Adresse email</label>
-                  <input type="email" id="pass-email" name="pass-email" autocomplete="email" placeholder="marie.dupont@exemple.fr">
+                  <label for="buyer-email">Adresse email</label>
+                  <input type="email" id="buyer-email" name="buyer-email" autocomplete="email" placeholder="marie.dupont@exemple.fr" required>
                 </div>
-              </div>
-            </div>
-
-            <!-- Email pour reçu (billets simples) -->
-            <div class="billet-email-block" id="email-block" style="display:none">
-              <div class="billet-field">
-                <label for="buyer-email">Email pour reçu <span style="opacity:.5;font-weight:400;">(facultatif)</span></label>
-                <input type="email" id="buyer-email" name="buyer-email" autocomplete="email" placeholder="votre@email.fr">
               </div>
             </div>
 
@@ -242,7 +234,6 @@
     const SQUARE_LOC_ID   = 'L1QHZTGHT0PC7';
 
     const PRICES = { plein: 1100, reduit: 900, enfant: 0, 'pass-plein': 3000, 'pass-reduit': 2500 };
-    const PASS_IDS = ['pass-plein', 'pass-reduit'];
 
     const qty = { plein: 0, reduit: 0, enfant: 0, 'pass-plein': 0, 'pass-reduit': 0 };
     let squareCard = null;
@@ -258,10 +249,6 @@
       return Object.keys(PRICES).reduce((acc, id) => acc + PRICES[id] * qty[id], 0);
     }
 
-    function hasPass() {
-      return PASS_IDS.some(id => qty[id] > 0);
-    }
-
     // ── Mise à jour UI ─────────────────────────────────────────────────────────
     function update() {
       const total = totalCentimes();
@@ -271,9 +258,6 @@
       const hasItems = Object.values(qty).some(v => v > 0);
       const paymentZone = document.getElementById('payment-zone');
       paymentZone.style.display = hasItems ? '' : 'none';
-
-      document.getElementById('pass-info-block').style.display = hasPass() ? '' : 'none';
-      document.getElementById('email-block').style.display = hasPass() ? 'none' : (hasItems ? '' : 'none');
 
       const payBtn = document.getElementById('pay-btn');
       payBtn.disabled = total === 0 || !squareCard || paying;
@@ -361,28 +345,21 @@
         return;
       }
 
-      // Validation pass saison
-      let passInfo = null;
-      if (hasPass()) {
-        const nom    = document.getElementById('pass-nom').value.trim();
-        const prenom = document.getElementById('pass-prenom').value.trim();
-        const email  = document.getElementById('pass-email').value.trim();
-        if (!nom || !prenom) {
-          showMessage('error', 'Veuillez renseigner le nom et le prénom du titulaire du Pass Saison.');
-          document.getElementById(nom ? 'pass-prenom' : 'pass-nom').focus();
-          return;
-        }
-        if (!email || !email.includes('@')) {
-          showMessage('error', 'Veuillez renseigner une adresse email valide pour le Pass Saison.');
-          document.getElementById('pass-email').focus();
-          return;
-        }
-        passInfo = { nom, prenom, email };
+      // Validation coordonnées acheteur (toujours requises)
+      const nom    = document.getElementById('buyer-nom').value.trim();
+      const prenom = document.getElementById('buyer-prenom').value.trim();
+      const email  = document.getElementById('buyer-email').value.trim();
+      if (!nom || !prenom) {
+        showMessage('error', 'Veuillez renseigner votre nom et prénom.');
+        document.getElementById(nom ? 'buyer-prenom' : 'buyer-nom').focus();
+        return;
       }
-
-      const buyerEmail = !hasPass()
-        ? document.getElementById('buyer-email').value.trim()
-        : null;
+      if (!email || !email.includes('@')) {
+        showMessage('error', 'Veuillez renseigner une adresse email valide.');
+        document.getElementById('buyer-email').focus();
+        return;
+      }
+      const buyerInfo = { nom, prenom, email };
 
       // Tokenisation de la carte
       paying = true;
@@ -423,8 +400,7 @@
           body: JSON.stringify({
             sourceId: tokenResult.token,
             items,
-            passInfo: passInfo || undefined,
-            email: buyerEmail || undefined,
+            buyerInfo,
             idempotencyKey
           })
         });

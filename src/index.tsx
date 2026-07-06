@@ -143,15 +143,17 @@ app.post('/api/billetterie/pay', async (c) => {
   if (!token) return c.json({ error: 'Paiement non configuré' }, 500)
 
   const body = await c.req.json() as any
-  const { sourceId, items, passInfo, email, idempotencyKey } = body
+  const { sourceId, items, buyerInfo, idempotencyKey } = body
 
   if (!sourceId || !Array.isArray(items) || !idempotencyKey) {
     return c.json({ error: 'Données manquantes' }, 400)
   }
+  if (!buyerInfo?.nom?.trim() || !buyerInfo?.prenom?.trim() || !buyerInfo?.email?.trim()) {
+    return c.json({ error: 'Nom, prénom et email requis' }, 400)
+  }
 
   const lineItems: any[] = []
   let expectedTotal = 0
-  let hasPass = false
 
   for (const item of items) {
     const tarif = TARIFS[item.id]
@@ -159,22 +161,18 @@ app.post('/api/billetterie/pay', async (c) => {
     const qty = parseInt(item.qty)
     if (isNaN(qty) || qty < 0 || qty > 50) return c.json({ error: 'Quantité invalide' }, 400)
     if (qty === 0) continue
-    if (item.id === 'pass-plein' || item.id === 'pass-reduit') hasPass = true
     lineItems.push({ catalog_object_id: tarif.variationId, quantity: String(qty) })
     expectedTotal += tarif.price * qty
   }
 
   if (lineItems.length === 0) return c.json({ error: 'Panier vide' }, 400)
   if (expectedTotal === 0) return c.json({ error: 'Montant nul — pas de paiement requis' }, 400)
-  if (hasPass && (!passInfo?.nom?.trim() || !passInfo?.prenom?.trim() || !passInfo?.email?.trim())) {
-    return c.json({ error: 'Nom, prénom et email requis pour le Pass Saison' }, 400)
-  }
 
   const orderBody: any = {
     order: {
       location_id: SQUARE_LOCATION_ID,
       line_items: lineItems,
-      ...(passInfo ? { metadata: { pass_nom: passInfo.nom, pass_prenom: passInfo.prenom, pass_email: passInfo.email } } : {})
+      metadata: { buyer_nom: buyerInfo.nom, buyer_prenom: buyerInfo.prenom, buyer_email: buyerInfo.email }
     },
     idempotency_key: idempotencyKey + '-order'
   }
@@ -199,9 +197,8 @@ app.post('/api/billetterie/pay', async (c) => {
     order_id: orderId,
     location_id: SQUARE_LOCATION_ID,
   }
-  const buyerEmail = passInfo?.email?.trim() || email?.trim()
-  if (buyerEmail) paymentBody.buyer_email_address = buyerEmail
-  if (passInfo) paymentBody.note = `Pass Saison — ${passInfo.prenom} ${passInfo.nom}`
+  paymentBody.buyer_email_address = buyerInfo.email.trim()
+  paymentBody.note = `${buyerInfo.prenom} ${buyerInfo.nom}`
 
   const payRes = await fetch('https://connect.squareup.com/v2/payments', {
     method: 'POST',
