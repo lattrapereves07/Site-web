@@ -163,7 +163,11 @@
     "arts_title": "Podiumkunsten & Cultuur",
     "arts_badge": "Speciale evenementen",
     "arts_text": "Voorstellingen, creatieve workshops, vertellingen, muziek… Momenten die het leven van de plek verrijken om te verrassen en te verwonderen. La Compagnie des Songes, een vereniging op locatie, brengt deze momenten van delen en culturele ontdekking tot leven. Bekijk onze agenda voor het programma.",
-    "arts_btn": "Bekijk de evenementen →"
+    "arts_btn": "Bekijk de evenementen →",
+    "animaux_more": "Meer weten over onze dieren →",
+    "sensoriel_more": "Meer weten over het zintuiglijk parcours →",
+    "filets_more": "Meer weten over de klimnetten in de bomen →",
+    "jeux_more": "Meer weten over de spellen en curiosa →"
   },
   "agenda": {
     "hero_title": "EVENEMENTEN",
@@ -459,6 +463,22 @@
     "legende": {
       "title": "De legende van L'Attrape-Rêves — Gramado, bewaker van de dromen — Gravières, Ardèche",
       "description": "Ontdek de legende van Gramado en de ijsvogel, het verhaal achter L'Attrape-Rêves, pretpark en ontdekkingsboerderij in Gravières, Ardèche."
+    },
+    "animaux": {
+      "title": "De dieren — L'Attrape-Rêves — Ontdekkingsboerderij, Gravières, Ardèche",
+      "description": "Ezels, dwerggeiten, kippen en varkens bij L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche. Een gezinsactiviteit om de dieren te observeren, voeren en aaien."
+    },
+    "filets_arbres": {
+      "title": "Klimnetten in de bomen — L'Attrape-Rêves — Klimparcours, Gravières, Ardèche",
+      "description": "Een parcours van klimnetten in de bomen, toegankelijk vanaf 3 jaar zonder uitrusting, bij L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche."
+    },
+    "parcours_sensoriel": {
+      "title": "Zintuiglijk parcours — L'Attrape-Rêves — Ontdekkingsboerderij, Gravières, Ardèche",
+      "description": "Een blootsvoets zintuiglijk parcours over kiezels, grind en stro bij L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche. Een natuurlijke pauze voor het hele gezin."
+    },
+    "jeux_emerveillement": {
+      "title": "Spellen en verwondering — L'Attrape-Rêves — Ontdekkingsboerderij, Gravières, Ardèche",
+      "description": "Vervormende spiegels, muziekinstrumenten, verrassende installaties... De spellen en curiosa van L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche."
     }
   },
   "legende": {
@@ -483,5 +503,37 @@
     "spirit3_text": "Een rustig moment van introspectie, op het ritme van de natuur.",
     "spirit4_title": "Verwonder u",
     "spirit4_text": "Verrassingen, schoonheid en kunstinstallaties bij elke bocht in het pad."
+  },
+  "animaux": {
+    "hero_title": "DE DIEREN",
+    "hero_subtitle": "Onze viervoetige en gevederde bewoners",
+    "p1": "Bij L'Attrape-Rêves, een ontdekkingsboerderij midden in de Cévennes van de Ardèche, zijn de dieren geen decor: het zijn de echte bewoners van de plek, het hele jaar door verzorgd. Deze gezinsactiviteit in de Ardèche nodigt jong en oud uit om te vertragen, te observeren en een echte band met het levende op te bouwen.",
+    "p2": "Onze ezels, met hun nieuwsgierige grote oren, houden van aaien en gedeelde momenten. De ondeugende, knuffelige dwerggeiten willen altijd wel spelen. De kippen lopen vrij rond in hun eigen kleine wereld, en de varkens, koningen van het middagdutje, genieten van elk rustig moment.",
+    "p3": "In tegenstelling tot een dierentuin zijn er hier geen ruiten of onpersoonlijke hekken: u komt dichtbij, voert, observeert op dierenhoogte. Het is een pretpark voor kinderen in de Cévennes, gericht op zachte dierbegeleiding, gedragen door La Compagnie des Songes, een vereniging die het hele jaar door aanwezig is.",
+    "p4": "Andere bewoners zullen misschien in de loop van de seizoenen bij de familie komen — elk bezoek kan een nieuwe ontmoeting opleveren."
+  },
+  "filets": {
+    "hero_title": "KLIMNETTEN IN DE BOMEN",
+    "hero_subtitle": "Een klimparcours toegankelijk vanaf 3 jaar",
+    "p1": "Gespannen tussen de takken, midden in het Ardèche-bos, bieden de netten van L'Attrape-Rêves een uniek luchtparcours, zonder enige uitrusting of klimgordel. Klimmen, stuiteren, kruipen, zachtjes naar beneden glijden: deze gezinsactiviteit in de Ardèche maakt van de boomtoppen een enorme speeltuin.",
+    "p2": "Toegankelijk vanaf 3 jaar, is het parcours ontworpen om veilig beoefend te worden, zonder de beperkingen van een klassiek klimbos — geen karabijnhaken, geen vastgelegde route. Kinderen verkennen op hun eigen tempo, onder toezicht van een begeleidende volwassene, terwijl de doeken tussen de bomen vallen en sprongen dempen.",
+    "p3": "Het is een van de topactiviteiten van dit pretpark voor kinderen in de Cévennes: een klimparcours dat vrijheidsgevoel, lichaamsbeweging en een adembenemend uitzicht vanaf de boomtoppen combineert. Een ervaring die net zo goed bevalt aan peuters als aan grotere kinderen, die maar wat graag willen blijven.",
+    "p4": "Het klimnettenparcours is inbegrepen bij het standaardticket voor L'Attrape-Rêves — geen extra kosten."
+  },
+  "sensoriel": {
+    "hero_title": "ZINTUIGLIJK PARCOURS",
+    "hero_subtitle": "Herontdek de wereld met al uw zintuigen",
+    "p1": "Sluit uw ogen. Loop op blote voeten. Bij L'Attrape-Rêves nodigt het zintuiglijk parcours elke bezoeker uit om te vertragen en de natuur anders te verkennen — via tast, gehoor en geur, veel meer dan via het zicht.",
+    "p2": "Het pad slingert door verschillende texturen: kiezels, grind, stro, mos, schors… Elke stap wordt een ontdekking, elk oppervlak een nieuwe sensatie. Het is een gezinsactiviteit in de Ardèche die vooral geliefd is bij kinderen, die hun evenwicht en houvast herontdekken, maar ook bij volwassenen op zoek naar een zintuiglijke pauze weg van schermen.",
+    "p3": "Dit parcours past bij de geest van de plek: een zintuiglijke toevlucht midden in het levende, bedacht om jong en oud op te laden. Het is geen simpele attractie, maar een echte uitnodiging tot mindfulness, midden in de Cévennes van de Ardèche.",
+    "p4": "Geschikt voor het hele gezin, zonder vereisten of speciale uitrusting, is het zintuiglijk parcours toegankelijk voor alle bezoekers van dit pretpark voor kinderen in de Cévennes, ongeacht hun leeftijd."
+  },
+  "jeux": {
+    "hero_title": "SPELLEN VOL VERWONDERING",
+    "hero_subtitle": "Curiosa, verrassingen en magische momenten",
+    "p1": "Tussen de bomen en paden van L'Attrape-Rêves schuilen duizend-en-een curiosa: vervormende spiegels, muziekinstrumenten in de open lucht, verkoelingszones, verrassende installaties… Hier is alles bedacht om het kind in u wakker te maken en de nieuwsgierigheid te prikkelen, ongeacht uw leeftijd.",
+    "p2": "Deze gezinsactiviteit in de Ardèche zet in op het onverwachte: we vertellen u niet alles, de verrassing hoort bij het spel. Bij een bocht in het pad duikt een muzikale paddenstoel op, een gigantische kleurbel, of een tijdelijke kunstinstallatie die de wandeling markeert en momenten van verbondenheid tussen jong en oud creëert.",
+    "p3": "Dit pretpark voor kinderen in de Cévennes koestert de kunst van de subtiele verwondering — geen luidruchtige attracties of wachtrijen, maar een reeks kleine wonderen om op eigen tempo te ontdekken, als gezin. Hier komen ook de hoogtepunten van La Compagnie des Songes tot leven: voorstellingen, creatieve workshops en incidentele evenementen verrijken het bezoek volgens de seizoenskalender.",
+    "p4": "Bekijk onze agenda om geen enkel evenement te missen."
   }
 }

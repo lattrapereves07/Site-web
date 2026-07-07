@@ -163,7 +163,11 @@
     "arts_title": "Darstellende Künste & Kultur",
     "arts_badge": "Gelegentliche Veranstaltungen",
     "arts_text": "Aufführungen, kreative Workshops, Märchen, Musik… Momente, die das Leben am Ort bereichern und überraschen. La Compagnie des Songes, der vor Ort ansässige Verein, gestaltet diese Augenblicke des Austauschs und der kulturellen Entdeckung. Schauen Sie in unseren Agenda für das Programm.",
-    "arts_btn": "Agenda ansehen →"
+    "arts_btn": "Agenda ansehen →",
+    "animaux_more": "Mehr über unsere Tiere erfahren →",
+    "sensoriel_more": "Mehr über den Sinnespfad erfahren →",
+    "filets_more": "Mehr über die Kletternetze in den Bäumen erfahren →",
+    "jeux_more": "Mehr über die Spiele und Kuriositäten erfahren →"
   },
   "agenda": {
     "hero_title": "AGENDA",
@@ -459,6 +463,22 @@
     "legende": {
       "title": "Die Legende von L'Attrape-Rêves — Gramado, Hüter der Träume — Gravières, Ardèche",
       "description": "Entdecken Sie die Legende von Gramado und dem Eisvogel, die Geschichte hinter L'Attrape-Rêves, Freizeitpark und Entdeckerhof in Gravières, Ardèche."
+    },
+    "animaux": {
+      "title": "Die Tiere — L'Attrape-Rêves — Entdeckerhof, Gravières, Ardèche",
+      "description": "Esel, Zwergziegen, Hühner und Schweine bei L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche. Eine Familienaktivität, um die Tiere zu beobachten, zu füttern und zu streicheln."
+    },
+    "filets_arbres": {
+      "title": "Kletternetze in den Bäumen — L'Attrape-Rêves — Kletterparcours, Gravières, Ardèche",
+      "description": "Ein Parcours aus Kletternetzen in den Bäumen, zugänglich ab 3 Jahren ohne Ausrüstung, bei L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche."
+    },
+    "parcours_sensoriel": {
+      "title": "Sinnespfad — L'Attrape-Rêves — Entdeckerhof, Gravières, Ardèche",
+      "description": "Ein barfuß begehbarer Sinnespfad über Kieselsteine, Kies und Stroh bei L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche. Eine Auszeit in der Natur für die ganze Familie."
+    },
+    "jeux_emerveillement": {
+      "title": "Spiele des Staunens — L'Attrape-Rêves — Entdeckerhof, Gravières, Ardèche",
+      "description": "Verzerrende Spiegel, Musikinstrumente, überraschende Installationen... Die Spiele und Kuriositäten von L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche."
     }
   },
   "legende": {
@@ -483,5 +503,37 @@
     "spirit3_text": "Ein ruhiger Moment der Einkehr, im Rhythmus der Natur.",
     "spirit4_title": "Staunen",
     "spirit4_text": "Überraschungen, Schönheit und Kunstinstallationen an jeder Wegbiegung."
+  },
+  "animaux": {
+    "hero_title": "DIE TIERE",
+    "hero_subtitle": "Unsere Bewohner mit vier Beinen und Federn",
+    "p1": "Bei L'Attrape-Rêves, einem Entdeckerhof mitten in den Cevennen der Ardèche, sind die Tiere keine bloße Kulisse: Sie sind die echten Bewohner des Ortes, das ganze Jahr über umsorgt. Diese Familienaktivität in der Ardèche lädt Groß und Klein ein, langsamer zu werden, zu beobachten und eine echte Verbindung zur lebendigen Welt zu knüpfen.",
+    "p2": "Unsere Esel mit ihren neugierigen, großen Ohren lieben Streicheleinheiten und gemeinsame Momente. Die verspielten, verschmusten Zwergziegen sind immer zum Spielen bereit. Die Hühner streifen frei umher und führen ihre eigene kleine Welt, und die Schweine, Könige des Mittagsschlafs, genießen jeden ruhigen Moment.",
+    "p3": "Anders als in einem Zoo gibt es hier keine Scheiben oder unpersönlichen Zäune: Sie kommen nah heran, füttern, beobachten auf Augenhöhe der Tiere. Es ist ein Freizeitpark für Kinder in den Cevennen, der auf sanfte tiergestützte Begegnungen setzt, getragen von La Compagnie des Songes, einem Verein, der ganzjährig vor Ort ist.",
+    "p4": "Im Laufe der Jahreszeiten kommen vielleicht weitere Bewohner zur Familie hinzu — jeder Besuch kann eine neue Begegnung bereithalten."
+  },
+  "filets": {
+    "hero_title": "KLETTERNETZE IN DEN BÄUMEN",
+    "hero_subtitle": "Ein Kletterparcours für Kinder ab 3 Jahren",
+    "p1": "Zwischen den Ästen mitten im Wald der Ardèche gespannt, bieten die Netze von L'Attrape-Rêves einen einzigartigen Kletterparcours in der Luft, ganz ohne Ausrüstung oder Klettergurt. Klettern, hüpfen, kriechen, sanft hinabgleiten: Diese Familienaktivität in der Ardèche macht die Baumkronen zu einem riesigen Spielplatz.",
+    "p2": "Zugänglich ab 3 Jahren, ist der Parcours darauf ausgelegt, sicher begangen zu werden, ohne die Einschränkungen eines klassischen Kletterwaldes — keine Karabiner, keine vorgegebene Route. Die Kinder erkunden in ihrem eigenen Tempo, unter den Augen einer begleitenden erwachsenen Person, während die zwischen den Bäumen gespannten Netze Stürze und Sprünge abfedern.",
+    "p3": "Es ist eine der Hauptattraktionen dieses Freizeitparks für Kinder in den Cevennen: ein Kletterparcours, der Freiheitsgefühl, körperliche Betätigung und einen atemberaubenden Blick von den Baumwipfeln vereint. Ein Erlebnis, das kleinen wie großen Kindern gleichermaßen gefällt, die sich gegen den Abstieg wehren werden.",
+    "p4": "Der Kletternetz-Parcours ist im regulären Eintritt zu L'Attrape-Rêves enthalten — kein Aufpreis."
+  },
+  "sensoriel": {
+    "hero_title": "SINNESPFAD",
+    "hero_subtitle": "Die Welt mit allen Sinnen neu entdecken",
+    "p1": "Schließen Sie die Augen. Gehen Sie barfuß. Bei L'Attrape-Rêves lädt der Sinnespfad jeden Besucher ein, langsamer zu werden und die Natur anders zu erkunden — über Tasten, Hören und Riechen, weit mehr als über das Sehen.",
+    "p2": "Der Weg schlängelt sich durch verschiedene Texturen: Kieselsteine, Kies, Stroh, Moos, Rinde… Jeder Schritt wird zur Entdeckung, jede Oberfläche zu einer neuen Empfindung. Es ist eine Familienaktivität in der Ardèche, die besonders bei Kindern beliebt ist, die ihr Gleichgewicht und ihren Stand neu entdecken, aber auch bei Erwachsenen auf der Suche nach einer sinnlichen Pause fernab der Bildschirme.",
+    "p3": "Dieser Pfad passt zum Geist des Ortes: ein Sinnesrefugium mitten im Lebendigen, gedacht, um Groß und Klein aufzutanken. Es handelt sich nicht um eine bloße Attraktion, sondern um eine echte Einladung zur Achtsamkeit, mitten in den Cevennen der Ardèche.",
+    "p4": "Geeignet für die ganze Familie, ohne Voraussetzungen oder besondere Ausrüstung, steht der Sinnespfad allen Besuchern dieses Freizeitparks für Kinder in den Cevennen offen, unabhängig vom Alter."
+  },
+  "jeux": {
+    "hero_title": "SPIELE DES STAUNENS",
+    "hero_subtitle": "Kuriositäten, Überraschungen und magische Momente",
+    "p1": "Zwischen den Bäumen und Pfaden von L'Attrape-Rêves verbergen sich tausendundeine Kuriositäten: verzerrende Spiegel, Musikinstrumente unter freiem Himmel, Erfrischungszonen, überraschende Installationen… Hier ist alles darauf ausgelegt, die Kinderseele zu wecken und die Neugier zu wecken, ganz gleich, wie alt man ist.",
+    "p2": "Diese Familienaktivität in der Ardèche setzt auf das Unerwartete: Wir verraten nicht alles, die Überraschung gehört zum Spiel. An einer Wegbiegung setzen ein musikalischer Pilz, eine riesige Malblase oder eine temporäre Kunstinstallation Akzente im Spaziergang und schaffen gemeinsame Momente zwischen Groß und Klein.",
+    "p3": "Dieser Freizeitpark für Kinder in den Cevennen pflegt die Kunst des leisen Staunens — keine lauten Fahrgeschäfte oder Warteschlangen, sondern eine Abfolge kleiner Wunder, die man in seinem eigenen Tempo, als Familie, entdecken kann. Hier erwachen auch die Höhepunkte von La Compagnie des Songes zum Leben: Shows, kreative Workshops und gelegentliche Veranstaltungen bereichern den Besuch je nach Saisonkalender.",
+    "p4": "Werfen Sie einen Blick in unseren Veranstaltungskalender, um keinen Termin zu verpassen."
   }
 }

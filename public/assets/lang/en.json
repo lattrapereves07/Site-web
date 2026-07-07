@@ -163,7 +163,11 @@
     "arts_title": "Performing Arts & Culture",
     "arts_badge": "Special events",
     "arts_text": "Shows, creative workshops, storytelling, music… Moments that punctuate the life of the place to surprise and inspire wonder. La Compagnie des Songes, an association based on site, brings these moments of sharing and cultural discovery to life. Check our events page for the programme.",
-    "arts_btn": "See the events →"
+    "arts_btn": "See the events →",
+    "animaux_more": "Learn more about our animals →",
+    "sensoriel_more": "Learn more about the sensory trail →",
+    "filets_more": "Learn more about the treetop nets →",
+    "jeux_more": "Learn more about the games and curiosities →"
   },
   "agenda": {
     "hero_title": "EVENTS",
@@ -459,6 +463,22 @@
     "legende": {
       "title": "The Legend of L'Attrape-Rêves — Gramado, Guardian of Dreams — Gravières, Ardèche",
       "description": "Discover the legend of Gramado and the kingfisher, the story behind L'Attrape-Rêves, an amusement park and discovery farm in Gravières, Ardèche."
+    },
+    "animaux": {
+      "title": "The Animals — L'Attrape-Rêves — Discovery Farm, Gravières, Ardèche",
+      "description": "Donkeys, pygmy goats, chickens and pigs at L'Attrape-Rêves, a discovery farm in Gravières, Ardèche. A family activity to observe, feed and pet the animals."
+    },
+    "filets_arbres": {
+      "title": "Treetop Nets — L'Attrape-Rêves — Suspended Course, Gravières, Ardèche",
+      "description": "A course of nets suspended in the trees, open to children from age 3 with no harness, at L'Attrape-Rêves, a discovery farm in Gravières, Ardèche."
+    },
+    "parcours_sensoriel": {
+      "title": "Sensory Trail — L'Attrape-Rêves — Discovery Farm, Gravières, Ardèche",
+      "description": "A barefoot sensory trail through pebbles, gravel and straw at L'Attrape-Rêves, a discovery farm in Gravières, Ardèche. A natural break for the whole family."
+    },
+    "jeux_emerveillement": {
+      "title": "Games & Wonder — L'Attrape-Rêves — Discovery Farm, Gravières, Ardèche",
+      "description": "Distorting mirrors, musical instruments, surprising installations... The games and curiosities of L'Attrape-Rêves, a discovery farm in Gravières, Ardèche."
     }
   },
   "legende": {
@@ -483,5 +503,37 @@
     "spirit3_text": "A quiet moment of introspection, at nature's own pace.",
     "spirit4_title": "Wonder",
     "spirit4_text": "Surprises, beauty and art installations around every corner."
+  },
+  "animaux": {
+    "hero_title": "THE ANIMALS",
+    "hero_subtitle": "Our four-legged and feathered residents",
+    "p1": "At L'Attrape-Rêves, a discovery farm nestled in the Cévennes hills of the Ardèche, the animals aren't mere decoration: they're the real residents of the place, cared for all year round. This family activity in the Ardèche invites young and old alike to slow down, observe, and build a genuine bond with the living world.",
+    "p2": "Our donkeys, with their curious, oversized ears, love a cuddle and a shared moment. The pygmy goats, playful and affectionate, are always up for a game. The hens wander freely, going about their own little world, and the pigs, kings of the afternoon nap, savour every quiet moment.",
+    "p3": "Unlike a zoo, there's no glass or impersonal fencing here: you get close, you feed, you observe at animal height. It's a children's park in the Cévennes designed around gentle animal-assisted activities, run by La Compagnie des Songes, an association based on site year-round.",
+    "p4": "Other residents may well join the family as the seasons go by — every visit could bring a new encounter."
+  },
+  "filets": {
+    "hero_title": "TREETOP NETS",
+    "hero_subtitle": "A suspended course open to children from age 3",
+    "p1": "Strung between the branches deep in the Ardèche forest, the nets at L'Attrape-Rêves offer a unique aerial course, with no harness or safety gear required. Climbing, bouncing, crawling, gently dropping down: this family activity in the Ardèche turns the treetops into a giant playground.",
+    "p2": "Open to children from age 3, the course is designed to be enjoyed safely without the constraints of a classic tree-climbing adventure course — no carabiners, no fixed route. Children explore at their own pace, under the watchful eye of an accompanying adult, while the netting stretched between the trees cushions falls and jumps.",
+    "p3": "It's one of the flagship activities at this children's park in the Cévennes: a suspended course that combines a sense of freedom, physical activity and a breathtaking view from the treetops. An experience just as loved by toddlers as by older kids, who'll fight not to come back down.",
+    "p4": "The treetop nets course is included in the standard admission ticket to L'Attrape-Rêves — no extra charge."
+  },
+  "sensoriel": {
+    "hero_title": "SENSORY TRAIL",
+    "hero_subtitle": "Rediscover the world with all your senses",
+    "p1": "Close your eyes. Walk barefoot. At L'Attrape-Rêves, the sensory trail invites every visitor to slow down and explore nature differently — through touch, hearing and smell, far more than through sight.",
+    "p2": "The path winds through different textures: pebbles, gravel, straw, moss, bark… Every step becomes a discovery, every surface a new sensation. It's a family activity in the Ardèche especially loved by children, who rediscover their balance and footing, but also by adults seeking a sensory break away from screens.",
+    "p3": "This trail is part of the spirit of the place: a sensory haven at the heart of the living world, designed to recharge young and old alike. It's not just an attraction, but a genuine invitation to mindfulness, deep in the Cévennes hills of the Ardèche.",
+    "p4": "Suitable for the whole family, with no prerequisites or special equipment, the sensory trail is open to every visitor of this children's park in the Cévennes, whatever their age."
+  },
+  "jeux": {
+    "hero_title": "GAMES OF WONDER",
+    "hero_subtitle": "Curiosities, surprises and moments of magic",
+    "p1": "Among the trees and paths of L'Attrape-Rêves lie a thousand and one curiosities: distorting mirrors, open-air musical instruments, cool-down zones, surprising installations… Everything here is designed to awaken the child within and spark curiosity, whatever your age.",
+    "p2": "This family activity in the Ardèche thrives on the unexpected: we won't tell you everything, the surprise is part of the fun. Around a bend, a musical mushroom, a giant colouring bubble, or a temporary art installation punctuates the stroll and creates moments to share between young and old.",
+    "p3": "This children's park in the Cévennes cultivates the art of quiet wonder — no loud rides or queues, just a string of little marvels to discover at your own pace, as a family. It's also here that the highlights of La Compagnie des Songes come to life: shows, creative workshops and occasional events enrich the visit throughout the season.",
+    "p4": "Check our events calendar so you don't miss the next get-together."
   }
 }

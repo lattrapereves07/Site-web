@@ -21,6 +21,10 @@ const PAGES = [
   { file: 'infos-pratiques.html', metaKey: 'infos' },
   { file: 'billetterie.html', metaKey: 'billetterie' },
   { file: 'la-legende.html', metaKey: 'legende' },
+  { file: 'animaux.html', metaKey: 'animaux' },
+  { file: 'filets-arbres.html', metaKey: 'filets_arbres' },
+  { file: 'parcours-sensoriel.html', metaKey: 'parcours_sensoriel' },
+  { file: 'jeux-emerveillement.html', metaKey: 'jeux_emerveillement' },
   { file: 'mentions-legales.html', metaKey: 'mentions' },
   { file: 'politique-de-confidentialite.html', metaKey: 'politique' },
 ]
@@ -121,6 +125,9 @@ function generatePage(page, lang, srcHtml) {
   })
 
   // 8. Schema.org FAQPage généré depuis les .faq-item déjà traduits (SEO)
+  // Supprime toute balise générée par un run précédent avant d'en réinsérer une
+  // (le run 'fr' est auto-référent : sans ce nettoyage, le schema s'accumule).
+  $('script[data-generated="faq-schema"]').remove()
   const faqEntities = []
   $('.faq-item').each((_, el) => {
     const q = $(el).find('.faq-question [data-i18n]').first().text().trim()
@@ -129,7 +136,7 @@ function generatePage(page, lang, srcHtml) {
   })
   if (faqEntities.length) {
     const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }
-    $('head').append(`\n  <script type="application/ld+json">${JSON.stringify(faqSchema)}</script>\n`)
+    $('head').append(`\n  <script type="application/ld+json" data-generated="faq-schema">${JSON.stringify(faqSchema)}</script>\n`)
   }
 
   return $.html()

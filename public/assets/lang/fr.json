@@ -163,7 +163,11 @@
     "arts_title": "Arts Vivants & Culture",
     "arts_badge": "Événements ponctuels",
     "arts_text": "Spectacles, ateliers créatifs, contes, musique… Des instants qui viennent ponctuer la vie du lieu pour surprendre et émerveiller. La Compagnie des Songes, association présente sur place, anime ces moments de partage et de découverte culturelle. Consultez notre agenda pour découvrir la programmation.",
-    "arts_btn": "Voir l'agenda →"
+    "arts_btn": "Voir l'agenda →",
+    "animaux_more": "En savoir plus sur nos animaux →",
+    "sensoriel_more": "En savoir plus sur le parcours sensoriel →",
+    "filets_more": "En savoir plus sur les filets dans les arbres →",
+    "jeux_more": "En savoir plus sur les jeux et curiosités →"
   },
   "agenda": {
     "hero_title": "AGENDA",
@@ -459,6 +463,22 @@
     "legende": {
       "title": "La légende de l'Attrape-Rêves — Gramado, gardien des rêves — Gravières, Ardèche",
       "description": "Découvrez la légende de Gramado et du martin-pêcheur, l'histoire qui a donné naissance à l'Attrape-Rêves, parc de loisirs et ferme de découverte à Gravières en Ardèche."
+    },
+    "animaux": {
+      "title": "Les animaux — L'Attrape-Rêves — Ferme de découverte, Gravières, Ardèche",
+      "description": "Ânes, chèvres naines, poules et cochons à l'Attrape-Rêves, ferme de découverte à Gravières en Ardèche. Une activité famille pour observer, nourrir et caresser les animaux."
+    },
+    "filets_arbres": {
+      "title": "Filets dans les arbres — L'Attrape-Rêves — Parcours suspendu, Gravières, Ardèche",
+      "description": "Un parcours de filets suspendus dans les arbres, accessible dès 3 ans sans équipement, à l'Attrape-Rêves, ferme de découverte à Gravières en Ardèche."
+    },
+    "parcours_sensoriel": {
+      "title": "Parcours sensoriel — L'Attrape-Rêves — Ferme de découverte, Gravières, Ardèche",
+      "description": "Un parcours sensoriel pieds nus à travers galets, graviers et paille à l'Attrape-Rêves, ferme de découverte à Gravières en Ardèche. Une pause nature en famille."
+    },
+    "jeux_emerveillement": {
+      "title": "Jeux et curiosités — L'Attrape-Rêves — Ferme de découverte, Gravières, Ardèche",
+      "description": "Miroirs déformants, instruments de musique, installations surprenantes... Les jeux et curiosités de l'Attrape-Rêves, ferme de découverte à Gravières en Ardèche."
     }
   },
   "legende": {
@@ -483,5 +503,37 @@
     "spirit3_text": "Une introspection tranquille, au rythme de la nature.",
     "spirit4_title": "S'émerveiller",
     "spirit4_text": "Surprises, beauté et installations artistiques à chaque détour du chemin."
+  },
+  "animaux": {
+    "hero_title": "LES ANIMAUX",
+    "hero_subtitle": "Nos pensionnaires à quatre pattes et à plumes",
+    "p1": "À l'Attrape-Rêves, ferme de découverte nichée dans les Cévennes ardéchoises, les animaux ne sont pas de simples décors : ce sont les vrais habitants du lieu, choyés toute l'année. Cette activité famille en Ardèche invite petits et grands à ralentir, observer, et tisser un vrai lien avec le vivant.",
+    "p2": "Nos ânes, aux grandes oreilles curieuses, adorent les caresses et les moments partagés. Les chèvres naines, espiègles et câlines, ne demandent qu'à jouer. Les poules se baladent en liberté dans leur petit monde, et les cochons, rois de la sieste, savourent chaque instant de calme.",
+    "p3": "Contrairement à un zoo, ici pas de vitres ni de barrières impersonnelles : vous approchez, vous nourrissez, vous observez à hauteur d'animal. C'est un parc enfants en Cévennes pensé pour la médiation animale douce, portée par La Compagnie des Songes, association présente sur place à l'année.",
+    "p4": "D'autres pensionnaires rejoindront peut-être la famille au fil des saisons — chaque visite peut réserver une nouvelle rencontre."
+  },
+  "filets": {
+    "hero_title": "FILETS DANS LES ARBRES",
+    "hero_subtitle": "Un parcours aérien accessible dès 3 ans",
+    "p1": "Suspendus entre les branches au cœur de la forêt ardéchoise, les filets de l'Attrape-Rêves offrent un parcours aérien unique, sans aucun équipement ni baudrier. Grimper, rebondir, ramper, se laisser tomber en douceur : cette activité famille en Ardèche fait de la canopée un immense terrain de jeu.",
+    "p2": "Accessible dès 3 ans, le parcours est pensé pour être praticable en toute sécurité, sans les contraintes d'un accrobranche classique — pas de mousquetons, pas de parcours imposé. Les enfants explorent à leur rythme, sous le regard d'un adulte accompagnateur, tandis que les tissus tendus entre les arbres amortissent chutes et sauts.",
+    "p3": "C'est l'une des activités phares de ce parc enfants en Cévennes : un parcours suspendu qui mêle sensation de liberté, dépense physique et vue imprenable depuis la cime des arbres. Une expérience qui plaît autant aux tout-petits qu'aux plus grands, prêts à batailler pour ne pas en redescendre.",
+    "p4": "Le parcours de filets fait partie de l'entrée standard à l'Attrape-Rêves — aucun supplément à prévoir."
+  },
+  "sensoriel": {
+    "hero_title": "PARCOURS SENSORIEL",
+    "hero_subtitle": "Redécouvrir le monde avec tous vos sens",
+    "p1": "Fermez les yeux. Marchez pieds nus. À l'Attrape-Rêves, le parcours sensoriel invite chaque visiteur à ralentir et à explorer la nature autrement — par le toucher, l'ouïe, l'odorat, bien plus que par la vue.",
+    "p2": "Le chemin serpente à travers différentes textures : galets, graviers, paille, mousse, écorce… Chaque pas devient une découverte, chaque surface une nouvelle sensation. C'est une activité famille en Ardèche particulièrement appréciée des enfants, qui redécouvrent leurs appuis et leur équilibre, mais aussi des adultes en quête d'une pause sensorielle loin des écrans.",
+    "p3": "Ce parcours s'inscrit dans l'esprit du lieu : un refuge sensoriel au cœur du vivant, pensé pour ressourcer petits et grands. Il ne s'agit pas d'une simple attraction, mais d'une véritable invitation à la pleine conscience, au cœur des Cévennes ardéchoises.",
+    "p4": "Praticable en famille, sans prérequis ni équipement particulier, le parcours sensoriel est accessible à tous les visiteurs de ce parc enfants en Cévennes, quel que soit leur âge."
+  },
+  "jeux": {
+    "hero_title": "JEUX D'ÉMERVEILLEMENT",
+    "hero_subtitle": "Curiosités, surprises et instants de magie",
+    "p1": "Entre les arbres et les sentiers de l'Attrape-Rêves se cachent mille et une curiosités : miroirs déformants, instruments de musique à ciel ouvert, zones fraîcheur, installations surprenantes… Ici, tout est pensé pour réveiller la part d'enfance et piquer la curiosité, quel que soit l'âge.",
+    "p2": "Cette activité famille en Ardèche mise sur l'inattendu : on ne vous dit pas tout, la surprise fait partie du jeu. Au détour d'un chemin, un champignon musical, une bulle à coloriage géante, ou une installation artistique éphémère viennent ponctuer la balade et créer des moments de partage entre petits et grands.",
+    "p3": "Ce parc enfants en Cévennes cultive l'art de l'émerveillement discret — pas d'attractions bruyantes ni de files d'attente, mais une succession de petites merveilles à découvrir à son rythme, en famille. C'est aussi ici que prennent vie les temps forts de La Compagnie des Songes : spectacles, ateliers créatifs et animations ponctuelles viennent enrichir la visite selon le calendrier de la saison.",
+    "p4": "Consultez notre agenda pour ne rien manquer des prochains rendez-vous."
   }
 }
