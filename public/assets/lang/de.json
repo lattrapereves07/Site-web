@@ -11,7 +11,7 @@
     "hero_title_1": "ENTDECKUNGS-",
     "hero_title_2": "BAUERNHOF",
     "hero_subtitle": "und Staunen",
-    "hero_badge": "Eröffnung am 28. Juni 2026!",
+    "hero_badge": "Diesen Sommer täglich geöffnet · 10-19 Uhr",
     "hero_tagline": "Ein Sinnesort mitten in der Natur — zum Erholen und Staunen für Groß und Klein!",
     "hero_cta": "Tickets kaufen",
     "hero_location": "Gravières — Cevennen der Ardèche (07)",
@@ -50,7 +50,42 @@
     "food_title": "GUTEN APPETIT!",
     "food_subtitle": "Snacks & Getränke",
     "food_text": "Eine leckere Pause zwischen dem Klettern in den Netzen oder einer Kuscheleinheit mit den Ziegen. Kühle Getränke, kleine Snacks…",
-    "food_link": "Karte und Infos →"
+    "food_link": "Karte und Infos →",
+    "events_loading": "Wird geladen…",
+    "events_i18n": {
+      "empty": "Derzeit keine bevorstehenden Veranstaltungen.",
+      "error": "Veranstaltungen konnten nicht geladen werden.",
+      "reserve": "Buchen →",
+      "months": [
+        "JAN",
+        "FEB",
+        "MÄR",
+        "APR",
+        "MAI",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OKT",
+        "NOV",
+        "DEZ"
+      ],
+      "days": [
+        "SO",
+        "MO",
+        "DI",
+        "MI",
+        "DO",
+        "FR",
+        "SA"
+      ],
+      "categories": {
+        "atelier": "Workshop",
+        "spectacle": "Show",
+        "concert": "Konzert",
+        "evenement": "Veranstaltung"
+      }
+    }
   },
   "cta": {
     "title": "Bereit zum Träumen?",
@@ -264,7 +299,46 @@
     "hero_subtitle": "Online kaufen, entspannt ankommen",
     "text": "Kaufen Sie Ihre Eintrittskarten online, um gleich bei Ihrer Ankunft loszulegen!",
     "placeholder": "Ticketshop wird eingerichtet — Eröffnung Sommer 2026",
-    "help": "Problem mit der Buchung? Kontaktieren Sie uns unter <a href=\"tel:+33428400049\">04 28 40 00 49</a> oder per <a href=\"mailto:contact@lattrapereves07.fr\">E-Mail</a>."
+    "help": "Problem mit der Buchung? Kontaktieren Sie uns unter <a href=\"tel:+33428400049\">04 28 40 00 49</a> oder per <a href=\"mailto:contact@lattrapereves07.fr\">E-Mail</a>.",
+    "choose_title": "Wählen Sie Ihre Tickets",
+    "tarif_plein_name": "Ticket Erwachsene",
+    "tarif_reduit_name": "Ermäßigtes Ticket <small style=\"font-weight:400\">(3–12 Jahre)</small>",
+    "tarif_daily_desc": "Gültig für den ganzen Tag — beliebig ein- und ausgehen",
+    "tarif_enfant_name": "Kinderticket <small style=\"font-weight:400\">(unter 3 Jahren)</small>",
+    "tarif_enfant_desc": "Kostenloser Eintritt",
+    "tarif_pass_plein_name": "Saisonkarte — voller Preis",
+    "tarif_pass_reduit_name": "Saisonkarte — ermäßigter Preis <small style=\"font-weight:400\">(3–12 Jahre)</small>",
+    "tarif_pass_desc": "Unbegrenzter Eintritt von Ostern bis Allerheiligen",
+    "free": "Kostenlos",
+    "total_label": "Gesamt",
+    "coords_title": "Ihre Angaben",
+    "coords_nom": "Nachname",
+    "coords_prenom": "Vorname",
+    "coords_email": "E-Mail-Adresse",
+    "card_label": "Kartenzahlung",
+    "pay_label": "Bezahlen",
+    "secure_note": "Sichere Zahlung über Square · Ihre Kartendaten erreichen niemals unsere Server",
+    "js_i18n": {
+      "processing": "Wird bearbeitet…",
+      "pay_label": "Bezahlen",
+      "err_no_ticket": "Bitte wählen Sie mindestens ein kostenpflichtiges Ticket aus.",
+      "err_name": "Bitte geben Sie Ihren Vor- und Nachnamen ein.",
+      "err_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "err_card_read": "Fehler beim Lesen der Karte. Bitte versuchen Sie es erneut.",
+      "err_card_invalid": "Ungültige Kartendaten.",
+      "err_3ds": "Die Bankverifizierung (3D Secure) ist fehlgeschlagen oder wurde abgebrochen. Bitte versuchen Sie es erneut.",
+      "err_network": "Server konnte nicht erreicht werden. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut — es wurde keine Zahlung abgebucht.",
+      "err_payment_generic": "Die Zahlung konnte nicht verarbeitet werden (Fehler {status}). Versuchen Sie es erneut oder kontaktieren Sie uns unter 04 28 40 00 49.",
+      "err_square_load": "Zahlungsformular konnte nicht geladen werden. Überprüfen Sie Ihre Verbindung und laden Sie die Seite neu.",
+      "err_square_init": "Fehler beim Laden des Zahlungsformulars. Bitte laden Sie die Seite neu.",
+      "success_title": "Zahlung bestätigt!",
+      "success_subtitle": "Ihre Tickets sind reserviert.",
+      "success_ref_label": "Bestellreferenz",
+      "success_instructions": "Nennen Sie am Tag Ihres Besuchs einfach Ihren Namen<br>oder diese Referenz am Eingang.",
+      "success_email_sent_prefix": "Eine Bestätigungs-E-Mail wurde gesendet an",
+      "success_no_email": "Bitte notieren Sie sich Ihre Bestellreferenz.",
+      "success_receipt_link": "Zahlungsbeleg ansehen →"
+    }
   },
   "mentions": {
     "title": "IMPRESSUM",
@@ -328,5 +402,43 @@
     "p9_text": "[Text folgt]",
     "p10_title": "Der Sinnesweg",
     "p10_text": "Barfuß, in Socken oder in Schuhen...<br>Nimm dir Zeit, die Empfindungen durch dich hindurchfließen zu lassen.<br>Das Wichtige ist nicht das Ziel, sondern der Weg..."
+  },
+  "meta": {
+    "index": {
+      "title": "L'Attrape-Rêves — Freizeitpark und Entdeckerhof — Gravières, Ardèche",
+      "description": "Familienfreundlicher Freizeitpark und Entdeckerhof in Gravières, Ardèche. Tiere, Kletternetze in den Bäumen ab 3 Jahren, Sinnespfad, Staunespiele und eine Märchenwelt mit Gramado. Diesen Sommer täglich geöffnet. Erwachsene 11€, Kinder 9€, kostenlos unter 3 Jahren."
+    },
+    "le_lieu": {
+      "title": "Der Ort — L'Attrape-Rêves — Entdeckerhof, Gravières, Ardèche",
+      "description": "Entdecken Sie die Geschichte von L'Attrape-Rêves, einem Entdeckerhof voller Staunen in Gravières, Ardèche. La Fabrique aux Merveilles und La Compagnie des Songes."
+    },
+    "decouvrir": {
+      "title": "Tiere und Spiele — L'Attrape-Rêves — Entdeckerhof, Gravières, Ardèche",
+      "description": "Alle Aktivitäten von L'Attrape-Rêves: kleine Tiere, Sinnespfad, Kletternetze in den Bäumen, Holzspiele, lebendige Kunst. Gravières, Ardèche."
+    },
+    "manger": {
+      "title": "Essen & Trinken — L'Attrape-Rêves — Imbiss und Getränke, Gravières",
+      "description": "Kleine Speisen und Getränke bei L'Attrape-Rêves: Foodtruck, Getränke, Eis, Süßigkeiten, mitten in der Natur. Gravières, Ardèche."
+    },
+    "agenda": {
+      "title": "Veranstaltungen — L'Attrape-Rêves — Shows, Workshops, Events",
+      "description": "Veranstaltungskalender von L'Attrape-Rêves: Shows, kreative Workshops, kulturelle Veranstaltungen. Gravières, Ardèche."
+    },
+    "infos": {
+      "title": "Praktische Infos — L'Attrape-Rêves — Öffnungszeiten, Preise, Anfahrt",
+      "description": "Öffnungszeiten, Preise, Anfahrt und praktische Informationen für Ihren Besuch bei L'Attrape-Rêves in Gravières, Ardèche. FAQ und Wegbeschreibung."
+    },
+    "billetterie": {
+      "title": "Tickets — L'Attrape-Rêves — Tickets buchen",
+      "description": "Kaufen Sie Ihre Eintrittstickets online für L'Attrape-Rêves, einen Entdeckerhof in Gravières, Ardèche."
+    },
+    "mentions": {
+      "title": "Impressum — L'Attrape-Rêves",
+      "description": "Impressum der Website L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche."
+    },
+    "politique": {
+      "title": "Datenschutzerklärung — L'Attrape-Rêves",
+      "description": "Datenschutzerklärung der Website L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche. Keine Cookies, Ihre Privatsphäre wird respektiert."
+    }
   }
 }

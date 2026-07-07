@@ -48,8 +48,18 @@
   }
   setActiveNav();
 
-  /* ---- i18n MULTILINGUAL SYSTEM ---- */
-  var currentLang = localStorage.getItem('atrv-lang') || 'fr';
+  /* ---- i18n MULTILINGUAL SYSTEM ----
+     Les pages touristiques (accueil, le lieu, billetterie, etc.) existent
+     désormais en vrai HTML statique par langue (/en/, /nl/, /de/), généré par
+     scripts/generate-lang-pages.mjs. Les boutons de langue y naviguent donc
+     directement vers la page sœur (attribut data-href), sans réécriture JS.
+     Seules les pages marquées data-i18n-dynamic (ex: panneaux.html, outil
+     d'impression sans URL dédiée par langue) gardent l'ancien comportement de
+     traduction à la volée via fetch + innerHTML. */
+  var dynamicI18n = document.body.hasAttribute('data-i18n-dynamic');
+  var currentLang = dynamicI18n
+    ? (localStorage.getItem('atrv-lang') || 'fr')
+    : (document.documentElement.getAttribute('lang') || 'fr');
   var translations = {};
 
   function setLang(lang) {
@@ -133,13 +143,22 @@
   // Bind all lang buttons
   document.querySelectorAll('.lang-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      setLang(btn.getAttribute('data-lang'));
+      var href = btn.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      } else if (dynamicI18n) {
+        setLang(btn.getAttribute('data-lang'));
+      }
     });
   });
 
   // Initialize
   updateLangButtons(currentLang);
-  loadTranslations(currentLang);
+  if (dynamicI18n) {
+    loadTranslations(currentLang);
+  } else {
+    document.documentElement.lang = currentLang;
+  }
 
   /* ---- FAQ ACCORDION ---- */
   document.querySelectorAll('.faq-question').forEach(function (btn) {

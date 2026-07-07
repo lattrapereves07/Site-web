@@ -11,7 +11,7 @@
     "hero_title_1": "DISCOVERY",
     "hero_title_2": "FARM",
     "hero_subtitle": "and wonder",
-    "hero_badge": "Opening June 28, 2026!",
+    "hero_badge": "Open every day this summer · 10am-7pm",
     "hero_tagline": "A sensory haven in the heart of nature to recharge young and old alike!",
     "hero_cta": "Book my tickets",
     "hero_location": "Gravières — Cévennes d'Ardèche (07)",
@@ -50,7 +50,42 @@
     "food_title": "LET'S FEAST!",
     "food_subtitle": "Light meals & refreshments",
     "food_text": "A tasty break between bouncing on the nets and cuddling the goats. Cold drinks, light meals…",
-    "food_link": "Menu and info →"
+    "food_link": "Menu and info →",
+    "events_loading": "Loading…",
+    "events_i18n": {
+      "empty": "No upcoming events at the moment.",
+      "error": "Unable to load events.",
+      "reserve": "Book →",
+      "months": [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC"
+      ],
+      "days": [
+        "SUN",
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT"
+      ],
+      "categories": {
+        "atelier": "Workshop",
+        "spectacle": "Show",
+        "concert": "Concert",
+        "evenement": "Event"
+      }
+    }
   },
   "cta": {
     "title": "Ready to dream?",
@@ -264,7 +299,46 @@
     "hero_subtitle": "Buy online, simplify your arrival",
     "text": "Buy your entry tickets online and enjoy the moment from the second you arrive!",
     "placeholder": "Ticketing being set up — Opening summer 2026",
-    "help": "Having trouble with your booking? Contact us on <a href=\"tel:+33428400049\">04 28 40 00 49</a> or by <a href=\"mailto:contact@lattrapereves07.fr\">email</a>."
+    "help": "Having trouble with your booking? Contact us on <a href=\"tel:+33428400049\">04 28 40 00 49</a> or by <a href=\"mailto:contact@lattrapereves07.fr\">email</a>.",
+    "choose_title": "Choose your tickets",
+    "tarif_plein_name": "Full-price ticket",
+    "tarif_reduit_name": "Reduced-price ticket <small style=\"font-weight:400\">(ages 3–12)</small>",
+    "tarif_daily_desc": "Valid for the day — come and go as you please",
+    "tarif_enfant_name": "Children's ticket <small style=\"font-weight:400\">(under 3)</small>",
+    "tarif_enfant_desc": "Free admission",
+    "tarif_pass_plein_name": "Season pass — full price",
+    "tarif_pass_reduit_name": "Season pass — reduced price <small style=\"font-weight:400\">(ages 3–12)</small>",
+    "tarif_pass_desc": "Unlimited admission from Easter to All Saints' Day",
+    "free": "Free",
+    "total_label": "Total",
+    "coords_title": "Your details",
+    "coords_nom": "Last name",
+    "coords_prenom": "First name",
+    "coords_email": "Email address",
+    "card_label": "Card payment",
+    "pay_label": "Pay",
+    "secure_note": "Secure payment by Square · Your card details never reach our servers",
+    "js_i18n": {
+      "processing": "Processing…",
+      "pay_label": "Pay",
+      "err_no_ticket": "Please select at least one paid ticket.",
+      "err_name": "Please enter your first and last name.",
+      "err_email": "Please enter a valid email address.",
+      "err_card_read": "Error reading the card. Please try again.",
+      "err_card_invalid": "Invalid card details.",
+      "err_3ds": "Bank verification (3D Secure) failed or was cancelled. Please try again.",
+      "err_network": "Could not reach the server. Check your connection and try again — you have not been charged.",
+      "err_payment_generic": "The payment could not be processed (error {status}). Please try again or contact us at 04 28 40 00 49.",
+      "err_square_load": "Could not load the payment form. Check your connection and reload the page.",
+      "err_square_init": "Error loading the payment form. Please reload the page.",
+      "success_title": "Payment confirmed!",
+      "success_subtitle": "Your tickets are booked.",
+      "success_ref_label": "Order reference",
+      "success_instructions": "On the day of your visit, simply give your name<br>or this reference at the entrance.",
+      "success_email_sent_prefix": "A confirmation email has been sent to",
+      "success_no_email": "Please make a note of your order reference.",
+      "success_receipt_link": "View payment receipt →"
+    }
   },
   "mentions": {
     "title": "LEGAL NOTICE",
@@ -328,5 +402,43 @@
     "p9_text": "[Text coming soon]",
     "p10_title": "The Sensory Trail",
     "p10_text": "Barefoot, in socks, or in shoes...<br>Take time to let the sensations wash over you.<br>What matters is not the destination, but the journey..."
+  },
+  "meta": {
+    "index": {
+      "title": "L'Attrape-Rêves — Amusement Park & Discovery Farm — Gravières, Ardèche",
+      "description": "Family amusement park and discovery farm in Gravières, Ardèche. Animals, tree rope nets from age 3, sensory trail, wonder-filled games and a storytelling world with Gramado. Open daily this summer. Adult €11, child €9, free under 3."
+    },
+    "le_lieu": {
+      "title": "The Place — L'Attrape-Rêves — Discovery Farm, Gravières, Ardèche",
+      "description": "Discover the story of L'Attrape-Rêves, a discovery farm and place of wonder in Gravières, Ardèche. La Fabrique aux Merveilles and La Compagnie des Songes."
+    },
+    "decouvrir": {
+      "title": "Animals & Activities — L'Attrape-Rêves — Discovery Farm, Gravières, Ardèche",
+      "description": "All the activities at L'Attrape-Rêves: farm animals, sensory trail, tree rope nets, wooden games, live arts. Gravières, Ardèche."
+    },
+    "manger": {
+      "title": "Food & Drink — L'Attrape-Rêves — Snacks and Refreshments, Gravières",
+      "description": "Light meals and refreshments at L'Attrape-Rêves: food truck, drinks, ice cream, sweets, right in the heart of nature. Gravières, Ardèche."
+    },
+    "agenda": {
+      "title": "Events — L'Attrape-Rêves — Shows, Workshops, Events",
+      "description": "L'Attrape-Rêves events: shows, creative workshops, cultural events. Gravières, Ardèche."
+    },
+    "infos": {
+      "title": "Practical Info — L'Attrape-Rêves — Hours, Prices, Access",
+      "description": "Opening hours, prices, access and practical information to visit L'Attrape-Rêves in Gravières, Ardèche. FAQ and directions."
+    },
+    "billetterie": {
+      "title": "Tickets — L'Attrape-Rêves — Book Your Tickets",
+      "description": "Buy your entry tickets online for L'Attrape-Rêves, a discovery farm in Gravières, Ardèche."
+    },
+    "mentions": {
+      "title": "Legal Notice — L'Attrape-Rêves",
+      "description": "Legal notice for the L'Attrape-Rêves website, a discovery farm in Gravières, Ardèche."
+    },
+    "politique": {
+      "title": "Privacy Policy — L'Attrape-Rêves",
+      "description": "Privacy policy for the L'Attrape-Rêves website, a discovery farm in Gravières, Ardèche. No cookies, your privacy respected."
+    }
   }
 }

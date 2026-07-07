@@ -11,7 +11,7 @@
     "hero_title_1": "ONTDEKKING-",
     "hero_title_2": "BOERDERIJ",
     "hero_subtitle": "en verwondering",
-    "hero_badge": "Opening 28 juni 2026!",
+    "hero_badge": "Deze zomer elke dag geopend · 10-19u",
     "hero_tagline": "Een zintuiglijke oase midden in de natuur om jong en oud op te laden!",
     "hero_cta": "Mijn tickets boeken",
     "hero_location": "Gravières — Cévennes d'Ardèche (07)",
@@ -50,7 +50,42 @@
     "food_title": "LEKKER SMULLEN!",
     "food_subtitle": "Lichte maaltijden & drankjes",
     "food_text": "Een lekkere pauze tussen het springen op de netten en het knuffelen van de geiten. Koude drankjes, lichte maaltijden…",
-    "food_link": "Menu en info →"
+    "food_link": "Menu en info →",
+    "events_loading": "Laden…",
+    "events_i18n": {
+      "empty": "Op dit moment geen aankomende evenementen.",
+      "error": "Kan evenementen niet laden.",
+      "reserve": "Boeken →",
+      "months": [
+        "JAN",
+        "FEB",
+        "MRT",
+        "APR",
+        "MEI",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OKT",
+        "NOV",
+        "DEC"
+      ],
+      "days": [
+        "ZON",
+        "MAA",
+        "DIN",
+        "WOE",
+        "DON",
+        "VRI",
+        "ZAT"
+      ],
+      "categories": {
+        "atelier": "Workshop",
+        "spectacle": "Voorstelling",
+        "concert": "Concert",
+        "evenement": "Evenement"
+      }
+    }
   },
   "cta": {
     "title": "Klaar om te dromen?",
@@ -264,7 +299,46 @@
     "hero_subtitle": "Koop online, vereenvoudig uw aankomst",
     "text": "Koop uw entreekaarten online en geniet meteen bij aankomst!",
     "placeholder": "Ticketverkoop wordt ingesteld — Opening zomer 2026",
-    "help": "Problemen met uw reservering? Neem contact met ons op via <a href=\"tel:+33428400049\">04 28 40 00 49</a> of per <a href=\"mailto:contact@lattrapereves07.fr\">e-mail</a>."
+    "help": "Problemen met uw reservering? Neem contact met ons op via <a href=\"tel:+33428400049\">04 28 40 00 49</a> of per <a href=\"mailto:contact@lattrapereves07.fr\">e-mail</a>.",
+    "choose_title": "Kies uw tickets",
+    "tarif_plein_name": "Volwassen ticket",
+    "tarif_reduit_name": "Kortingsticket <small style=\"font-weight:400\">(3–12 jaar)</small>",
+    "tarif_daily_desc": "Geldig voor de hele dag — vrij in en uitlopen",
+    "tarif_enfant_name": "Kinderticket <small style=\"font-weight:400\">(jonger dan 3 jaar)</small>",
+    "tarif_enfant_desc": "Gratis toegang",
+    "tarif_pass_plein_name": "Seizoenspas — volledig tarief",
+    "tarif_pass_reduit_name": "Seizoenspas — kortingstarief <small style=\"font-weight:400\">(3–12 jaar)</small>",
+    "tarif_pass_desc": "Onbeperkte toegang van Pasen tot Allerheiligen",
+    "free": "Gratis",
+    "total_label": "Totaal",
+    "coords_title": "Uw gegevens",
+    "coords_nom": "Achternaam",
+    "coords_prenom": "Voornaam",
+    "coords_email": "E-mailadres",
+    "card_label": "Betaling per kaart",
+    "pay_label": "Betalen",
+    "secure_note": "Veilig betalen via Square · Uw bankgegevens komen nooit op onze servers terecht",
+    "js_i18n": {
+      "processing": "Bezig met verwerken…",
+      "pay_label": "Betalen",
+      "err_no_ticket": "Selecteer minstens één betaald ticket.",
+      "err_name": "Vul uw voor- en achternaam in.",
+      "err_email": "Vul een geldig e-mailadres in.",
+      "err_card_read": "Fout bij het lezen van de kaart. Probeer het opnieuw.",
+      "err_card_invalid": "Ongeldige kaartgegevens.",
+      "err_3ds": "Bankverificatie (3D Secure) is mislukt of geannuleerd. Probeer het opnieuw.",
+      "err_network": "Kan de server niet bereiken. Controleer uw verbinding en probeer opnieuw — er is niets van uw rekening afgeschreven.",
+      "err_payment_generic": "De betaling kon niet worden verwerkt (fout {status}). Probeer het opnieuw of neem contact met ons op via 04 28 40 00 49.",
+      "err_square_load": "Kan het betaalformulier niet laden. Controleer uw verbinding en herlaad de pagina.",
+      "err_square_init": "Fout bij het laden van het betaalformulier. Herlaad de pagina.",
+      "success_title": "Betaling bevestigd!",
+      "success_subtitle": "Uw tickets zijn gereserveerd.",
+      "success_ref_label": "Bestelreferentie",
+      "success_instructions": "Geef op de dag van uw bezoek gewoon uw naam<br>of deze referentie aan de ingang.",
+      "success_email_sent_prefix": "Er is een bevestigingsmail verzonden naar",
+      "success_no_email": "Noteer uw bestelreferentie.",
+      "success_receipt_link": "Betalingsbewijs bekijken →"
+    }
   },
   "mentions": {
     "title": "JURIDISCHE INFORMATIE",
@@ -328,5 +402,43 @@
     "p9_text": "[Tekst volgt]",
     "p10_title": "Het Zintuigenpad",
     "p10_text": "Op blote voeten, in sokken, of in schoenen...<br>Neem de tijd om je door de sensaties te laten doorkruisen.<br>Het gaat er niet om waar je aankomt, maar om de weg..."
+  },
+  "meta": {
+    "index": {
+      "title": "L'Attrape-Rêves — Pretpark en ontdekkingsboerderij — Gravières, Ardèche",
+      "description": "Gezinspretpark en ontdekkingsboerderij in Gravières, Ardèche. Dieren, klimnetten in de bomen vanaf 3 jaar, zintuiglijk parcours, verwonderingsspellen en een sprookjeswereld met Gramado. Dagelijks geopend deze zomer. Volwassene €11, kind €9, gratis onder 3 jaar."
+    },
+    "le_lieu": {
+      "title": "De plek — L'Attrape-Rêves — Ontdekkingsboerderij, Gravières, Ardèche",
+      "description": "Ontdek het verhaal van L'Attrape-Rêves, een ontdekkingsboerderij vol verwondering in Gravières, Ardèche. La Fabrique aux Merveilles en La Compagnie des Songes."
+    },
+    "decouvrir": {
+      "title": "Dieren en spellen — L'Attrape-Rêves — Ontdekkingsboerderij, Gravières, Ardèche",
+      "description": "Alle activiteiten van L'Attrape-Rêves: kleine dieren, zintuiglijk parcours, klimnetten in de bomen, houten spellen, levende kunsten. Gravières, Ardèche."
+    },
+    "manger": {
+      "title": "Eten & Drinken — L'Attrape-Rêves — Kleine catering en drankenstand, Gravières",
+      "description": "Lichte maaltijden en drankjes bij L'Attrape-Rêves: foodtruck, dranken, ijs, snoep, midden in de natuur. Gravières, Ardèche."
+    },
+    "agenda": {
+      "title": "Agenda — L'Attrape-Rêves — Voorstellingen, workshops, evenementen",
+      "description": "Agenda van L'Attrape-Rêves: voorstellingen, creatieve workshops, culturele evenementen. Gravières, Ardèche."
+    },
+    "infos": {
+      "title": "Praktische info — L'Attrape-Rêves — Openingstijden, tarieven, bereikbaarheid",
+      "description": "Openingstijden, tarieven, bereikbaarheid en praktische informatie voor een bezoek aan L'Attrape-Rêves in Gravières, Ardèche. FAQ en routebeschrijving."
+    },
+    "billetterie": {
+      "title": "Tickets — L'Attrape-Rêves — Boek uw tickets",
+      "description": "Koop online uw toegangstickets voor L'Attrape-Rêves, een ontdekkingsboerderij in Gravières, Ardèche."
+    },
+    "mentions": {
+      "title": "Wettelijke vermeldingen — L'Attrape-Rêves",
+      "description": "Wettelijke vermeldingen van de website L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche."
+    },
+    "politique": {
+      "title": "Privacybeleid — L'Attrape-Rêves",
+      "description": "Privacybeleid van de website L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche. Geen cookies, uw privacy gerespecteerd."
+    }
   }
 }

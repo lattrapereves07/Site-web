@@ -11,7 +11,7 @@
     "hero_title_1": "FERME DE",
     "hero_title_2": "DÉCOUVERTE",
     "hero_subtitle": "et d'émerveillement",
-    "hero_badge": "Ouvert depuis le 28 juin 2026 !",
+    "hero_badge": "Ouvert tous les jours cet été · 10h-19h",
     "hero_tagline": "Un refuge sensoriel au cœur du vivant pour ressourcer petits et grands !",
     "hero_cta": "Réserver mes billets",
     "hero_location": "Gravières — Cévennes d'Ardèche (07)",
@@ -50,7 +50,42 @@
     "food_title": "ON SE RÉGALE !",
     "food_subtitle": "Petite restauration & buvette",
     "food_text": "Une pause gourmande entre deux cabrioles dans les filets ou une séance de câlins aux chèvres. Boissons fraîches, petite restauration…",
-    "food_link": "Carte et infos →"
+    "food_link": "Carte et infos →",
+    "events_loading": "Chargement…",
+    "events_i18n": {
+      "empty": "Pas d'événement à venir pour le moment.",
+      "error": "Impossible de charger les événements.",
+      "reserve": "Réserver →",
+      "months": [
+        "JAN",
+        "FÉV",
+        "MAR",
+        "AVR",
+        "MAI",
+        "JUIN",
+        "JUIL",
+        "AOÛ",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DÉC"
+      ],
+      "days": [
+        "DIM",
+        "LUN",
+        "MAR",
+        "MER",
+        "JEU",
+        "VEN",
+        "SAM"
+      ],
+      "categories": {
+        "atelier": "Atelier",
+        "spectacle": "Spectacle",
+        "concert": "Concert",
+        "evenement": "Événement"
+      }
+    }
   },
   "cta": {
     "title": "Prêts à rêver ?",
@@ -264,7 +299,46 @@
     "hero_subtitle": "Achetez en ligne, simplifiez votre arrivée",
     "text": "Achetez vos billets d'entrée en ligne pour profiter dès votre arrivée !",
     "placeholder": "Billetterie en cours de configuration — Ouverture été 2026",
-    "help": "Un souci avec la réservation ? Contactez-nous au <a href=\"tel:+33428400049\">04 28 40 00 49</a> ou par <a href=\"mailto:contact@lattrapereves07.fr\">email</a>."
+    "help": "Un souci avec la réservation ? Contactez-nous au <a href=\"tel:+33428400049\">04 28 40 00 49</a> ou par <a href=\"mailto:contact@lattrapereves07.fr\">email</a>.",
+    "choose_title": "Choisissez vos billets",
+    "tarif_plein_name": "Billet plein tarif",
+    "tarif_reduit_name": "Billet tarif réduit <small style=\"font-weight:400\">(3–12 ans)</small>",
+    "tarif_daily_desc": "Valable à la journée — entrées/sorties libres",
+    "tarif_enfant_name": "Billet enfants <small style=\"font-weight:400\">(moins de 3 ans)</small>",
+    "tarif_enfant_desc": "Entrée gratuite",
+    "tarif_pass_plein_name": "Pass saison plein tarif",
+    "tarif_pass_reduit_name": "Pass saison tarif réduit <small style=\"font-weight:400\">(3–12 ans)</small>",
+    "tarif_pass_desc": "Entrées illimitées de Pâques à la Toussaint",
+    "free": "Gratuit",
+    "total_label": "Total",
+    "coords_title": "Vos coordonnées",
+    "coords_nom": "Nom",
+    "coords_prenom": "Prénom",
+    "coords_email": "Adresse email",
+    "card_label": "Paiement par carte",
+    "pay_label": "Payer",
+    "secure_note": "Paiement sécurisé par Square · Vos données bancaires ne transitent pas par nos serveurs",
+    "js_i18n": {
+      "processing": "Traitement en cours…",
+      "pay_label": "Payer",
+      "err_no_ticket": "Veuillez sélectionner au moins un billet payant.",
+      "err_name": "Veuillez renseigner votre nom et prénom.",
+      "err_email": "Veuillez renseigner une adresse email valide.",
+      "err_card_read": "Erreur lors de la lecture de la carte. Veuillez réessayer.",
+      "err_card_invalid": "Informations de carte invalides.",
+      "err_3ds": "La vérification bancaire (3D Secure) a échoué ou a été annulée. Veuillez réessayer.",
+      "err_network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez — vous n'avez pas été débité.",
+      "err_payment_generic": "Le paiement n'a pas pu être traité (erreur {status}). Réessayez ou contactez-nous au 04 28 40 00 49.",
+      "err_square_load": "Impossible de charger le formulaire de paiement. Vérifiez votre connexion et rechargez la page.",
+      "err_square_init": "Erreur lors du chargement du formulaire de paiement. Veuillez recharger la page.",
+      "success_title": "Paiement confirmé !",
+      "success_subtitle": "Vos billets sont réservés.",
+      "success_ref_label": "Référence de commande",
+      "success_instructions": "Le jour de votre visite, donnez simplement votre nom<br>ou cette référence à l'accueil.",
+      "success_email_sent_prefix": "Un email de confirmation a été envoyé à",
+      "success_no_email": "Pensez à noter votre référence de commande.",
+      "success_receipt_link": "Voir le reçu de paiement →"
+    }
   },
   "mentions": {
     "title": "MENTIONS LÉGALES",
@@ -328,5 +402,43 @@
     "p9_text": "[Texte à venir]",
     "p10_title": "Le Parcours Sensoriel",
     "p10_text": "À pieds nus, en chaussettes, ou en chaussures...<br>Prends le temps de te laisser traverser par les sensations.<br>L'important n'est pas l'arrivée, mais le chemin..."
+  },
+  "meta": {
+    "index": {
+      "title": "L'Attrape-Rêves — Parc de loisirs et ferme de découverte — Gravières, Ardèche",
+      "description": "Parc de loisirs et ferme de découverte en famille à Gravières, Ardèche. Animaux, filets dans les arbres dès 3 ans, parcours sensoriel, jeux d'émerveillement et univers de conte avec Gramado. Ouvert tous les jours cet été. Adulte 11€, enfant 9€, gratuit -3 ans."
+    },
+    "le_lieu": {
+      "title": "Le lieu — L'Attrape-Rêves — Ferme de découverte, Gravières, Ardèche",
+      "description": "Découvrez l'histoire de l'Attrape-Rêves, ferme de découverte et d'émerveillement à Gravières en Ardèche. La Fabrique aux Merveilles et La Compagnie des Songes."
+    },
+    "decouvrir": {
+      "title": "Animaux et jeux — L'Attrape-Rêves — Ferme de découverte, Gravières, Ardèche",
+      "description": "Toutes les activités de l'Attrape-Rêves : petits animaux, parcours sensoriel, filets dans les arbres, jeux en bois, arts vivants. Gravières, Ardèche."
+    },
+    "manger": {
+      "title": "Manger & Boire — L'Attrape-Rêves — Petite restauration et buvette, Gravières",
+      "description": "Petite restauration et buvette à l'Attrape-Rêves : foodtruck, boissons, glaces, confiseries au cœur de la nature. Gravières, Ardèche."
+    },
+    "agenda": {
+      "title": "Agenda — L'Attrape-Rêves — Spectacles, ateliers, événements",
+      "description": "Agenda de l'Attrape-Rêves : spectacles, ateliers créatifs, événements culturels. Gravières, Ardèche."
+    },
+    "infos": {
+      "title": "Infos pratiques — L'Attrape-Rêves — Horaires, tarifs, accès",
+      "description": "Horaires, tarifs, accès et informations pratiques pour visiter l'Attrape-Rêves à Gravières en Ardèche. FAQ et plan d'accès."
+    },
+    "billetterie": {
+      "title": "Billetterie — L'Attrape-Rêves — Réserver vos billets",
+      "description": "Achetez vos billets d'entrée en ligne pour l'Attrape-Rêves, ferme de découverte à Gravières en Ardèche."
+    },
+    "mentions": {
+      "title": "Mentions légales — L'Attrape-Rêves",
+      "description": "Mentions légales du site L'Attrape-Rêves, ferme de découverte à Gravières, Ardèche."
+    },
+    "politique": {
+      "title": "Politique de confidentialité — L'Attrape-Rêves",
+      "description": "Politique de confidentialité du site L'Attrape-Rêves, ferme de découverte à Gravières, Ardèche. Aucun cookie, respect de votre vie privée."
+    }
   }
 }
