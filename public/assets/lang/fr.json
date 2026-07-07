@@ -85,7 +85,20 @@
         "concert": "Concert",
         "evenement": "Événement"
       }
-    }
+    },
+    "intro_text": "L'Attrape-Rêves est un parc de loisirs et une ferme de découverte nichée au cœur des Cévennes ardéchoises, à Gravières. En famille, venez rencontrer nos animaux, grimper dans les filets suspendus, vous laisser porter par le parcours sensoriel, et plonger dans l'univers de conte de Gramado, gardien des rêves. Ouvert tous les jours cet été, de 10h à 19h — tarif adulte 11&nbsp;€, enfant (3-12&nbsp;ans) 9&nbsp;€, gratuit pour les moins de 3&nbsp;ans.",
+    "essentials_horaires_title": "Horaires",
+    "essentials_horaires_text": "Ouvert tous les jours cet été, de 10h à 19h.<br>Hors saison : mercredi, samedi et dimanche.",
+    "essentials_more": "En savoir plus →",
+    "essentials_tarifs_title": "Tarifs",
+    "essentials_tarif_adulte": "Adulte",
+    "essentials_tarif_enfant": "Enfant (3-12 ans)",
+    "essentials_tarif_bebe": "Moins de 3 ans",
+    "essentials_free": "Gratuit",
+    "essentials_book": "Réserver mes billets →",
+    "univers_title": "L'<span class=\"text-coral\">univers</span> de l'Attrape-Rêves",
+    "univers_text": "Ici veille Gramado, gardien des rêves, guidé jadis par un martin-pêcheur jusqu'à ce coin de rivière. Une légende se raconte encore entre les arbres, portée par le vent et le reflet bleu de l'eau.",
+    "univers_cta": "Découvrir la légende →"
   },
   "cta": {
     "title": "Prêts à rêver ?",
@@ -120,7 +133,8 @@
     "who_compagnie_text": "Association présente sur place, La Compagnie des Songes anime le lieu à travers la médiation animale, les événements culturels et les ateliers.",
     "who_compagnie_link": "Découvrir la Compagnie des Songes →",
     "gallery_title": "Le lieu en images",
-    "photo_placeholder": "Photo à venir"
+    "photo_placeholder": "Photo à venir",
+    "legende_link": "Découvrir la légende de Gramado →"
   },
   "decouvrir": {
     "hero_title": "ANIMAUX ET JEUX",
@@ -292,7 +306,9 @@
     "faq14_a": "Oui ! Il est tout à fait possible de se baigner sans avoir à reprendre la voiture ! À la Vernède (sous réserve d'accord du camping), à la Baumette, et sur plusieurs autres spots à proximité immédiate de l'Attrape-Rêves.",
     "faq15_q": "Le site est-il ombragé ?",
     "faq15_a": "Le site est pratiquement entièrement ombragé, il est très facile d'y trouver de l'ombre. N'oubliez pas cependant de prévoir de quoi vous protéger.",
-    "swim_note": "Coins de baignade accessibles à pied"
+    "swim_note": "Coins de baignade accessibles à pied",
+    "faq16_q": "Faut-il réserver à l'avance ?",
+    "faq16_a": "Non, la réservation n'est pas obligatoire : vous pouvez venir directement sur place. Réserver en ligne reste pratique pour simplifier votre arrivée."
   },
   "billetterie": {
     "hero_title": "RÉSERVER MES BILLETS",
@@ -439,6 +455,33 @@
     "politique": {
       "title": "Politique de confidentialité — L'Attrape-Rêves",
       "description": "Politique de confidentialité du site L'Attrape-Rêves, ferme de découverte à Gravières, Ardèche. Aucun cookie, respect de votre vie privée."
+    },
+    "legende": {
+      "title": "La légende de l'Attrape-Rêves — Gramado, gardien des rêves — Gravières, Ardèche",
+      "description": "Découvrez la légende de Gramado et du martin-pêcheur, l'histoire qui a donné naissance à l'Attrape-Rêves, parc de loisirs et ferme de découverte à Gravières en Ardèche."
     }
+  },
+  "legende": {
+    "hero_title": "LA LÉGENDE",
+    "hero_subtitle": "Gramado, gardien des rêves",
+    "p1": "Il était une fois un homme fatigué d'un monde devenu gris et bruyant, à la recherche du sens qu'il avait perdu en chemin. Une nuit, un martin-pêcheur aux plumes bleues, rousses et blanches se glisse dans son rêve et lui promet de le mener vers un lieu merveilleux.",
+    "p2": "À son réveil, Gramado — car c'est ainsi qu'il se nomme — part en quête de ce paradis, traversant déserts, montagnes et forêts majestueuses. Épuisé, il finit par s'endormir au pied d'un arbre. Le martin-pêcheur réapparaît alors et lui souffle une vérité toute simple : « Ce que tu cherches, ce n'est pas au bout du monde que tu vas le trouver. » L'oiseau le guide jusqu'au bord du Chassezac.",
+    "p3": "Là, Gramado interroge les habitants du lieu — une truite qui a enfin remonté le courant, un caillou porté par la crue comme il le rêvait, un renard qui connaît toutes les ruses du monde, un âne qui a trouvé sa prairie, une chèvre restée près des siens, une poule qui ne rate jamais un lever de soleil, un chêne qui fait de l'ombre pour tous. Et le martin-pêcheur lui pose la question qui change tout : « Tu te souviens de ce que tu voulais construire, petit ? » Gramado se souvient : harmonie. Un endroit où tout le monde serait heureux, où la nature serait belle, où les gens se souriraient.",
+    "p4": "Il se met alors à bâtir, malgré les tempêtes, les brigands, la bureaucratie. Quand il achève son œuvre, les nuages gris s'écartent, la nature pousse plus fort, les oiseaux chantent plus clair, les fleurs s'ouvrent — et les gens se sourient enfin. Depuis, personne n'a revu Gramado. Certains disent qu'il est parti chercher d'autres rivières ; d'autres, qu'il est devenu aussi discret que le martin-pêcheur. Mais quand la lumière tombe juste sur l'eau du Chassezac, on aperçoit parfois un éclair bleu — et ceux qui le voient se souviennent, l'instant d'un battement d'aile, de leur rêve d'enfant.",
+    "characters_title": "Les personnages",
+    "gramado_title": "Gramado",
+    "gramado_text": "Un homme parti à la recherche du sens perdu, qui a fini par fonder ce lieu au bord du Chassezac — accomplissant, sans le savoir, son rêve d'enfant : construire un endroit où tout le monde serait heureux.",
+    "oiseau_title": "Le Martin-Pêcheur",
+    "oiseau_text": "Oiseau-guide aux couleurs éclatantes, il révèle à Gramado que ce qu'il cherchait était déjà là. Son bleu n'existe pas vraiment : c'est un reflet de lumière, tout comme les rêves sont le reflet joyeux de notre réalité.",
+    "spirit_title": "L'esprit du lieu",
+    "spirit_intro": "Tout à l'Attrape-Rêves est pensé pour raviver quatre choses simples :",
+    "spirit1_title": "Retrouver son âme d'enfant",
+    "spirit1_text": "S'amuser comme un gosse, lâcher le contrôle, le temps d'une visite.",
+    "spirit2_title": "Réveiller les rêves oubliés",
+    "spirit2_text": "De petits déclencheurs, doux et involontaires, qui remontent à la surface.",
+    "spirit3_title": "S'accorder une pause",
+    "spirit3_text": "Une introspection tranquille, au rythme de la nature.",
+    "spirit4_title": "S'émerveiller",
+    "spirit4_text": "Surprises, beauté et installations artistiques à chaque détour du chemin."
   }
 }

@@ -20,6 +20,7 @@ const PAGES = [
   { file: 'agenda.html', metaKey: 'agenda' },
   { file: 'infos-pratiques.html', metaKey: 'infos' },
   { file: 'billetterie.html', metaKey: 'billetterie' },
+  { file: 'la-legende.html', metaKey: 'legende' },
   { file: 'mentions-legales.html', metaKey: 'mentions' },
   { file: 'politique-de-confidentialite.html', metaKey: 'politique' },
 ]
@@ -119,6 +120,18 @@ function generatePage(page, lang, srcHtml) {
     $(el).toggleClass('active', targetLang === lang)
   })
 
+  // 8. Schema.org FAQPage généré depuis les .faq-item déjà traduits (SEO)
+  const faqEntities = []
+  $('.faq-item').each((_, el) => {
+    const q = $(el).find('.faq-question [data-i18n]').first().text().trim()
+    const a = $(el).find('.faq-answer p').first().text().trim()
+    if (q && a) faqEntities.push({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })
+  })
+  if (faqEntities.length) {
+    const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }
+    $('head').append(`\n  <script type="application/ld+json">${JSON.stringify(faqSchema)}</script>\n`)
+  }
+
   return $.html()
 }
 
@@ -137,3 +150,25 @@ for (const page of PAGES) {
 }
 
 console.log(`✓ ${count} pages générées (${PAGES.length} pages × ${LANGS.length} langues)`)
+
+// ===== SITEMAP.XML =====
+// Une entrée <url> par langue, avec le jeu complet d'alternates hreflang
+// (format sitemap multilingue recommandé par Google).
+const urlEntries = []
+for (const page of PAGES) {
+  for (const lang of LANGS) {
+    const alternates = LANGS.map(
+      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${urlFor(l, page.file)}"/>`
+    ).join('\n')
+    urlEntries.push(
+      `  <url>\n    <loc>${urlFor(lang, page.file)}</loc>\n${alternates}\n    <xhtml:link rel="alternate" hreflang="x-default" href="${urlFor('fr', page.file)}"/>\n  </url>`
+    )
+  }
+}
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urlEntries.join('\n')}
+</urlset>
+`
+fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap, 'utf-8')
+console.log(`✓ sitemap.xml généré (${urlEntries.length} URLs)`)

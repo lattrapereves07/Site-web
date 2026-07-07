@@ -85,7 +85,20 @@
         "concert": "Konzert",
         "evenement": "Veranstaltung"
       }
-    }
+    },
+    "intro_text": "L'Attrape-Rêves ist ein Freizeitpark und Entdeckerhof für die ganze Familie, mitten in den Cevennen der Ardèche, in Gravières. Treffen Sie unsere Tiere, klettern Sie durch die Kletternetze in den Bäumen, lassen Sie sich vom Sinnespfad tragen und tauchen Sie ein in die Märchenwelt von Gramado, dem Hüter der Träume. Diesen Sommer täglich geöffnet, von 10 bis 19 Uhr — Erwachsene &euro;11, Kinder (3-12 Jahre) &euro;9, kostenlos unter 3 Jahren.",
+    "essentials_horaires_title": "Öffnungszeiten",
+    "essentials_horaires_text": "Diesen Sommer täglich geöffnet, von 10 bis 19 Uhr.<br>Außerhalb der Saison: Mittwoch, Samstag und Sonntag.",
+    "essentials_more": "Mehr erfahren →",
+    "essentials_tarifs_title": "Preise",
+    "essentials_tarif_adulte": "Erwachsene",
+    "essentials_tarif_enfant": "Kind (3-12 Jahre)",
+    "essentials_tarif_bebe": "Unter 3 Jahren",
+    "essentials_free": "Kostenlos",
+    "essentials_book": "Tickets buchen →",
+    "univers_title": "Die <span class=\"text-coral\">Welt</span> von L'Attrape-Rêves",
+    "univers_text": "Hier wacht Gramado, der Hüter der Träume, einst von einem Eisvogel an diese Flussbiegung geführt. Eine Legende wird noch immer zwischen den Bäumen erzählt, getragen vom Wind und dem blauen Schimmer des Wassers.",
+    "univers_cta": "Die Legende entdecken →"
   },
   "cta": {
     "title": "Bereit zum Träumen?",
@@ -120,7 +133,8 @@
     "who_compagnie_text": "Als vor Ort ansässiger Verein belebt La Compagnie des Songes den Ort durch Tiergestützte Mediation, kulturelle Veranstaltungen und Workshops.",
     "who_compagnie_link": "Die Compagnie des Songes entdecken →",
     "gallery_title": "Der Ort in Bildern",
-    "photo_placeholder": "Foto folgt"
+    "photo_placeholder": "Foto folgt",
+    "legende_link": "Die Legende von Gramado entdecken →"
   },
   "decouvrir": {
     "hero_title": "TIERE UND SPIELE",
@@ -292,7 +306,9 @@
     "faq14_a": "Ja! Man kann schwimmen, ohne wieder ins Auto steigen zu müssen! An der Vernède (vorbehaltlich der Genehmigung des Campingplatzes), an der Baumette, und an mehreren anderen Stellen in unmittelbarer Nähe der Attrape-Rêves.",
     "faq15_q": "Ist das Gelände beschattet?",
     "faq15_a": "Das Gelände ist praktisch vollständig beschattet, es ist sehr einfach, Schatten zu finden. Vergessen Sie jedoch nicht, Sonnenschutz mitzunehmen.",
-    "swim_note": "Badestellen zu Fuß erreichbar"
+    "swim_note": "Badestellen zu Fuß erreichbar",
+    "faq16_q": "Muss ich im Voraus buchen?",
+    "faq16_a": "Nein, eine Buchung ist nicht erforderlich — Sie können einfach vorbeikommen. Die Online-Buchung ist lediglich praktisch, um Ihre Ankunft zu vereinfachen."
   },
   "billetterie": {
     "hero_title": "TICKETS KAUFEN",
@@ -439,6 +455,33 @@
     "politique": {
       "title": "Datenschutzerklärung — L'Attrape-Rêves",
       "description": "Datenschutzerklärung der Website L'Attrape-Rêves, Entdeckerhof in Gravières, Ardèche. Keine Cookies, Ihre Privatsphäre wird respektiert."
+    },
+    "legende": {
+      "title": "Die Legende von L'Attrape-Rêves — Gramado, Hüter der Träume — Gravières, Ardèche",
+      "description": "Entdecken Sie die Legende von Gramado und dem Eisvogel, die Geschichte hinter L'Attrape-Rêves, Freizeitpark und Entdeckerhof in Gravières, Ardèche."
     }
+  },
+  "legende": {
+    "hero_title": "DIE LEGENDE",
+    "hero_subtitle": "Gramado, Hüter der Träume",
+    "p1": "Es war einmal ein Mann, müde von einer grau und laut gewordenen Welt, auf der Suche nach dem Sinn, den er unterwegs verloren hatte. Eines Nachts schleicht sich ein Eisvogel mit blauen, rostroten und weißen Federn in seinen Traum und verspricht, ihn zu einem wunderbaren Ort zu führen.",
+    "p2": "Beim Erwachen macht sich Gramado — so heißt er — auf die Suche nach diesem Paradies, durch Wüsten, Berge und majestätische Wälder. Erschöpft schläft er schließlich am Fuß eines Baumes ein. Der Eisvogel erscheint erneut und flüstert ihm eine einfache Wahrheit zu: „Was du suchst, findest du nicht am Ende der Welt.“ Der Vogel führt ihn ans Ufer des Chassezac.",
+    "p3": "Dort befragt Gramado die Bewohner des Ortes — eine Forelle, die endlich stromaufwärts geschwommen ist, einen Stein, der vom Hochwasser mitgerissen wurde, wie er es sich erträumt hatte, einen Fuchs, der alle Tricks der Welt kennt, einen Esel, der seine Wiese gefunden hat, eine Ziege, die bei ihrer Familie geblieben ist, ein Huhn, das nie einen Sonnenaufgang verpasst, eine Eiche, die allen Schatten spendet. Und der Eisvogel stellt ihm die Frage, die alles verändert: „Erinnerst du dich, was du als Kind bauen wolltest?“ Gramado erinnert sich: Harmonie. Ein Ort, an dem alle glücklich wären, an dem die Natur schön wäre, an dem die Menschen einander anlächeln würden.",
+    "p4": "Also beginnt er zu bauen, trotz Stürmen, Räubern und Bürokratie. Als sein Werk vollendet ist, teilen sich die grauen Wolken, die Natur wächst kräftiger, die Vögel singen klarer, die Blumen öffnen sich — und die Menschen lächeln endlich. Seitdem hat niemand Gramado wiedergesehen. Manche sagen, er sei auf der Suche nach anderen Flüssen; andere, er sei so unauffällig geworden wie der Eisvogel selbst. Doch wenn das Licht genau richtig auf das Wasser des Chassezac fällt, erscheint manchmal ein blauer Blitz — und wer ihn sieht, erinnert sich für den Bruchteil eines Flügelschlags an seinen Kindheitstraum.",
+    "characters_title": "Die Figuren",
+    "gramado_title": "Gramado",
+    "gramado_text": "Ein Mann, der sich auf die Suche nach verlorenem Sinn machte und schließlich diesen Ort am Ufer des Chassezac gründete — und dabei, ohne es zu wissen, seinen Kindheitstraum verwirklichte: einen Ort zu bauen, an dem alle glücklich wären.",
+    "oiseau_title": "Der Eisvogel",
+    "oiseau_text": "Ein strahlend farbiger Führervogel, der Gramado offenbart, dass das, wonach er suchte, bereits da war. Sein Blau existiert eigentlich gar nicht: Es ist ein Lichtreflex — genau wie Träume der fröhliche Widerschein unserer Wirklichkeit sind.",
+    "spirit_title": "Der Geist des Ortes",
+    "spirit_intro": "Bei L'Attrape-Rêves dreht sich alles darum, vier einfache Dinge wiederzubeleben:",
+    "spirit1_title": "Die eigene Kinderseele wiederfinden",
+    "spirit1_text": "Wie ein Kind spielen, die Kontrolle loslassen, für die Dauer eines Besuchs.",
+    "spirit2_title": "Vergessene Träume wecken",
+    "spirit2_text": "Kleine, sanfte, unbeabsichtigte Auslöser, die sie wieder an die Oberfläche bringen.",
+    "spirit3_title": "Sich eine Pause gönnen",
+    "spirit3_text": "Ein ruhiger Moment der Einkehr, im Rhythmus der Natur.",
+    "spirit4_title": "Staunen",
+    "spirit4_text": "Überraschungen, Schönheit und Kunstinstallationen an jeder Wegbiegung."
   }
 }

@@ -85,7 +85,20 @@
         "concert": "Concert",
         "evenement": "Evenement"
       }
-    }
+    },
+    "intro_text": "L'Attrape-Rêves is een gezinspretpark en ontdekkingsboerderij midden in de Cévennes van de Ardèche, in Gravières. Kom onze dieren ontmoeten, klim door de klimnetten in de bomen, laat u meevoeren door het zintuiglijk parcours en stap in de sprookjeswereld van Gramado, bewaker van de dromen. Deze zomer dagelijks geopend, van 10 tot 19 uur — volwassene &euro;11, kind (3-12 jaar) &euro;9, gratis onder 3 jaar.",
+    "essentials_horaires_title": "Openingstijden",
+    "essentials_horaires_text": "Deze zomer elke dag geopend, van 10 tot 19 uur.<br>Buiten het seizoen: woensdag, zaterdag en zondag.",
+    "essentials_more": "Meer weten →",
+    "essentials_tarifs_title": "Tarieven",
+    "essentials_tarif_adulte": "Volwassene",
+    "essentials_tarif_enfant": "Kind (3-12 jaar)",
+    "essentials_tarif_bebe": "Jonger dan 3 jaar",
+    "essentials_free": "Gratis",
+    "essentials_book": "Mijn tickets boeken →",
+    "univers_title": "De <span class=\"text-coral\">wereld</span> van L'Attrape-Rêves",
+    "univers_text": "Hier waakt Gramado, bewaker van de dromen, ooit geleid door een ijsvogel naar deze bocht in de rivier. Een legende wordt nog steeds verteld tussen de bomen, gedragen door de wind en de blauwe glinstering van het water.",
+    "univers_cta": "Ontdek de legende →"
   },
   "cta": {
     "title": "Klaar om te dromen?",
@@ -120,7 +133,8 @@
     "who_compagnie_text": "Een vereniging op locatie, La Compagnie des Songes brengt de plek tot leven door dierondersteunde activiteiten, culturele evenementen en workshops.",
     "who_compagnie_link": "Ontdek La Compagnie des Songes →",
     "gallery_title": "De plek in beeld",
-    "photo_placeholder": "Foto volgt binnenkort"
+    "photo_placeholder": "Foto volgt binnenkort",
+    "legende_link": "Ontdek de legende van Gramado →"
   },
   "decouvrir": {
     "hero_title": "DIEREN & SPELEN",
@@ -292,7 +306,9 @@
     "faq14_a": "Ja! Je kunt zwemmen zonder de auto opnieuw te moeten nemen! Bij de Vernède (mits akkoord van de camping), bij de Baumette, en op meerdere andere plekken vlak bij L'Attrape-Rêves.",
     "faq15_q": "Is het terrein beschaduwd?",
     "faq15_a": "Het terrein is vrijwel geheel beschaduwd, dus schaduw vinden is heel gemakkelijk. Vergeet echter niet om zonbescherming mee te nemen.",
-    "swim_note": "Zwemplekken op loopafstand"
+    "swim_note": "Zwemplekken op loopafstand",
+    "faq16_q": "Moet ik van tevoren reserveren?",
+    "faq16_a": "Nee, reserveren is niet verplicht — u kunt gewoon langskomen. Online boeken is wel handig om uw aankomst te vereenvoudigen."
   },
   "billetterie": {
     "hero_title": "MIJN TICKETS BOEKEN",
@@ -439,6 +455,33 @@
     "politique": {
       "title": "Privacybeleid — L'Attrape-Rêves",
       "description": "Privacybeleid van de website L'Attrape-Rêves, ontdekkingsboerderij in Gravières, Ardèche. Geen cookies, uw privacy gerespecteerd."
+    },
+    "legende": {
+      "title": "De legende van L'Attrape-Rêves — Gramado, bewaker van de dromen — Gravières, Ardèche",
+      "description": "Ontdek de legende van Gramado en de ijsvogel, het verhaal achter L'Attrape-Rêves, pretpark en ontdekkingsboerderij in Gravières, Ardèche."
     }
+  },
+  "legende": {
+    "hero_title": "DE LEGENDE",
+    "hero_subtitle": "Gramado, bewaker van de dromen",
+    "p1": "Er was eens een man, moe van een grijze en lawaaierige wereld, op zoek naar de zin die hij onderweg was kwijtgeraakt. Op een nacht glipt een ijsvogel met blauwe, rossige en witte veren zijn droom binnen en belooft hem naar een prachtige plek te leiden.",
+    "p2": "Bij het ontwaken vertrekt Gramado — zo heet hij — op zoek naar dit paradijs, door woestijnen, bergen en machtige bossen. Uitgeput valt hij uiteindelijk in slaap aan de voet van een boom. De ijsvogel verschijnt opnieuw en fluistert hem een eenvoudige waarheid toe: \"Wat je zoekt, vind je niet aan het einde van de wereld.\" De vogel leidt hem naar de oever van de Chassezac.",
+    "p3": "Daar ondervraagt Gramado de bewoners van de plek — een forel die eindelijk stroomopwaarts is gezwommen, een steen die door de vloed werd meegevoerd zoals hij had gedroomd, een vos die alle listen van de wereld kent, een ezel die zijn weide heeft gevonden, een geit die bij haar familie is gebleven, een kip die nooit een zonsopgang mist, een eik die voor iedereen schaduw geeft. En de ijsvogel stelt hem de vraag die alles verandert: \"Weet je nog wat je wilde bouwen, toen je klein was?\" Gramado herinnert het zich: harmonie. Een plek waar iedereen gelukkig zou zijn, waar de natuur mooi zou zijn, waar mensen naar elkaar zouden glimlachen.",
+    "p4": "Dus begint hij te bouwen, ondanks stormen, struikrovers en bureaucratie. Wanneer zijn werk voltooid is, trekken de grijze wolken weg, groeit de natuur sterker, zingen de vogels helderder, gaan de bloemen open — en glimlachen de mensen eindelijk. Sindsdien heeft niemand Gramado nog gezien. Sommigen zeggen dat hij op zoek is gegaan naar andere rivieren; anderen, dat hij net zo onzichtbaar is geworden als de ijsvogel. Maar wanneer het licht precies goed op het water van de Chassezac valt, verschijnt soms een blauwe flits — en wie hem ziet, herinnert zich, voor de duur van een vleugelslag, zijn kinderdroom.",
+    "characters_title": "De personages",
+    "gramado_title": "Gramado",
+    "gramado_text": "Een man die op zoek ging naar verloren zin en uiteindelijk deze plek stichtte aan de oever van de Chassezac — daarmee onbewust zijn kinderdroom vervullend: een plek bouwen waar iedereen gelukkig zou zijn.",
+    "oiseau_title": "De IJsvogel",
+    "oiseau_text": "Een gidsvogel in schitterende kleuren, die Gramado onthult dat wat hij zocht er al was. Zijn blauw bestaat eigenlijk niet: het is een lichtspiegeling, net zoals dromen de vrolijke weerspiegeling van onze werkelijkheid zijn.",
+    "spirit_title": "De geest van de plek",
+    "spirit_intro": "Alles bij L'Attrape-Rêves is bedacht om vier eenvoudige dingen nieuw leven in te blazen:",
+    "spirit1_title": "Herontdek uw innerlijke kind",
+    "spirit1_text": "Speel als een kind, laat de controle los, al is het maar voor even.",
+    "spirit2_title": "Wek vergeten dromen",
+    "spirit2_text": "Kleine, zachte, onbedoelde triggers die ze weer naar boven brengen.",
+    "spirit3_title": "Gun uzelf een pauze",
+    "spirit3_text": "Een rustig moment van introspectie, op het ritme van de natuur.",
+    "spirit4_title": "Verwonder u",
+    "spirit4_text": "Verrassingen, schoonheid en kunstinstallaties bij elke bocht in het pad."
   }
 }

@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /admin.html
+Disallow: /caisse.html
+Disallow: /cuisine.html
+Disallow: /calendrier-animaux.html
+Disallow: /invitation-admin.html
+Disallow: /invitation-perso.html
+Disallow: /invitation-pro.html
+Disallow: /panneaux.html
+Disallow: /avis.html
+Disallow: /api/
+
+Sitemap: https://www.lattrapereves07.fr/sitemap.xml
