@@ -98,7 +98,12 @@
     "essentials_book": "Mijn tickets boeken →",
     "univers_title": "De <span class=\"text-coral\">wereld</span> van L'Attrape-Rêves",
     "univers_text": "Hier waakt Gramado, bewaker van de dromen, ooit geleid door een ijsvogel naar deze bocht in de rivier. Een legende wordt nog steeds verteld tussen de bomen, gedragen door de wind en de blauwe glinstering van het water.",
-    "univers_cta": "Ontdek de legende →"
+    "univers_cta": "Ontdek de legende →",
+    "reviews_title": "Wat mensen <span class=\"text-coral\">zeggen</span>",
+    "review1_text": "Een plek om (opnieuw) verbinding te maken met jezelf en de natuur, die echt goed doet. Er hangt poëzie in de lucht, mooie energie.",
+    "review2_text": "Een magische plek die echt goed doet! Een bijzondere energie, bijna magie, die het hart weer op zijn plek zet. Je komt er anders uit, lichter.",
+    "review3_text": "Een mooi klein paradijsje voor het hele gezin. Alles is er voor verwondering: natuur, dieren, klimparcours in de bomen, een glijbaan… en ook wat ontspanning voor de ouders!",
+    "reviews_more": "Bekijk alle Google-recensies →"
   },
   "cta": {
     "title": "Klaar om te dromen?",

@@ -98,7 +98,12 @@
     "essentials_book": "Tickets buchen →",
     "univers_title": "Die <span class=\"text-coral\">Welt</span> von L'Attrape-Rêves",
     "univers_text": "Hier wacht Gramado, der Hüter der Träume, einst von einem Eisvogel an diese Flussbiegung geführt. Eine Legende wird noch immer zwischen den Bäumen erzählt, getragen vom Wind und dem blauen Schimmer des Wassers.",
-    "univers_cta": "Die Legende entdecken →"
+    "univers_cta": "Die Legende entdecken →",
+    "reviews_title": "Was man <span class=\"text-coral\">sagt</span>",
+    "review1_text": "Ein Ort, um sich (wieder) mit sich selbst und der Natur zu verbinden, der wirklich guttut. Es liegt Poesie in der Luft, schöne Energien.",
+    "review2_text": "Ein magischer Ort, der wirklich guttut! Eine besondere Energie, fast wie Magie, die das Herz wieder ins Gleichgewicht bringt. Man geht anders, leichter hinaus.",
+    "review3_text": "Ein schönes kleines Paradies für die ganze Familie. Alles ist da für das Staunen: Natur, Tiere, Kletterparcours in den Bäumen, eine Rutsche… und auch etwas Entspannung für die Eltern!",
+    "reviews_more": "Alle Google-Bewertungen ansehen →"
   },
   "cta": {
     "title": "Bereit zum Träumen?",

@@ -98,7 +98,12 @@
     "essentials_book": "Book my tickets →",
     "univers_title": "The <span class=\"text-coral\">world</span> of L'Attrape-Rêves",
     "univers_text": "Here watches over Gramado, guardian of dreams, once guided by a kingfisher to this bend in the river. A legend is still told among the trees, carried by the wind and the blue glint of the water.",
-    "univers_cta": "Discover the legend →"
+    "univers_cta": "Discover the legend →",
+    "reviews_title": "What people are <span class=\"text-coral\">saying</span>",
+    "review1_text": "A place to (re)connect with yourself and with nature that truly does you good. There's poetry in the air, beautiful energy.",
+    "review2_text": "A magical place that truly does you good! A special energy, almost magic, that puts your heart back in place. You leave different, lighter.",
+    "review3_text": "A lovely little corner of paradise for the whole family. Everything is here for wonder: nature, animals, treetop courses, a slide… and a bit of relaxation for the parents too!",
+    "reviews_more": "See all Google reviews →"
   },
   "cta": {
     "title": "Ready to dream?",

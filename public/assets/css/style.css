@@ -1400,6 +1400,53 @@ main {
   opacity: 0.8;
 }
 
+/* --- HOME: AVIS GOOGLE --- */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.review-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 26px 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.review-stars {
+  color: #f0b429;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.review-quote {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--dark-grey);
+  flex: 1;
+  margin-bottom: 14px;
+}
+
+.review-quote::before { content: "\201C"; }
+.review-quote::after { content: "\201D"; }
+
+.review-author {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--coral);
+}
+
+@media (max-width: 768px) {
+  .reviews-grid { grid-template-columns: 1fr; }
+}
+
 /* --- HOME: INTRO + ESSENTIELS (HORAIRES/TARIFS) --- */
 .home-intro-text {
   max-width: 760px;

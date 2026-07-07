@@ -98,7 +98,12 @@
     "essentials_book": "Réserver mes billets →",
     "univers_title": "L'<span class=\"text-coral\">univers</span> de l'Attrape-Rêves",
     "univers_text": "Ici veille Gramado, gardien des rêves, guidé jadis par un martin-pêcheur jusqu'à ce coin de rivière. Une légende se raconte encore entre les arbres, portée par le vent et le reflet bleu de l'eau.",
-    "univers_cta": "Découvrir la légende →"
+    "univers_cta": "Découvrir la légende →",
+    "reviews_title": "Ce qu'on en <span class=\"text-coral\">dit</span>",
+    "review1_text": "Un lieu de (re)connexion à soi et à la nature qui fait vraiment du bien. Il y a de la poésie dans l'air, de belles énergies.",
+    "review2_text": "Un endroit magique qui fait vraiment du bien ! Une énergie particulière, presque de la magie, qui remet le cœur en place. On ressort différent, plus léger.",
+    "review3_text": "Joli petit coin de paradis pour toute la famille. Tout est là pour l'émerveillement : nature, animaux, parcours dans les arbres, toboggan… et un peu de détente pour les parents !",
+    "reviews_more": "Voir tous les avis Google →"
   },
   "cta": {
     "title": "Prêts à rêver ?",
