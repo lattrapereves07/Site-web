@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bénévoles — Admin — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260708">
+  <style>
+    .admin-wrap { max-width: 900px; margin: 100px auto 40px; padding: 0 20px; }
+    .admin-title { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin-bottom: 24px; }
+
+    .login-box { max-width: 400px; margin: 120px auto; padding: 40px; background: var(--beige); border-radius: 16px; text-align: center; }
+    .login-box h1 { font-family: var(--font-title); color: var(--coral); margin-bottom: 20px; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-box .error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+
+    .hidden { display: none !important; }
+
+    .bv-event-card { background: white; border-radius: 16px; padding: 20px 22px; margin-bottom: 22px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .bv-event-card-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .bv-event-card h2 { font-family: var(--font-accent); color: var(--dark-grey); margin: 0; font-size: 1.3rem; }
+    .bv-event-card .date { font-size: 0.88rem; color: #888; }
+    .draft-badge { font-size: 0.75rem; font-weight: 700; color: #888; background: var(--light-beige); padding: 2px 10px; border-radius: 20px; }
+    .referent-line { font-size: 0.9rem; color: var(--dark-grey); margin: 6px 0 4px; }
+    .referent-line b { color: var(--green); }
+    .info-msg { font-size: 0.88rem; color: #666; background: var(--beige); border-radius: 8px; padding: 8px 12px; margin: 8px 0 4px; }
+    .referent-hint { font-size: 0.78rem; color: #aaa; margin-bottom: 14px; }
+
+    .poste-card { border: 2px solid var(--light-beige); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
+    .poste-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .poste-nom { font-weight: 700; color: var(--dark-grey); font-family: var(--font-ui); }
+    .poste-horaire { font-size: 0.85rem; color: var(--coral); font-weight: 600; }
+    .poste-note { font-size: 0.85rem; color: #888; margin-top: 2px; }
+    .poste-actions { display: flex; gap: 6px; }
+    .poste-actions button { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .btn-edit-mini { background: var(--sky-blue); color: white; }
+    .btn-del-mini { background: #c0392b; color: white; }
+
+    .capacity-bar { height: 10px; border-radius: 6px; background: var(--light-beige); margin: 10px 0 6px; overflow: hidden; }
+    .capacity-fill { height: 100%; border-radius: 6px; transition: width 0.2s; }
+    .capacity-label { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
+
+    .inscrit-list { display: flex; flex-direction: column; gap: 6px; }
+    .inscrit-row { display: flex; justify-content: space-between; align-items: flex-start; background: var(--beige); border-radius: 8px; padding: 6px 10px; font-size: 0.88rem; gap: 8px; }
+    .inscrit-nom { font-weight: 700; color: var(--dark-grey); }
+    .inscrit-remarque { color: #777; font-style: italic; }
+    .inscrit-row button { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 0.9rem; padding: 0 4px; flex-shrink: 0; }
+    .empty-postes { font-size: 0.85rem; color: #aaa; font-style: italic; margin: 8px 0; }
+
+    .add-poste-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-top: 14px; border-top: 1px dashed var(--light-beige); padding-top: 14px; }
+    .add-poste-form .fgroup { display: flex; flex-direction: column; gap: 3px; }
+    .add-poste-form label { font-size: 0.75rem; font-weight: 700; color: #888; }
+    .add-poste-form input { padding: 8px 10px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; font-family: var(--font-body); }
+    .add-poste-form input[name=nom] { min-width: 180px; flex: 1; }
+    .add-poste-form input[name=heure_debut], .add-poste-form input[name=heure_fin] { width: 90px; }
+    .add-poste-form input[name=places] { width: 70px; }
+    .add-poste-form input[name=note] { min-width: 160px; flex: 1; }
+    .add-poste-form button { padding: 9px 18px; border: none; border-radius: 8px; background: var(--coral); color: white; font-weight: 700; cursor: pointer; }
+
+    .empty-state { text-align: center; padding: 60px 20px; opacity: 0.6; }
+    .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-box">
+  <img src="assets/images/logo.png" alt="Logo" width="60" style="margin-bottom: 12px;">
+  <h1>🙋 Bénévoles</h1>
+  <div id="loginError" class="error hidden"></div>
+  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus>
+  <button class="btn btn-coral" onclick="doLogin()" style="width:100%;cursor:pointer;border:none;font-size:1rem;">Connexion</button>
+</div>
+
+<div id="adminPanel" class="admin-wrap hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h1 class="admin-title" style="margin-bottom:0;">🙋 Bénévoles — Admin</h1>
+    <div style="display:flex;gap:8px;">
+      <a href="admin.html" class="btn btn-outline" style="font-size:0.9rem;">Agenda</a>
+      <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
+    </div>
+  </div>
+  <p style="margin-bottom:24px;color:#888;">Gérez les postes et suivez les inscriptions des bénévoles, événement par événement. Pour activer un nouvel événement ici, cochez « peut faire appel à des bénévoles » dans <a href="admin.html">l'agenda admin</a>.</p>
+
+  <div id="eventsList"><div class="loading-state">Chargement…</div></div>
+</div>
+
+<script>
+let token = localStorage.getItem('atrv_token') || ''
+let events = []
+let editingPosteId = null
+
+if (token) {
+  fetch('/api/admin/benevoles', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(r => { if (r.ok) { showAdmin() } else { token = ''; localStorage.removeItem('atrv_token') } })
+    .catch(() => {})
+}
+
+document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  if (r.ok) {
+    const data = await r.json()
+    token = data.token
+    localStorage.setItem('atrv_token', token)
+    showAdmin()
+  } else {
+    document.getElementById('loginError').textContent = 'Mot de passe incorrect'
+    document.getElementById('loginError').classList.remove('hidden')
+  }
+}
+
+function showAdmin() {
+  document.getElementById('loginScreen').classList.add('hidden')
+  document.getElementById('adminPanel').classList.remove('hidden')
+  loadEvents()
+}
+
+function logout() {
+  token = ''
+  localStorage.removeItem('atrv_token')
+  location.reload()
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML }
+
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-')
+  const dt = new Date(y, m - 1, d)
+  const days = ['dim','lun','mar','mer','jeu','ven','sam']
+  const months = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc']
+  return `${days[dt.getDay()]} ${parseInt(d)} ${months[parseInt(m)-1]} ${y}`
+}
+
+async function loadEvents() {
+  const list = document.getElementById('eventsList')
+  list.innerHTML = '<div class="loading-state">Chargement…</div>'
+  try {
+    const r = await fetch('/api/admin/benevoles', { headers: { 'Authorization': 'Bearer ' + token } })
+    events = await r.json()
+    renderEvents()
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+function capacityColor(taken, places) {
+  if (taken >= places) return '#8B6F47'
+  const ratio = taken / places
+  if (ratio >= 0.7) return 'var(--coral)'
+  return 'var(--green)'
+}
+
+function renderEvents() {
+  const list = document.getElementById('eventsList')
+  if (!events.length) {
+    list.innerHTML = `<div class="empty-state">Aucun événement ne fait appel à des bénévoles pour l'instant.<br>Cochez la case dédiée dans <a href="admin.html">l'agenda admin</a> pour en activer un.</div>`
+    return
+  }
+
+  list.innerHTML = events.map(ev => `
+    <div class="bv-event-card">
+      <div class="bv-event-card-top">
+        <h2>${esc(ev.title)}</h2>
+        <span class="date">${formatDate(ev.event_date)}${ev.event_time ? ' · ' + ev.event_time : ''}</span>
+      </div>
+      ${!ev.is_published ? '<span class="draft-badge">Brouillon</span>' : ''}
+      <div class="referent-line">Référent(e) : <b>${esc(ev.benevole_referent_nom) || '—'}</b>${ev.benevole_referent_contact ? ' · ' + esc(ev.benevole_referent_contact) : ''}</div>
+      ${ev.benevole_info ? `<div class="info-msg">💬 ${esc(ev.benevole_info)}</div>` : ''}
+      <div class="referent-hint">Le référent et le message se modifient depuis l'agenda admin.</div>
+
+      ${ev.postes.length ? ev.postes.map(p => renderPoste(p)).join('') : '<div class="empty-postes">Aucun poste défini pour cet événement.</div>'}
+
+      <form class="add-poste-form" onsubmit="return addPoste(event, ${ev.id})">
+        <div class="fgroup"><label>Poste</label><input name="nom" placeholder="Ex : Service buvette" required></div>
+        <div class="fgroup"><label>De</label><input name="heure_debut" placeholder="18h"></div>
+        <div class="fgroup"><label>À</label><input name="heure_fin" placeholder="22h"></div>
+        <div class="fgroup"><label>Places</label><input name="places" type="number" min="1" value="1" required></div>
+        <div class="fgroup"><label>Note (facultatif)</label><input name="note" placeholder="Précisions..."></div>
+        <button type="submit">+ Ajouter</button>
+      </form>
+    </div>
+  `).join('')
+}
+
+function renderPoste(p) {
+  if (editingPosteId === p.id) return renderPosteEditForm(p)
+
+  const taken = p.inscriptions.length
+  const pct = Math.min(100, Math.round((taken / p.places) * 100))
+  const color = capacityColor(taken, p.places)
+  const horaire = (p.heure_debut || p.heure_fin) ? `${p.heure_debut || '?'} – ${p.heure_fin || '?'}` : ''
+
+  return `
+    <div class="poste-card">
+      <div class="poste-top">
+        <div>
+          <span class="poste-nom">${esc(p.nom)}</span>
+          ${horaire ? ` <span class="poste-horaire">${esc(horaire)}</span>` : ''}
+          ${p.note ? `<div class="poste-note">${esc(p.note)}</div>` : ''}
+        </div>
+        <div class="poste-actions">
+          <button class="btn-edit-mini" onclick="startEditPoste(${p.id})">✏️</button>
+          <button class="btn-del-mini" onclick="deletePoste(${p.id})">🗑️</button>
+        </div>
+      </div>
+      <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%;background:${color};"></div></div>
+      <div class="capacity-label">${taken} / ${p.places} place${p.places > 1 ? 's' : ''} pourvue${taken > 1 ? 's' : ''}${taken >= p.places ? ' — complet ✓' : ''}</div>
+      <div class="inscrit-list">
+        ${p.inscriptions.map(i => `
+          <div class="inscrit-row">
+            <span><span class="inscrit-nom">${esc(i.nom)}</span>${i.remarque ? ' — <span class="inscrit-remarque">' + esc(i.remarque) + '</span>' : ''}</span>
+            <button onclick="deleteInscription(${i.id})" title="Retirer cette inscription">✕</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
+function renderPosteEditForm(p) {
+  return `
+    <div class="poste-card">
+      <form class="add-poste-form" onsubmit="return saveEditPoste(event, ${p.id})" style="border-top:none;padding-top:0;margin-top:0;">
+        <div class="fgroup"><label>Poste</label><input name="nom" value="${esc(p.nom)}" required></div>
+        <div class="fgroup"><label>De</label><input name="heure_debut" value="${esc(p.heure_debut || '')}"></div>
+        <div class="fgroup"><label>À</label><input name="heure_fin" value="${esc(p.heure_fin || '')}"></div>
+        <div class="fgroup"><label>Places</label><input name="places" type="number" min="1" value="${p.places}" required></div>
+        <div class="fgroup"><label>Note (facultatif)</label><input name="note" value="${esc(p.note || '')}"></div>
+        <button type="submit">💾 Enregistrer</button>
+        <button type="button" class="btn btn-cancel" style="cursor:pointer;font-size:0.9rem;padding:9px 16px;" onclick="cancelEditPoste()">Annuler</button>
+      </form>
+    </div>
+  `
+}
+
+function startEditPoste(id) {
+  editingPosteId = id
+  renderEvents()
+}
+
+function cancelEditPoste() {
+  editingPosteId = null
+  renderEvents()
+}
+
+async function saveEditPoste(evt, id) {
+  evt.preventDefault()
+  const form = evt.target
+  const body = {
+    nom: form.nom.value,
+    heure_debut: form.heure_debut.value,
+    heure_fin: form.heure_fin.value,
+    places: parseInt(form.places.value) || 1,
+    note: form.note.value
+  }
+  await fetch('/api/admin/benevoles/postes/' + id, {
+    method: 'PUT',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  editingPosteId = null
+  loadEvents()
+  return false
+}
+
+async function addPoste(evt, eventId) {
+  evt.preventDefault()
+  const form = evt.target
+  const body = {
+    event_id: eventId,
+    nom: form.nom.value,
+    heure_debut: form.heure_debut.value,
+    heure_fin: form.heure_fin.value,
+    places: parseInt(form.places.value) || 1,
+    note: form.note.value
+  }
+  await fetch('/api/admin/benevoles/postes', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  loadEvents()
+  return false
+}
+
+async function deletePoste(id) {
+  if (!confirm('Supprimer ce poste et toutes ses inscriptions ?')) return
+  await fetch('/api/admin/benevoles/postes/' + id, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  loadEvents()
+}
+
+async function deleteInscription(id) {
+  if (!confirm('Retirer cette inscription ?')) return
+  await fetch('/api/admin/benevoles/inscriptions/' + id, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  loadEvents()
+}
+</script>
+</body>
+</html>

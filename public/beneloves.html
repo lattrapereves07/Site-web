@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bénévoles — La Compagnie des Songes — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260708">
+  <style>
+    body { background: var(--beige); margin: 0; }
+    .bv-page { max-width: 720px; margin: 0 auto; padding: 24px 16px 60px; }
+
+    .bv-header { text-align: center; padding: 28px 0 12px; }
+    .bv-logo { width: 68px; margin-bottom: 10px; }
+    .bv-title { font-family: var(--font-title); font-size: 2.4rem; color: var(--green); margin: 0 0 4px; line-height: 1; }
+    .bv-subtitle { font-family: var(--font-hand); font-size: 1.15rem; color: var(--coral); margin: 0 0 10px; }
+    .bv-intro { font-size: 0.92rem; color: var(--dark-grey); opacity: 0.85; max-width: 520px; margin: 0 auto 20px; line-height: 1.5; }
+
+    .bv-event-card { background: white; border-radius: 18px; padding: 22px 24px; margin-bottom: 26px; box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+    .bv-event-title { font-family: var(--font-accent); color: var(--dark-grey); font-size: 1.4rem; margin: 0 0 2px; }
+    .bv-event-date { font-size: 0.9rem; color: #888; margin-bottom: 12px; }
+
+    .referent-box { background: var(--beige); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; font-size: 0.88rem; }
+    .referent-box b { color: var(--green); }
+    .info-msg { font-size: 0.88rem; color: #666; background: rgba(213,121,86,0.08); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
+
+    .poste-card { border: 2px solid var(--light-beige); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+    .poste-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .poste-nom { font-family: var(--font-ui); font-weight: 700; color: var(--dark-grey); font-size: 1.05rem; }
+    .poste-horaire { font-size: 0.85rem; color: var(--coral); font-weight: 700; }
+    .poste-note { font-size: 0.85rem; color: #888; margin-bottom: 8px; }
+
+    .capacity-row { display: flex; align-items: center; gap: 10px; margin: 8px 0 10px; }
+    .capacity-bar { flex: 1; height: 10px; border-radius: 6px; background: var(--light-beige); overflow: hidden; }
+    .capacity-fill { height: 100%; border-radius: 6px; transition: width 0.2s; }
+    .capacity-label { font-size: 0.8rem; color: #888; white-space: nowrap; }
+    .full-badge { display: inline-block; font-size: 0.8rem; font-weight: 700; color: white; background: var(--brown); padding: 3px 12px; border-radius: 20px; }
+
+    .inscrit-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .inscrit-row { display: flex; justify-content: space-between; align-items: flex-start; background: var(--beige); border-radius: 8px; padding: 7px 12px; font-size: 0.9rem; gap: 8px; }
+    .inscrit-nom { font-weight: 700; color: var(--dark-grey); }
+    .inscrit-remarque { color: #777; font-style: italic; }
+    .inscrit-row .btn-unsub { background: none; border: none; color: var(--coral); font-size: 0.78rem; font-weight: 700; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+
+    .signup-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; border-top: 1px dashed var(--light-beige); padding-top: 12px; }
+    .signup-form .fgroup { display: flex; flex-direction: column; gap: 3px; }
+    .signup-form label { font-size: 0.75rem; font-weight: 700; color: #888; }
+    .signup-form input { padding: 9px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.92rem; box-sizing: border-box; font-family: var(--font-body); }
+    .signup-form input[name=nom] { min-width: 140px; }
+    .signup-form input[name=remarque] { min-width: 180px; flex: 1; }
+    .signup-form button { padding: 10px 18px; border: none; border-radius: 20px; background: var(--coral); color: white; font-weight: 700; cursor: pointer; }
+    .signup-form button:hover { background: var(--coral-hover); }
+    .signup-feedback { font-size: 0.82rem; color: #c0392b; margin-top: 6px; }
+
+    .hidden { display: none !important; }
+    .empty-state { text-align: center; padding: 60px 20px; opacity: 0.6; }
+    .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+
+<div class="bv-page">
+  <div class="bv-header">
+    <img class="bv-logo" src="assets/images/logo.png" alt="Logo L'Attrape-Rêves">
+    <h1 class="bv-title">🙋 Bénévoles</h1>
+    <p class="bv-subtitle">La Compagnie des Songes a besoin de vous !</p>
+    <p class="bv-intro">Merci de donner un peu de votre temps pour nos soirées. Choisissez un poste ci-dessous, laissez votre nom, et à bientôt !</p>
+  </div>
+
+  <div id="eventsList"><div class="loading-state">Chargement…</div></div>
+</div>
+
+<script>
+function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML }
+
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-')
+  const dt = new Date(y, m - 1, d)
+  const days = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi']
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
+  return `${days[dt.getDay()]} ${parseInt(d)} ${months[parseInt(m)-1]} ${y}`
+}
+
+function myInscriptionIds() {
+  try { return JSON.parse(localStorage.getItem('mes_inscriptions_benevole') || '[]') } catch { return [] }
+}
+function rememberInscription(id) {
+  const ids = myInscriptionIds()
+  ids.push(id)
+  localStorage.setItem('mes_inscriptions_benevole', JSON.stringify(ids))
+}
+function forgetInscription(id) {
+  const ids = myInscriptionIds().filter(x => x !== id)
+  localStorage.setItem('mes_inscriptions_benevole', JSON.stringify(ids))
+}
+
+async function loadEvents() {
+  const list = document.getElementById('eventsList')
+  try {
+    const r = await fetch('/api/benevoles')
+    const events = await r.json()
+    renderEvents(events)
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">Erreur réseau, réessayez dans un instant.</div>'
+  }
+}
+
+function capacityColor(taken, places) {
+  if (taken >= places) return '#8B6F47'
+  const ratio = taken / places
+  if (ratio >= 0.7) return 'var(--coral)'
+  return 'var(--green)'
+}
+
+function renderEvents(events) {
+  const list = document.getElementById('eventsList')
+  if (!events.length) {
+    list.innerHTML = '<div class="empty-state">Aucun événement ne recherche de bénévoles pour le moment.<br>Revenez bientôt !</div>'
+    return
+  }
+  const mine = myInscriptionIds()
+
+  list.innerHTML = events.map(ev => `
+    <div class="bv-event-card">
+      <h2 class="bv-event-title">${esc(ev.title)}</h2>
+      <div class="bv-event-date">${formatDate(ev.event_date)}${ev.event_time ? ' à ' + ev.event_time : ''}</div>
+      ${ev.benevole_referent_nom ? `<div class="referent-box">📣 Référent(e) de la soirée : <b>${esc(ev.benevole_referent_nom)}</b>${ev.benevole_referent_contact ? ' — ' + esc(ev.benevole_referent_contact) : ''}</div>` : ''}
+      ${ev.benevole_info ? `<div class="info-msg">💬 ${esc(ev.benevole_info)}</div>` : ''}
+      ${ev.postes.length ? ev.postes.map(p => renderPoste(p, ev)).join('') : '<p style="opacity:0.6;font-size:0.9rem;">Aucun poste ouvert pour l&rsquo;instant, revenez bientôt.</p>'}
+    </div>
+  `).join('')
+
+  function renderPoste(p, ev) {
+    const taken = p.inscriptions.length
+    const pct = Math.min(100, Math.round((taken / p.places) * 100))
+    const color = capacityColor(taken, p.places)
+    const horaire = (p.heure_debut || p.heure_fin) ? `${p.heure_debut || ''}${p.heure_debut && p.heure_fin ? ' – ' : ''}${p.heure_fin || ''}` : ''
+    const complet = taken >= p.places
+
+    return `
+      <div class="poste-card">
+        <div class="poste-top">
+          <span class="poste-nom">${esc(p.nom)}</span>
+          ${horaire ? `<span class="poste-horaire">${esc(horaire)}</span>` : ''}
+        </div>
+        ${p.note ? `<div class="poste-note">${esc(p.note)}</div>` : ''}
+        <div class="capacity-row">
+          <div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%;background:${color};"></div></div>
+          <span class="capacity-label">${taken}/${p.places}</span>
+          ${complet ? '<span class="full-badge">Complet</span>' : ''}
+        </div>
+        <div class="inscrit-list">
+          ${p.inscriptions.map(i => `
+            <div class="inscrit-row">
+              <span><span class="inscrit-nom">${esc(i.nom)}</span>${i.remarque ? ' — <span class="inscrit-remarque">' + esc(i.remarque) + '</span>' : ''}</span>
+              ${mine.includes(i.id) ? `<button class="btn-unsub" onclick="unsubscribe(${i.id}, '${esc(ev.benevole_referent_nom || '').replace(/'/g, "\\'")}', '${esc(ev.benevole_referent_contact || '').replace(/'/g, "\\'")}')">Se désinscrire</button>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${complet ? '' : `
+          <form class="signup-form" onsubmit="return signup(event, ${p.id})">
+            <div class="fgroup"><label>Votre nom *</label><input name="nom" placeholder="Prénom Nom" required></div>
+            <div class="fgroup"><label>Remarque (facultatif)</label><input name="remarque" placeholder="Ex : j'arriverai un peu après 18h"></div>
+            <button type="submit">Je m'inscris !</button>
+          </form>
+          <div class="signup-feedback hidden"></div>
+        `}
+      </div>
+    `
+  }
+}
+
+async function signup(evt, posteId) {
+  evt.preventDefault()
+  const form = evt.target
+  const feedback = form.nextElementSibling
+  const nom = form.nom.value.trim()
+  if (!nom) return false
+
+  const r = await fetch(`/api/benevoles/postes/${posteId}/inscriptions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nom, remarque: form.remarque.value.trim() })
+  })
+  const data = await r.json()
+  if (!r.ok) {
+    if (feedback) { feedback.textContent = data.error || 'Erreur, réessayez.'; feedback.classList.remove('hidden') }
+    loadEvents()
+    return false
+  }
+  rememberInscription(data.id)
+  loadEvents()
+  return false
+}
+
+async function unsubscribe(id, referentNom, referentContact) {
+  const contact = referentNom ? `\n\nMerci de prévenir ${referentNom}${referentContact ? ' (' + referentContact + ')' : ''} de votre désinscription.` : ''
+  if (!confirm('Confirmer votre désinscription ?' + contact)) return
+  await fetch('/api/benevoles/inscriptions/' + id, { method: 'DELETE' })
+  forgetInscription(id)
+  loadEvents()
+}
+
+loadEvents()
+</script>
+</body>
+</html>

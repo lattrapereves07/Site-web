@@ -564,17 +564,21 @@ app.get('/api/admin/events', requireAuth, async (c) => {
 // Create event
 app.post('/api/admin/events', requireAuth, async (c) => {
   const body = await c.req.json()
-  const { title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published } = body
-  
+  const { title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published,
+    benevoles_actif, benevole_referent_nom, benevole_referent_contact, benevole_info } = body
+
   const result = await c.env.DB.prepare(`
-    INSERT INTO events (title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO events (title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published,
+      benevoles_actif, benevole_referent_nom, benevole_referent_contact, benevole_info)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     title, description || null, event_date, event_time || null,
     end_date || null, end_time || null, category || 'evenement',
-    booking_url || null, is_published ?? 1
+    booking_url || null, is_published ?? 1,
+    benevoles_actif ? 1 : 0, benevole_referent_nom?.trim() || null,
+    benevole_referent_contact?.trim() || null, benevole_info?.trim() || null
   ).run()
-  
+
   return c.json({ id: result.meta.last_row_id, ...body }, 201)
 })
 
@@ -582,24 +586,34 @@ app.post('/api/admin/events', requireAuth, async (c) => {
 app.put('/api/admin/events/:id', requireAuth, async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
-  const { title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published } = body
-  
+  const { title, description, event_date, event_time, end_date, end_time, category, booking_url, is_published,
+    benevoles_actif, benevole_referent_nom, benevole_referent_contact, benevole_info } = body
+
   await c.env.DB.prepare(`
     UPDATE events SET title=?, description=?, event_date=?, event_time=?, end_date=?, end_time=?,
-    category=?, booking_url=?, is_published=?, updated_at=datetime('now')
+    category=?, booking_url=?, is_published=?,
+    benevoles_actif=?, benevole_referent_nom=?, benevole_referent_contact=?, benevole_info=?,
+    updated_at=datetime('now')
     WHERE id=?
   `).bind(
     title, description || null, event_date, event_time || null,
     end_date || null, end_time || null, category || 'evenement',
-    booking_url || null, is_published ?? 1, id
+    booking_url || null, is_published ?? 1,
+    benevoles_actif ? 1 : 0, benevole_referent_nom?.trim() || null,
+    benevole_referent_contact?.trim() || null, benevole_info?.trim() || null,
+    id
   ).run()
-  
+
   return c.json({ success: true })
 })
 
 // Delete event
 app.delete('/api/admin/events/:id', requireAuth, async (c) => {
   const id = c.req.param('id')
+  await c.env.DB.prepare(`
+    DELETE FROM benevole_inscriptions WHERE poste_id IN (SELECT id FROM benevole_postes WHERE event_id=?)
+  `).bind(id).run()
+  await c.env.DB.prepare('DELETE FROM benevole_postes WHERE event_id=?').bind(id).run()
   await c.env.DB.prepare('DELETE FROM events WHERE id=?').bind(id).run()
   return c.json({ success: true })
 })
@@ -635,6 +649,131 @@ app.delete('/api/admin/events/:id/image', requireAuth, async (c) => {
   await c.env.DB.prepare('UPDATE events SET image_data=NULL, updated_at=datetime(\'now\') WHERE id=?')
     .bind(id).run()
 
+  return c.json({ success: true })
+})
+
+// ===== BENEVOLES API =====
+
+async function attachPostesEtInscriptions(db: D1Database, events: any[]) {
+  const eventIds = events.map((e: any) => e.id)
+  if (eventIds.length === 0) return []
+
+  const evPlaceholders = eventIds.map(() => '?').join(',')
+  const { results: postes } = await db.prepare(`
+    SELECT * FROM benevole_postes WHERE event_id IN (${evPlaceholders}) ORDER BY ordre ASC, id ASC
+  `).bind(...eventIds).all()
+
+  const posteIds = postes.map((p: any) => p.id)
+  let inscriptions: any[] = []
+  if (posteIds.length > 0) {
+    const poPlaceholders = posteIds.map(() => '?').join(',')
+    const r = await db.prepare(`
+      SELECT id, poste_id, nom, remarque FROM benevole_inscriptions WHERE poste_id IN (${poPlaceholders}) ORDER BY id ASC
+    `).bind(...posteIds).all()
+    inscriptions = r.results
+  }
+
+  return events.map((e: any) => ({
+    ...e,
+    postes: postes.filter((p: any) => p.event_id === e.id).map((p: any) => ({
+      ...p,
+      inscriptions: inscriptions.filter((i: any) => i.poste_id === p.id)
+    }))
+  }))
+}
+
+// Liste publique des événements recherchant des bénévoles, avec postes + inscriptions
+app.get('/api/benevoles', async (c) => {
+  const { results: events } = await c.env.DB.prepare(`
+    SELECT id, title, event_date, event_time, end_date, end_time,
+           benevole_referent_nom, benevole_referent_contact, benevole_info
+    FROM events
+    WHERE benevoles_actif = 1 AND is_published = 1 AND event_date >= date('now')
+    ORDER BY event_date ASC, event_time ASC
+  `).all()
+
+  return c.json(await attachPostesEtInscriptions(c.env.DB, events))
+})
+
+// Inscription bénévole sur un poste (public, sans mot de passe)
+app.post('/api/benevoles/postes/:posteId/inscriptions', async (c) => {
+  const posteId = c.req.param('posteId')
+  const { nom, remarque } = await c.req.json()
+  if (!nom?.trim()) return c.json({ error: 'Le nom est obligatoire' }, 400)
+
+  const poste = await c.env.DB.prepare('SELECT places FROM benevole_postes WHERE id=?').bind(posteId).first() as any
+  if (!poste) return c.json({ error: 'Poste introuvable' }, 404)
+
+  const countRow = await c.env.DB.prepare('SELECT COUNT(*) as n FROM benevole_inscriptions WHERE poste_id=?').bind(posteId).first() as any
+  if ((countRow?.n ?? 0) >= poste.places) return c.json({ error: 'Ce poste est complet' }, 409)
+
+  const result = await c.env.DB.prepare(`
+    INSERT INTO benevole_inscriptions (poste_id, nom, remarque) VALUES (?, ?, ?)
+  `).bind(posteId, nom.trim(), remarque?.trim() || null).run()
+
+  return c.json({ id: result.meta.last_row_id, poste_id: Number(posteId), nom: nom.trim(), remarque: remarque?.trim() || null }, 201)
+})
+
+// Désinscription (public, auto-gestion depuis le navigateur du bénévole)
+app.delete('/api/benevoles/inscriptions/:id', async (c) => {
+  const id = c.req.param('id')
+  await c.env.DB.prepare('DELETE FROM benevole_inscriptions WHERE id=?').bind(id).run()
+  return c.json({ success: true })
+})
+
+// ===== ADMIN BENEVOLES API =====
+
+// Liste admin des événements avec bénévoles activés (tous statuts) + postes + inscriptions
+app.get('/api/admin/benevoles', requireAuth, async (c) => {
+  const { results: events } = await c.env.DB.prepare(`
+    SELECT id, title, event_date, event_time, is_published,
+           benevole_referent_nom, benevole_referent_contact, benevole_info
+    FROM events
+    WHERE benevoles_actif = 1
+    ORDER BY event_date ASC, event_time ASC
+  `).all()
+
+  return c.json(await attachPostesEtInscriptions(c.env.DB, events))
+})
+
+// Créer un poste bénévole
+app.post('/api/admin/benevoles/postes', requireAuth, async (c) => {
+  const { event_id, nom, heure_debut, heure_fin, places, note } = await c.req.json()
+  if (!event_id || !nom?.trim()) return c.json({ error: 'event_id et nom sont obligatoires' }, 400)
+
+  const result = await c.env.DB.prepare(`
+    INSERT INTO benevole_postes (event_id, nom, heure_debut, heure_fin, places, note)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).bind(event_id, nom.trim(), heure_debut || null, heure_fin || null, places || 1, note?.trim() || null).run()
+
+  return c.json({ id: result.meta.last_row_id }, 201)
+})
+
+// Modifier un poste bénévole
+app.put('/api/admin/benevoles/postes/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  const { nom, heure_debut, heure_fin, places, note } = await c.req.json()
+
+  await c.env.DB.prepare(`
+    UPDATE benevole_postes SET nom=?, heure_debut=?, heure_fin=?, places=?, note=?, updated_at=datetime('now')
+    WHERE id=?
+  `).bind(nom.trim(), heure_debut || null, heure_fin || null, places || 1, note?.trim() || null, id).run()
+
+  return c.json({ success: true })
+})
+
+// Supprimer un poste bénévole (et ses inscriptions)
+app.delete('/api/admin/benevoles/postes/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  await c.env.DB.prepare('DELETE FROM benevole_inscriptions WHERE poste_id=?').bind(id).run()
+  await c.env.DB.prepare('DELETE FROM benevole_postes WHERE id=?').bind(id).run()
+  return c.json({ success: true })
+})
+
+// Supprimer une inscription (admin)
+app.delete('/api/admin/benevoles/inscriptions/:id', requireAuth, async (c) => {
+  const id = c.req.param('id')
+  await c.env.DB.prepare('DELETE FROM benevole_inscriptions WHERE id=?').bind(id).run()
   return c.json({ success: true })
 })
 

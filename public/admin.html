@@ -105,6 +105,7 @@
     <h1 class="admin-title" style="margin-bottom:0;">🎪 Agenda — Admin</h1>
     <div style="display:flex;gap:8px;">
       <a href="reservations-admin.html" class="btn btn-outline" style="font-size:0.9rem;">Réservations</a>
+      <a href="beneloves-admin.html" class="btn btn-outline" style="font-size:0.9rem;">🙋 Bénévoles</a>
       <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
     </div>
   </div>
@@ -217,6 +218,29 @@
           <option value="0">Non — brouillon</option>
         </select>
       </div>
+    </div>
+    <div class="form-group" style="margin-top:4px;">
+      <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+        <input type="checkbox" id="fBenevoles" onchange="toggleBenevolesFields()" style="width:auto;">
+        🙋 Cet événement peut faire appel à des bénévoles
+      </label>
+    </div>
+    <div id="benevolesFields" class="hidden" style="background:var(--light-beige);border-radius:10px;padding:14px 16px;margin-bottom:12px;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Référent(e) de la soirée</label>
+          <input type="text" id="fBenevoleReferent" placeholder="Nom du/de la référent(e)">
+        </div>
+        <div class="form-group">
+          <label>Contact du/de la référent(e)</label>
+          <input type="text" id="fBenevoleContact" placeholder="Téléphone ou email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Message aux bénévoles (facultatif)</label>
+        <textarea id="fBenevoleInfo" placeholder="Infos utiles : où se garer, tenue, consignes..."></textarea>
+      </div>
+      <p style="font-size:0.85rem;color:#888;margin:0;">Les postes (buvette, cuisine...) et les inscriptions se gèrent depuis <a href="beneloves-admin.html" target="_blank">l'espace Bénévoles</a>, après avoir enregistré l'événement.</p>
     </div>
     <div class="form-actions">
       <button class="btn btn-coral" onclick="saveEvent()" style="cursor:pointer;border:none;font-size:1rem;">Enregistrer</button>
@@ -433,9 +457,18 @@ function editEvent(id) {
   document.getElementById('fCategory').value = e.category
   document.getElementById('fBooking').value = e.booking_url || ''
   document.getElementById('fPublished').value = e.is_published ? '1' : '0'
+  document.getElementById('fBenevoles').checked = !!e.benevoles_actif
+  document.getElementById('fBenevoleReferent').value = e.benevole_referent_nom || ''
+  document.getElementById('fBenevoleContact').value = e.benevole_referent_contact || ''
+  document.getElementById('fBenevoleInfo').value = e.benevole_info || ''
+  toggleBenevolesFields()
   document.getElementById('formTitle').textContent = '✏️ Modifier : ' + e.title
   document.getElementById('btnCancel').classList.remove('hidden')
   document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' })
+}
+
+function toggleBenevolesFields() {
+  document.getElementById('benevolesFields').classList.toggle('hidden', !document.getElementById('fBenevoles').checked)
 }
 
 function cancelEdit() {
@@ -448,6 +481,11 @@ function cancelEdit() {
   document.getElementById('fEndTime').value = ''
   document.getElementById('fBooking').value = ''
   document.getElementById('fPublished').value = '1'
+  document.getElementById('fBenevoles').checked = false
+  document.getElementById('fBenevoleReferent').value = ''
+  document.getElementById('fBenevoleContact').value = ''
+  document.getElementById('fBenevoleInfo').value = ''
+  toggleBenevolesFields()
   document.getElementById('formTitle').textContent = '➕ Nouvel événement'
   document.getElementById('btnCancel').classList.add('hidden')
 }
@@ -463,7 +501,11 @@ async function saveEvent() {
     end_time: document.getElementById('fEndTime').value,
     category: document.getElementById('fCategory').value,
     booking_url: fixUrl(document.getElementById('fBooking').value),
-    is_published: parseInt(document.getElementById('fPublished').value)
+    is_published: parseInt(document.getElementById('fPublished').value),
+    benevoles_actif: document.getElementById('fBenevoles').checked,
+    benevole_referent_nom: document.getElementById('fBenevoleReferent').value,
+    benevole_referent_contact: document.getElementById('fBenevoleContact').value,
+    benevole_info: document.getElementById('fBenevoleInfo').value
   }
   if (!body.title || !body.event_date) { alert('Titre et date sont obligatoires.'); return }
 
