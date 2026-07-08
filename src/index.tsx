@@ -321,11 +321,28 @@ app.post('/api/billetterie/pay', async (c) => {
   })
 })
 
+async function ensureReservationFlagsTable(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS reservation_flags (
+      reference TEXT PRIMARY KEY,
+      hidden INTEGER NOT NULL DEFAULT 0,
+      visited INTEGER NOT NULL DEFAULT 0,
+      visited_at TEXT,
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+}
+
+const RESERVATION_REF_RE = /^AR-[A-Z0-9]+$/
+
 // Recherche des réservations billetterie (lecture seule, source de vérité = Square)
 // Par référence / nom / prénom / email (recherche texte côté serveur) et/ou période.
+// Les statuts "masqué" / "visite validée" sont des annotations locales (reservation_flags),
+// Square reste la seule source de vérité pour les commandes elles-mêmes.
 app.get('/api/admin/reservations', requireAuth, async (c) => {
   const token = c.env.SQUARE_ACCESS_TOKEN
   if (!token) return c.json({ error: 'Square non configuré' }, 500)
+  await ensureReservationFlagsTable(c.env.DB)
 
   const q = (c.req.query('q') || '').trim().toLowerCase()
   const from = c.req.query('from') || '2026-06-28' // ouverture du site
@@ -366,18 +383,30 @@ app.get('/api/admin/reservations', requireAuth, async (c) => {
     return c.json({ error: 'Erreur réseau Square', details: e.message }, 502)
   }
 
+  const { results: flagRows } = await c.env.DB.prepare(
+    'SELECT reference, hidden, visited, visited_at FROM reservation_flags'
+  ).all()
+  const flags = new Map((flagRows as any[]).map((f) => [f.reference, f]))
+
   const results = orders
     .filter((o) => typeof o.reference_id === 'string' && o.reference_id.startsWith('AR-'))
-    .map((o) => ({
-      reference: o.reference_id,
-      orderId: o.id,
-      createdAt: o.created_at,
-      totalCentimes: o.total_money?.amount ?? 0,
-      buyerNom: o.metadata?.buyer_nom || null,
-      buyerPrenom: o.metadata?.buyer_prenom || null,
-      buyerEmail: o.metadata?.buyer_email || null,
-      items: (o.line_items || []).map((li: any) => ({ name: li.name, qty: li.quantity }))
-    }))
+    .map((o) => {
+      const flag = flags.get(o.reference_id)
+      return {
+        reference: o.reference_id,
+        orderId: o.id,
+        createdAt: o.created_at,
+        totalCentimes: o.total_money?.amount ?? 0,
+        buyerNom: o.metadata?.buyer_nom || null,
+        buyerPrenom: o.metadata?.buyer_prenom || null,
+        buyerEmail: o.metadata?.buyer_email || null,
+        items: (o.line_items || []).map((li: any) => ({ name: li.name, qty: li.quantity })),
+        hidden: !!flag?.hidden,
+        visited: !!flag?.visited,
+        visitedAt: flag?.visited_at || null
+      }
+    })
+    .filter((r) => (c.req.query('includeHidden') === '1' ? true : !r.hidden))
     .filter((r) => {
       if (!q) return true
       const hay = [r.reference, r.buyerNom, r.buyerPrenom, r.buyerEmail].filter(Boolean).join(' ').toLowerCase()
@@ -385,6 +414,33 @@ app.get('/api/admin/reservations', requireAuth, async (c) => {
     })
 
   return c.json({ results, count: results.length })
+})
+
+// Masque une réservation dans l'admin (n'affecte pas la commande Square — annulation/remboursement à faire dans Square directement)
+app.post('/api/admin/reservations/:reference/hide', requireAuth, async (c) => {
+  const reference = c.req.param('reference')
+  if (!RESERVATION_REF_RE.test(reference)) return c.json({ error: 'Référence invalide' }, 400)
+  await ensureReservationFlagsTable(c.env.DB)
+  await c.env.DB.prepare(`
+    INSERT INTO reservation_flags (reference, hidden, updated_at) VALUES (?, 1, datetime('now'))
+    ON CONFLICT(reference) DO UPDATE SET hidden = 1, updated_at = datetime('now')
+  `).bind(reference).run()
+  return c.json({ ok: true })
+})
+
+// Marque (ou démarque) la visite d'une réservation comme effectuée — check-in à l'accueil
+app.post('/api/admin/reservations/:reference/visit', requireAuth, async (c) => {
+  const reference = c.req.param('reference')
+  if (!RESERVATION_REF_RE.test(reference)) return c.json({ error: 'Référence invalide' }, 400)
+  const body = await c.req.json().catch(() => ({})) as { visited?: boolean }
+  const visited = body.visited !== false
+  await ensureReservationFlagsTable(c.env.DB)
+  await c.env.DB.prepare(`
+    INSERT INTO reservation_flags (reference, visited, visited_at, updated_at)
+    VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(reference) DO UPDATE SET visited = ?, visited_at = ?, updated_at = datetime('now')
+  `).bind(reference, visited ? 1 : 0, visited ? new Date().toISOString() : null, visited ? 1 : 0, visited ? new Date().toISOString() : null).run()
+  return c.json({ ok: true })
 })
 
 // ===== PUBLIC API =====

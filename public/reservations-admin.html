@@ -30,7 +30,8 @@
 
     .res-count { font-size: 0.9rem; opacity: 0.65; margin-bottom: 14px; }
 
-    .res-card { background: white; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .res-card { background: white; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent; }
+    .res-card.visited { border-color: #4caf7d; }
     .res-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
     .res-ref { font-weight: 800; color: var(--coral); font-size: 1.05rem; letter-spacing: 0.04em; }
     .res-date { font-size: 0.85rem; opacity: 0.6; }
@@ -39,7 +40,16 @@
     .res-items { font-size: 0.9rem; color: var(--dark-grey); border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px; display: flex; flex-wrap: wrap; gap: 4px 18px; }
     .res-item { opacity: 0.85; }
     .res-total { font-weight: 800; color: var(--coral); }
-    .res-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .res-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; }
+    .res-actions { display: flex; gap: 8px; }
+    .res-badge-visited { font-size: 0.8rem; font-weight: 700; color: #2e7d51; background: #e8f7ef; padding: 4px 10px; border-radius: 20px; }
+    .res-btn { padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 2px solid; background: transparent; }
+    .res-btn-validate { color: #2e7d51; border-color: #4caf7d; }
+    .res-btn-validate:hover { background: #e8f7ef; }
+    .res-btn-unvalidate { color: var(--dark-grey); border-color: var(--light-beige); opacity: 0.75; }
+    .res-btn-unvalidate:hover { opacity: 1; }
+    .res-btn-delete { color: #c0392b; border-color: #e6a49a; }
+    .res-btn-delete:hover { background: #fbeae7; }
 
     .empty-state { text-align: center; padding: 60px 20px; opacity: 0.55; }
     .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
@@ -57,7 +67,7 @@
 
 <div id="adminPanel" class="admin-wrap hidden">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <h1 class="admin-title" style="margin-bottom:0;">🎫 Réservations</h1>
+    <h1 class="admin-title" style="margin-bottom:0;">Réservations</h1>
     <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
   </div>
   <p style="margin-bottom:24px;color:#888;">Recherche en lecture seule dans les commandes Square — aucune donnée n'est dupliquée ici.</p>
@@ -178,7 +188,7 @@ function renderResults(results) {
   }
 
   list.innerHTML = results.map(r => `
-    <div class="res-card">
+    <div class="res-card${r.visited ? ' visited' : ''}" id="card-${esc(r.reference)}">
       <div class="res-top">
         <span class="res-ref">${esc(r.reference)}</span>
         <span class="res-date">${fmtDate(r.createdAt)}</span>
@@ -189,11 +199,39 @@ function renderResults(results) {
         ${r.items.map(it => `<span class="res-item">${esc(it.name)} × ${it.qty}</span>`).join('')}
       </div>
       <div class="res-bottom">
-        <span></span>
+        <div class="res-actions">
+          ${r.visited
+            ? `<span class="res-badge-visited">✓ Visite validée</span><button class="res-btn res-btn-unvalidate" onclick="doValidate('${esc(r.reference)}', false)">Annuler</button>`
+            : `<button class="res-btn res-btn-validate" onclick="doValidate('${esc(r.reference)}', true)">✓ Valider la visite</button>`
+          }
+          <button class="res-btn res-btn-delete" onclick="doDelete('${esc(r.reference)}')">Supprimer</button>
+        </div>
         <span class="res-total">${fmtEur(r.totalCentimes)}</span>
       </div>
     </div>
   `).join('')
+}
+
+async function doValidate(reference, visited) {
+  try {
+    const r = await fetch('/api/admin/reservations/' + encodeURIComponent(reference) + '/visit', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visited })
+    })
+    if (r.ok) doSearch()
+  } catch (e) {}
+}
+
+async function doDelete(reference) {
+  if (!confirm('Supprimer la réservation ' + reference + ' de cette liste ?\n\nCela ne touche pas la commande Square (annulation/remboursement à faire dans Square si besoin) — la réservation sera simplement masquée ici.')) return
+  try {
+    const r = await fetch('/api/admin/reservations/' + encodeURIComponent(reference) + '/hide', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    if (r.ok) doSearch()
+  } catch (e) {}
 }
 
 function esc(s) {
