@@ -321,6 +321,72 @@ app.post('/api/billetterie/pay', async (c) => {
   })
 })
 
+// Recherche des réservations billetterie (lecture seule, source de vérité = Square)
+// Par référence / nom / prénom / email (recherche texte côté serveur) et/ou période.
+app.get('/api/admin/reservations', requireAuth, async (c) => {
+  const token = c.env.SQUARE_ACCESS_TOKEN
+  if (!token) return c.json({ error: 'Square non configuré' }, 500)
+
+  const q = (c.req.query('q') || '').trim().toLowerCase()
+  const from = c.req.query('from') || '2026-06-28' // ouverture du site
+  const to = c.req.query('to') || new Date().toISOString().slice(0, 10)
+  const startAt = `${from}T00:00:00Z`
+  const endAt = `${to}T23:59:59Z`
+
+  const orders: any[] = []
+  let cursor: string | undefined
+  try {
+    do {
+      const searchBody: any = {
+        location_ids: [SQUARE_LOCATION_ID],
+        query: {
+          filter: {
+            date_time_filter: { created_at: { start_at: startAt, end_at: endAt } },
+            state_filter: { states: ['COMPLETED'] }
+          },
+          sort: { sort_field: 'CREATED_AT', sort_order: 'DESC' }
+        },
+        limit: 100,
+        ...(cursor ? { cursor } : {})
+      }
+      const res = await fetch('https://connect.squareup.com/v2/orders/search', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Square-Version': '2025-01-23' },
+        body: JSON.stringify(searchBody)
+      })
+      if (!res.ok) {
+        const err = await res.json() as any
+        return c.json({ error: 'Erreur recherche Square', details: err?.errors?.[0]?.detail }, 502)
+      }
+      const data = await res.json() as any
+      orders.push(...(data.orders || []))
+      cursor = data.cursor
+    } while (cursor && orders.length < 1000)
+  } catch (e: any) {
+    return c.json({ error: 'Erreur réseau Square', details: e.message }, 502)
+  }
+
+  const results = orders
+    .filter((o) => typeof o.reference_id === 'string' && o.reference_id.startsWith('AR-'))
+    .map((o) => ({
+      reference: o.reference_id,
+      orderId: o.id,
+      createdAt: o.created_at,
+      totalCentimes: o.total_money?.amount ?? 0,
+      buyerNom: o.metadata?.buyer_nom || null,
+      buyerPrenom: o.metadata?.buyer_prenom || null,
+      buyerEmail: o.metadata?.buyer_email || null,
+      items: (o.line_items || []).map((li: any) => ({ name: li.name, qty: li.quantity }))
+    }))
+    .filter((r) => {
+      if (!q) return true
+      const hay = [r.reference, r.buyerNom, r.buyerPrenom, r.buyerEmail].filter(Boolean).join(' ').toLowerCase()
+      return hay.includes(q)
+    })
+
+  return c.json({ results, count: results.length })
+})
+
 // ===== PUBLIC API =====
 
 // Initialise la table site_config si elle n'existe pas encore

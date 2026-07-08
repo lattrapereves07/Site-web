@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Réservations — Admin — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260708">
+  <style>
+    .admin-wrap { max-width: 900px; margin: 100px auto 40px; padding: 0 20px; }
+    .admin-title { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin-bottom: 24px; }
+
+    .login-box { max-width: 400px; margin: 120px auto; padding: 40px; background: var(--beige); border-radius: 16px; text-align: center; }
+    .login-box h1 { font-family: var(--font-title); color: var(--coral); margin-bottom: 20px; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-box .error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+
+    .hidden { display: none !important; }
+
+    .search-box { background: var(--beige); border-radius: 16px; padding: 20px 24px; margin-bottom: 28px; }
+    .search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .search-field { display: flex; flex-direction: column; gap: 4px; }
+    .search-field label { font-size: 0.8rem; font-weight: 700; color: var(--dark-grey); opacity: 0.7; }
+    .search-field input { padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; font-family: var(--font-ui); }
+    .search-field.grow { flex: 1; min-width: 220px; }
+    .search-box button { padding: 11px 22px; border: none; border-radius: 8px; background: var(--coral); color: white; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+    .search-box button:hover { opacity: 0.9; }
+    .search-hint { font-size: 0.82rem; opacity: 0.6; margin-top: 10px; }
+
+    .res-count { font-size: 0.9rem; opacity: 0.65; margin-bottom: 14px; }
+
+    .res-card { background: white; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .res-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .res-ref { font-weight: 800; color: var(--coral); font-size: 1.05rem; letter-spacing: 0.04em; }
+    .res-date { font-size: 0.85rem; opacity: 0.6; }
+    .res-buyer { font-weight: 700; color: var(--dark-grey); margin-bottom: 4px; }
+    .res-email { font-size: 0.88rem; opacity: 0.7; margin-bottom: 10px; }
+    .res-items { font-size: 0.9rem; color: var(--dark-grey); border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+    .res-item { opacity: 0.85; }
+    .res-total { font-weight: 800; color: var(--coral); }
+    .res-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; opacity: 0.55; }
+    .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-box">
+  <img src="assets/images/logo.png" alt="Logo" width="60" style="margin-bottom: 12px;">
+  <h1>Réservations</h1>
+  <div id="loginError" class="error hidden"></div>
+  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus>
+  <button class="btn btn-coral" onclick="doLogin()" style="width:100%;cursor:pointer;border:none;font-size:1rem;">Connexion</button>
+</div>
+
+<div id="adminPanel" class="admin-wrap hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h1 class="admin-title" style="margin-bottom:0;">🎫 Réservations</h1>
+    <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
+  </div>
+  <p style="margin-bottom:24px;color:#888;">Recherche en lecture seule dans les commandes Square — aucune donnée n'est dupliquée ici.</p>
+
+  <div class="search-box">
+    <div class="search-row">
+      <div class="search-field grow">
+        <label for="searchQ">Référence, nom ou email</label>
+        <input type="text" id="searchQ" placeholder="AR-XXXXXX, Dupont, marie@…">
+      </div>
+      <div class="search-field">
+        <label for="searchFrom">Du</label>
+        <input type="date" id="searchFrom">
+      </div>
+      <div class="search-field">
+        <label for="searchTo">Au</label>
+        <input type="date" id="searchTo">
+      </div>
+      <button onclick="doSearch()">Rechercher</button>
+    </div>
+    <p class="search-hint">Par défaut : depuis l'ouverture du site (28 juin 2026) jusqu'à aujourd'hui.</p>
+  </div>
+
+  <div id="resCount" class="res-count hidden"></div>
+  <div id="resList"></div>
+</div>
+
+<script>
+let token = localStorage.getItem('atrv_token') || ''
+
+if (token) {
+  fetch('/api/admin/reservations?q=', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(r => { if (r.ok) { showAdmin() } else { token = ''; localStorage.removeItem('atrv_token') } })
+    .catch(() => {})
+}
+
+document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+document.getElementById('searchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch() })
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  if (r.ok) {
+    const data = await r.json()
+    token = data.token
+    localStorage.setItem('atrv_token', token)
+    showAdmin()
+  } else {
+    document.getElementById('loginError').textContent = 'Mot de passe incorrect'
+    document.getElementById('loginError').classList.remove('hidden')
+  }
+}
+
+function showAdmin() {
+  document.getElementById('loginScreen').classList.add('hidden')
+  document.getElementById('adminPanel').classList.remove('hidden')
+  doSearch()
+}
+
+function logout() {
+  token = ''
+  localStorage.removeItem('atrv_token')
+  location.reload()
+}
+
+function fmtEur(centimes) {
+  return (centimes / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso)
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+    ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
+async function doSearch() {
+  const q = document.getElementById('searchQ').value.trim()
+  const from = document.getElementById('searchFrom').value
+  const to = document.getElementById('searchTo').value
+  const list = document.getElementById('resList')
+  const countEl = document.getElementById('resCount')
+  list.innerHTML = '<div class="loading-state">Recherche en cours…</div>'
+  countEl.classList.add('hidden')
+
+  const params = new URLSearchParams()
+  if (q) params.set('q', q)
+  if (from) params.set('from', from)
+  if (to) params.set('to', to)
+
+  try {
+    const r = await fetch('/api/admin/reservations?' + params.toString(), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    const data = await r.json()
+    if (!r.ok) {
+      list.innerHTML = '<div class="empty-state">' + (data.error || 'Erreur de recherche') + '</div>'
+      return
+    }
+    renderResults(data.results)
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+function renderResults(results) {
+  const list = document.getElementById('resList')
+  const countEl = document.getElementById('resCount')
+  countEl.classList.remove('hidden')
+  countEl.textContent = results.length + ' réservation' + (results.length > 1 ? 's' : '') + ' trouvée' + (results.length > 1 ? 's' : '')
+
+  if (!results.length) {
+    list.innerHTML = '<div class="empty-state">Aucune réservation ne correspond à cette recherche.</div>'
+    return
+  }
+
+  list.innerHTML = results.map(r => `
+    <div class="res-card">
+      <div class="res-top">
+        <span class="res-ref">${esc(r.reference)}</span>
+        <span class="res-date">${fmtDate(r.createdAt)}</span>
+      </div>
+      <div class="res-buyer">${esc(r.buyerPrenom || '')} ${esc(r.buyerNom || '')}</div>
+      <div class="res-email">${esc(r.buyerEmail || '—')}</div>
+      <div class="res-items">
+        ${r.items.map(it => `<span class="res-item">${esc(it.name)} × ${it.qty}</span>`).join('')}
+      </div>
+      <div class="res-bottom">
+        <span></span>
+        <span class="res-total">${fmtEur(r.totalCentimes)}</span>
+      </div>
+    </div>
+  `).join('')
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+</script>
+</body>
+</html>

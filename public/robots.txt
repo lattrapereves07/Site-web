@@ -8,6 +8,7 @@ Disallow: /invitation-perso.html
 Disallow: /invitation-pro.html
 Disallow: /panneaux.html
 Disallow: /avis.html
+Disallow: /reservations-admin.html
 Disallow: /api/
 
 Sitemap: https://www.lattrapereves07.fr/sitemap.xml
