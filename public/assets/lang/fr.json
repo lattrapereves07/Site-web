@@ -103,7 +103,9 @@
     "review1_text": "Un lieu de (re)connexion à soi et à la nature qui fait vraiment du bien. Il y a de la poésie dans l'air, de belles énergies.",
     "review2_text": "Un endroit magique qui fait vraiment du bien ! Une énergie particulière, presque de la magie, qui remet le cœur en place. On ressort différent, plus léger.",
     "review3_text": "Joli petit coin de paradis pour toute la famille. Tout est là pour l'émerveillement : nature, animaux, parcours dans les arbres, toboggan… et un peu de détente pour les parents !",
-    "reviews_more": "Voir tous les avis Google →"
+    "reviews_more": "Voir tous les avis Google →",
+    "heat_banner_text": "Trop chaud dehors ? Venez chercher la fraîcheur chez nous ! Visite <strong>100% à l'ombre des arbres</strong>, accès à la rivière, et brumisateurs sur place.",
+    "heat_banner_close": "Fermer"
   },
   "cta": {
     "title": "Prêts à rêver ?",
@@ -131,6 +133,7 @@
     "text_1": "L'Attrape-Rêves est né d'un rêve un peu fou : créer un lieu où le temps ralentit, où les enfants courent librement, où les adultes retrouvent leur âme d'enfant.",
     "text_2": "Installé à Gravières, au cœur des Cévennes ardéchoises, ce lieu prend soin de ses animaux toute l'année — ânes, chèvres naines, poules et cochons — tout en proposant des espaces de jeux, de découverte sensorielle et de culture vivante.",
     "text_3": "L'Attrape-Rêves, c'est une ferme qui ne ressemble à aucune autre. Un endroit où la nature, l'art et le jeu se mêlent pour offrir une parenthèse hors du temps.",
+    "text_fraicheur": "Toute la visite se fait à l'ombre des arbres, en bordure de rivière — un vrai refuge de fraîcheur, même les jours de forte chaleur. Des brumisateurs sont installés sur place pour se rafraîchir davantage.",
     "who_title": "Qui sommes-nous ?",
     "who_fabrique_title": "La Fabrique aux Merveilles",
     "who_fabrique_text": "Structure porteuse de l'Attrape-Rêves, La Fabrique aux Merveilles développe et gère ce projet de parc de loisirs et ferme de découverte.",
@@ -314,7 +317,7 @@
     "faq14_q": "Y a-t-il des spots de baignade à proximité ?",
     "faq14_a": "Oui ! Il est tout à fait possible de se baigner sans avoir à reprendre la voiture ! À la Vernède (sous réserve d'accord du camping), à la Baumette, et sur plusieurs autres spots à proximité immédiate de l'Attrape-Rêves.",
     "faq15_q": "Le site est-il ombragé ?",
-    "faq15_a": "Le site est pratiquement entièrement ombragé, il est très facile d'y trouver de l'ombre. N'oubliez pas cependant de prévoir de quoi vous protéger.",
+    "faq15_a": "Le site est pratiquement entièrement ombragé par les arbres et longe la rivière — même en cas de forte chaleur, on y respire. Des brumisateurs sont installés sur place pour se rafraîchir davantage. N'oubliez pas cependant de prévoir de quoi vous protéger.",
     "swim_note": "Coins de baignade accessibles à pied",
     "faq16_q": "Faut-il réserver à l'avance ?",
     "faq16_a": "Non, la réservation n'est pas obligatoire : vous pouvez venir directement sur place. Réserver en ligne reste pratique pour simplifier votre arrivée."

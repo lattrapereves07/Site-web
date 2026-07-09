@@ -18,6 +18,8 @@
   --sky-blue: #88C0E9;
   --green: #4E7438;
   --yellow: #ECBE2F;
+  --teal: #2E7D82;
+  --teal-dark: #235f63;
 
   /* Additional */
   --brown: #8B6F47;
@@ -548,6 +550,60 @@ main {
   box-shadow: 3px 4px 0 var(--brown), 0 6px 20px rgba(0,0,0,0.2);
   letter-spacing: 0.01em;
   line-height: 1.2;
+}
+
+.heat-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: linear-gradient(90deg, var(--teal), var(--teal-dark));
+  color: var(--white);
+  padding: 14px 50px 14px 20px;
+  text-align: center;
+  position: relative;
+}
+.heat-banner-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.heat-banner-text {
+  font-family: var(--font-ui);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.4;
+  max-width: 900px;
+}
+.heat-banner-text strong {
+  font-weight: 800;
+}
+.heat-banner-close {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: var(--white);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.heat-banner-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+@media (max-width: 600px) {
+  .heat-banner {
+    padding: 12px 40px 12px 14px;
+    gap: 10px;
+  }
+  .heat-banner-text {
+    font-size: 0.88rem;
+  }
 }
 
 .hero-tagline {

@@ -139,7 +139,20 @@ function generatePage(page, lang, srcHtml) {
     $('head').append(`\n  <script type="application/ld+json" data-generated="faq-schema">${JSON.stringify(faqSchema)}</script>\n`)
   }
 
-  return $.html()
+  return stripBlankLinesInHead($.html())
+}
+
+// cheerio.remove() détache l'élément mais laisse le texte (retour à ligne +
+// indentation) qui l'entourait ; comme ce script réécrit ses propres fichiers
+// de sortie, ces lignes vides s'accumulent à chaque exécution (non-idempotent).
+// On les nettoie dans <head>, seule zone où le script ajoute/retire des balises.
+function stripBlankLinesInHead(html) {
+  return html.replace(/<head>[\s\S]*?<\/head>/, (head) =>
+    head
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .join('\n')
+  )
 }
 
 let count = 0

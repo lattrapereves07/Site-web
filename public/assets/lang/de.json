@@ -103,7 +103,9 @@
     "review1_text": "Ein Ort, um sich (wieder) mit sich selbst und der Natur zu verbinden, der wirklich guttut. Es liegt Poesie in der Luft, schöne Energien.",
     "review2_text": "Ein magischer Ort, der wirklich guttut! Eine besondere Energie, fast wie Magie, die das Herz wieder ins Gleichgewicht bringt. Man geht anders, leichter hinaus.",
     "review3_text": "Ein schönes kleines Paradies für die ganze Familie. Alles ist da für das Staunen: Natur, Tiere, Kletterparcours in den Bäumen, eine Rutsche… und auch etwas Entspannung für die Eltern!",
-    "reviews_more": "Alle Google-Bewertungen ansehen →"
+    "reviews_more": "Alle Google-Bewertungen ansehen →",
+    "heat_banner_text": "Zu heiß draußen? Kommen Sie bei uns Abkühlung suchen! Ein Besuch <strong>100&nbsp;% im Schatten der Bäume</strong>, Zugang zum Fluss und Vernebler vor Ort.",
+    "heat_banner_close": "Schließen"
   },
   "cta": {
     "title": "Bereit zum Träumen?",
@@ -131,6 +133,7 @@
     "text_1": "L'Attrape-Rêves entstand aus einem etwas verrückten Traum: einen Ort zu schaffen, an dem die Zeit langsamer wird, Kinder frei laufen können und Erwachsene ihr inneres Kind wiederfinden.",
     "text_2": "Inmitten der Cevennen der Ardèche, in Gravières, kümmert sich dieser Ort das ganze Jahr um seine Tiere — Esel, Zwergziegen, Hühner und Schweine — und bietet gleichzeitig Spiel-, Entdeckungs- und Kulturräume.",
     "text_3": "L'Attrape-Rêves ist ein Bauernhof wie kein anderer. Ein Ort, an dem Natur, Kunst und Spiel zusammenfließen, um eine Auszeit außerhalb der Zeit zu bieten.",
+    "text_fraicheur": "Der gesamte Besuch findet im Schatten der Bäume statt, direkt am Fluss gelegen — eine echte kühle Oase, selbst an den heißesten Tagen. Zusätzlich sind vor Ort Vernebler aufgestellt.",
     "who_title": "Wer sind wir?",
     "who_fabrique_title": "La Fabrique aux Merveilles",
     "who_fabrique_text": "Als Träger des Attrape-Rêves entwickelt und verwaltet La Fabrique aux Merveilles dieses Freizeit- und Entdeckungsbauernhofprojekt.",
@@ -314,7 +317,7 @@
     "faq14_q": "Gibt es Badestellen in der Nähe?",
     "faq14_a": "Ja! Man kann schwimmen, ohne wieder ins Auto steigen zu müssen! An der Vernède (vorbehaltlich der Genehmigung des Campingplatzes), an der Baumette, und an mehreren anderen Stellen in unmittelbarer Nähe der Attrape-Rêves.",
     "faq15_q": "Ist das Gelände beschattet?",
-    "faq15_a": "Das Gelände ist praktisch vollständig beschattet, es ist sehr einfach, Schatten zu finden. Vergessen Sie jedoch nicht, Sonnenschutz mitzunehmen.",
+    "faq15_a": "Das Gelände ist praktisch vollständig von Bäumen beschattet und liegt am Fluss — selbst an sehr heißen Tagen bleibt es angenehm kühl. Zusätzlich sind vor Ort Vernebler aufgestellt. Vergessen Sie jedoch nicht, Sonnenschutz mitzunehmen.",
     "swim_note": "Badestellen zu Fuß erreichbar",
     "faq16_q": "Muss ich im Voraus buchen?",
     "faq16_a": "Nein, eine Buchung ist nicht erforderlich — Sie können einfach vorbeikommen. Die Online-Buchung ist lediglich praktisch, um Ihre Ankunft zu vereinfachen."

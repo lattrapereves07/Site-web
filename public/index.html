@@ -8,144 +8,6 @@
   <link rel="alternate" hreflang="nl" href="https://www.lattrapereves07.fr/nl/index.html">
   <link rel="alternate" hreflang="de" href="https://www.lattrapereves07.fr/de/index.html">
   <link rel="alternate" hreflang="x-default" href="https://www.lattrapereves07.fr/index.html">
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   <meta name="description" content="Parc de loisirs et ferme de découverte en famille à Gravières, Ardèche. Animaux, filets dans les arbres dès 3 ans, parcours sensoriel, jeux d'émerveillement et univers de conte avec Gramado. Ouvert tous les jours cet été. Adulte 11€, enfant 9€, gratuit -3 ans.">
   <!-- Open Graph -->
   <meta property="og:title" content="L'Attrape-Rêves — Parc de loisirs et ferme de découverte — Gravières, Ardèche">
@@ -156,17 +18,11 @@
   <meta property="og:url" content="https://www.lattrapereves07.fr/index.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_FR">
-  
   <!-- hreflang -->
-  
-  
-  
-  
-  
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="assets/css/style.css?v=20260708">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260709">
   <!-- Schema.org JSON-LD -->
   <script type="application/ld+json">
   {
@@ -294,6 +150,22 @@
 
     <!-- BANDEAU STATUT — géré par assets/js/site-status.js -->
     <div id="site-status-banner" class="site-status-banner" hidden=""></div>
+
+    <!-- BANDEAU CANICULE / FRAÎCHEUR -->
+    <div id="heatBanner" class="heat-banner" hidden="">
+      <span class="heat-banner-icon" aria-hidden="true">🌳</span>
+      <span class="heat-banner-text" data-i18n="home.heat_banner_text">Trop chaud dehors ? Venez chercher la fraîcheur chez nous ! Visite <strong>100% à l'ombre des arbres</strong>, accès à la rivière, et brumisateurs sur place.</span>
+      <button class="heat-banner-close" onclick="dismissHeatBanner()" aria-label="Fermer" data-i18n-title="home.heat_banner_close" title="Fermer">×</button>
+    </div>
+    <script>
+      if (!localStorage.getItem('atrv_heat_banner_dismissed')) {
+        document.getElementById('heatBanner').hidden = false;
+      }
+      function dismissHeatBanner() {
+        document.getElementById('heatBanner').hidden = true;
+        localStorage.setItem('atrv_heat_banner_dismissed', '1');
+      }
+    </script>
 
     <!-- ======== HERO ======== -->
     <section class="hero hero--photo torn-edge-bottom torn-beige" aria-label="Accueil">

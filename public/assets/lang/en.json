@@ -103,7 +103,9 @@
     "review1_text": "A place to (re)connect with yourself and with nature that truly does you good. There's poetry in the air, beautiful energy.",
     "review2_text": "A magical place that truly does you good! A special energy, almost magic, that puts your heart back in place. You leave different, lighter.",
     "review3_text": "A lovely little corner of paradise for the whole family. Everything is here for wonder: nature, animals, treetop courses, a slide… and a bit of relaxation for the parents too!",
-    "reviews_more": "See all Google reviews →"
+    "reviews_more": "See all Google reviews →",
+    "heat_banner_text": "Too hot outside? Come find some coolness with us! A visit <strong>100% shaded by trees</strong>, river access, and misting fans on site.",
+    "heat_banner_close": "Close"
   },
   "cta": {
     "title": "Ready to dream?",
@@ -131,6 +133,7 @@
     "text_1": "L'Attrape-Rêves was born from a slightly crazy dream: to create a place where time slows down, where children run freely, where adults rediscover their inner child.",
     "text_2": "Located in Gravières, in the heart of the Ardèche Cévennes, this place cares for its animals all year round — donkeys, pygmy goats, chickens and pigs — while offering play areas, sensory exploration and living culture.",
     "text_3": "L'Attrape-Rêves is a farm like no other. A place where nature, art and play come together to offer a timeless escape.",
+    "text_fraicheur": "The whole visit takes place in the shade of the trees, right along the river — a real haven of coolness, even on the hottest days. Misting fans are also set up on site to help you cool down further.",
     "who_title": "Who are we?",
     "who_fabrique_title": "La Fabrique aux Merveilles",
     "who_fabrique_text": "The organisation behind L'Attrape-Rêves, La Fabrique aux Merveilles develops and manages this leisure park and discovery farm project.",
@@ -314,7 +317,7 @@
     "faq14_q": "Are there swimming spots nearby?",
     "faq14_a": "Yes! You can swim without needing to get back in the car! At the Vernède (subject to agreement with the campsite), at the Baumette, and at several other spots right next to L'Attrape-Rêves.",
     "faq15_q": "Is the site shaded?",
-    "faq15_a": "The site is almost entirely shaded, making it very easy to find shade. However, don't forget to bring sun protection.",
+    "faq15_a": "The site is almost entirely shaded by trees and runs along the river — even on the hottest days, it stays cool. Misting fans are also set up on site to help you cool down further. However, don't forget to bring sun protection.",
     "swim_note": "Swimming spots within walking distance",
     "faq16_q": "Do I need to book in advance?",
     "faq16_a": "No, booking is not required — you can just show up. Booking online is simply a convenient way to speed up your arrival."
