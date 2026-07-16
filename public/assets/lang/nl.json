@@ -365,8 +365,12 @@
       "success_instructions": "Geef op de dag van uw bezoek gewoon uw naam<br>of deze referentie aan de ingang.",
       "success_email_sent_prefix": "Er is een bevestigingsmail verzonden naar",
       "success_no_email": "Noteer uw bestelreferentie.",
-      "success_receipt_link": "Betalingsbewijs bekijken →"
-    }
+      "success_receipt_link": "Betalingsbewijs bekijken →",
+      "err_pass_names": "Vul de voor- en achternaam van elke houder van de seizoenspas in.",
+      "success_passes_note": "De codes van uw seizoenspassen zijn per e-mail verzonden."
+    },
+    "pass_holders_title": "Houders van de seizoenspas",
+    "pass_holders_hint": "Elke seizoenspas is persoonlijk. De code van elke houder wordt naar bovenstaand e-mailadres gestuurd."
   },
   "mentions": {
     "title": "JURIDISCHE INFORMATIE",

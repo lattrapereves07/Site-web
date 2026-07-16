@@ -365,8 +365,12 @@
       "success_instructions": "On the day of your visit, simply give your name<br>or this reference at the entrance.",
       "success_email_sent_prefix": "A confirmation email has been sent to",
       "success_no_email": "Please make a note of your order reference.",
-      "success_receipt_link": "View payment receipt →"
-    }
+      "success_receipt_link": "View payment receipt →",
+      "err_pass_names": "Please enter the first and last name of each season pass holder.",
+      "success_passes_note": "Your season pass codes have been sent by email."
+    },
+    "pass_holders_title": "Season pass holders",
+    "pass_holders_hint": "Each season pass is personal. Every holder's code will be sent to the email address above."
   },
   "mentions": {
     "title": "LEGAL NOTICE",

@@ -365,8 +365,12 @@
       "success_instructions": "Nennen Sie am Tag Ihres Besuchs einfach Ihren Namen<br>oder diese Referenz am Eingang.",
       "success_email_sent_prefix": "Eine Bestätigungs-E-Mail wurde gesendet an",
       "success_no_email": "Bitte notieren Sie sich Ihre Bestellreferenz.",
-      "success_receipt_link": "Zahlungsbeleg ansehen →"
-    }
+      "success_receipt_link": "Zahlungsbeleg ansehen →",
+      "err_pass_names": "Bitte geben Sie Vor- und Nachname jedes Saisonkarten-Inhabers ein.",
+      "success_passes_note": "Die Codes Ihrer Saisonkarten wurden per E-Mail versendet."
+    },
+    "pass_holders_title": "Inhaber der Saisonkarten",
+    "pass_holders_hint": "Jede Saisonkarte ist personengebunden. Der Code jedes Inhabers wird an die obige E-Mail-Adresse gesendet."
   },
   "mentions": {
     "title": "IMPRESSUM",

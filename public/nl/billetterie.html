@@ -177,6 +177,13 @@
               </div>
             </div>
 
+            <!-- Titulaires des pass saison (nominatif, un nom par pass — affiché seulement si le panier en contient) -->
+            <div class="billet-pass-block hidden" id="pass-holders-block">
+              <h4 data-i18n="billetterie.pass_holders_title">Houders van de seizoenspas</h4>
+              <p style="font-size:0.85rem;opacity:0.7;margin:-6px 0 12px;" data-i18n="billetterie.pass_holders_hint">Elke seizoenspas is persoonlijk. De code van elke houder wordt naar bovenstaand e-mailadres gestuurd.</p>
+              <div id="pass-holders-rows"></div>
+            </div>
+
             <!-- Formulaire de carte Square -->
             <div class="billet-card-wrapper">
               <p class="billet-card-label">
@@ -228,7 +235,7 @@
   </footer>
 
   <script src="../assets/js/main.js?v=20260707"></script>
-  <script type="application/json" id="billet-i18n" data-i18n="billetterie.js_i18n">{"processing":"Bezig met verwerken…","pay_label":"Betalen","err_no_ticket":"Selecteer minstens één betaald ticket.","err_name":"Vul uw voor- en achternaam in.","err_email":"Vul een geldig e-mailadres in.","err_card_read":"Fout bij het lezen van de kaart. Probeer het opnieuw.","err_card_invalid":"Ongeldige kaartgegevens.","err_3ds":"Bankverificatie (3D Secure) is mislukt of geannuleerd. Probeer het opnieuw.","err_network":"Kan de server niet bereiken. Controleer uw verbinding en probeer opnieuw — er is niets van uw rekening afgeschreven.","err_payment_generic":"De betaling kon niet worden verwerkt (fout {status}). Probeer het opnieuw of neem contact met ons op via 04 28 40 00 49.","err_square_load":"Kan het betaalformulier niet laden. Controleer uw verbinding en herlaad de pagina.","err_square_init":"Fout bij het laden van het betaalformulier. Herlaad de pagina.","success_title":"Betaling bevestigd!","success_subtitle":"Uw tickets zijn gereserveerd.","success_ref_label":"Bestelreferentie","success_instructions":"Geef op de dag van uw bezoek gewoon uw naam<br>of deze referentie aan de ingang.","success_email_sent_prefix":"Er is een bevestigingsmail verzonden naar","success_no_email":"Noteer uw bestelreferentie.","success_receipt_link":"Betalingsbewijs bekijken →"}</script>
+  <script type="application/json" id="billet-i18n" data-i18n="billetterie.js_i18n">{"processing":"Bezig met verwerken…","pay_label":"Betalen","err_no_ticket":"Selecteer minstens één betaald ticket.","err_name":"Vul uw voor- en achternaam in.","err_email":"Vul een geldig e-mailadres in.","err_card_read":"Fout bij het lezen van de kaart. Probeer het opnieuw.","err_card_invalid":"Ongeldige kaartgegevens.","err_3ds":"Bankverificatie (3D Secure) is mislukt of geannuleerd. Probeer het opnieuw.","err_network":"Kan de server niet bereiken. Controleer uw verbinding en probeer opnieuw — er is niets van uw rekening afgeschreven.","err_payment_generic":"De betaling kon niet worden verwerkt (fout {status}). Probeer het opnieuw of neem contact met ons op via 04 28 40 00 49.","err_square_load":"Kan het betaalformulier niet laden. Controleer uw verbinding en herlaad de pagina.","err_square_init":"Fout bij het laden van het betaalformulier. Herlaad de pagina.","success_title":"Betaling bevestigd!","success_subtitle":"Uw tickets zijn gereserveerd.","success_ref_label":"Bestelreferentie","success_instructions":"Geef op de dag van uw bezoek gewoon uw naam<br>of deze referentie aan de ingang.","success_email_sent_prefix":"Er is een bevestigingsmail verzonden naar","success_no_email":"Noteer uw bestelreferentie.","success_receipt_link":"Betalingsbewijs bekijken →","err_pass_names":"Vul de voor- en achternaam van elke houder van de seizoenspas in.","success_passes_note":"De codes van uw seizoenspassen zijn per e-mail verzonden."}</script>
   <script>
   (function () {
     // ── Configuration ──────────────────────────────────────────────────────────
@@ -243,6 +250,63 @@
     let squarePayments = null;
     let squareCard = null;
     let paying = false;
+
+    // ── Titulaires des pass saison (nominatif) ─────────────────────────────────
+    function firstTextOf(selector) {
+      const el = document.querySelector(selector);
+      if (!el) return '';
+      const node = el.childNodes[0];
+      return node ? node.textContent.trim() : el.textContent.trim();
+    }
+    const NOM_LABEL = firstTextOf('label[for="buyer-nom"]') || 'Nom';
+    const PRENOM_LABEL = firstTextOf('label[for="buyer-prenom"]') || 'Prénom';
+    const PASS_LABELS = {
+      'pass-plein': firstTextOf('[data-i18n="billetterie.tarif_pass_plein_name"]') || 'Pass plein tarif',
+      'pass-reduit': firstTextOf('[data-i18n="billetterie.tarif_pass_reduit_name"]') || 'Pass réduit'
+    };
+    let passHolderValues = {};
+
+    function renderPassHolders() {
+      const block = document.getElementById('pass-holders-block');
+      const rowsEl = document.getElementById('pass-holders-rows');
+      const rows = [];
+      ['pass-plein', 'pass-reduit'].forEach(id => {
+        for (let i = 0; i < qty[id]; i++) rows.push({ type: id, key: id + '-' + i, label: PASS_LABELS[id] + ' #' + (i + 1) });
+      });
+
+      if (!rows.length) {
+        block.classList.add('hidden');
+        rowsEl.innerHTML = '';
+        passHolderValues = {};
+        return;
+      }
+      block.classList.remove('hidden');
+
+      const validKeys = new Set(rows.map(r => r.key));
+      Object.keys(passHolderValues).forEach(k => { if (!validKeys.has(k)) delete passHolderValues[k]; });
+
+      rowsEl.innerHTML = rows.map(r => `
+        <div class="billet-form-row">
+          <div class="billet-field">
+            <label>${esc(r.label)} — ${esc(PRENOM_LABEL)}</label>
+            <input type="text" data-pass-key="${r.key}" data-pass-field="prenom" data-pass-type="${r.type}" value="${esc((passHolderValues[r.key] && passHolderValues[r.key].prenom) || '')}">
+          </div>
+          <div class="billet-field">
+            <label>${esc(r.label)} — ${esc(NOM_LABEL)}</label>
+            <input type="text" data-pass-key="${r.key}" data-pass-field="nom" data-pass-type="${r.type}" value="${esc((passHolderValues[r.key] && passHolderValues[r.key].nom) || '')}">
+          </div>
+        </div>
+      `).join('');
+
+      rowsEl.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const k = inp.dataset.passKey;
+          passHolderValues[k] = passHolderValues[k] || { type: inp.dataset.passType };
+          passHolderValues[k][inp.dataset.passField] = inp.value;
+          passHolderValues[k].type = inp.dataset.passType;
+        });
+      });
+    }
 
     // ── Formatage prix ──────────────────────────────────────────────────────────
     function fmt(centimes) {
@@ -263,6 +327,8 @@
       const hasItems = Object.values(qty).some(v => v > 0);
       const paymentZone = document.getElementById('payment-zone');
       paymentZone.style.display = hasItems ? '' : 'none';
+
+      renderPassHolders();
 
       const payBtn = document.getElementById('pay-btn');
       payBtn.disabled = total === 0 || !squareCard || paying;
@@ -338,6 +404,9 @@
           ${data.emailSent
             ? `<p style="margin-top:16px;font-size:.92rem;">${T.success_email_sent_prefix} <strong>${esc(data.email)}</strong>.</p>`
             : `<p style="margin-top:16px;font-size:.92rem;opacity:.75;">${T.success_no_email}</p>`}
+          ${data.passCodesSent
+            ? `<p style="margin-top:8px;font-size:.92rem;">${T.success_passes_note}</p>`
+            : ''}
           ${data.receiptUrl
             ? `<p style="margin-top:12px;"><a href="${data.receiptUrl}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:600;">${T.success_receipt_link}</a></p>`
             : ''}
@@ -396,6 +465,18 @@
         return;
       }
       const buyerInfo = { nom, prenom, email };
+
+      // Validation titulaires des pass saison (nominatif — un nom par pass du panier)
+      const passHolders = Object.values(passHolderValues);
+      const expectedPassCount = qty['pass-plein'] + qty['pass-reduit'];
+      if (expectedPassCount > 0) {
+        const complete = passHolders.length === expectedPassCount &&
+          passHolders.every(h => h.prenom && h.prenom.trim() && h.nom && h.nom.trim());
+        if (!complete) {
+          showMessage('error', T.err_pass_names);
+          return;
+        }
+      }
 
       // Tokenisation de la carte
       paying = true;
@@ -462,7 +543,8 @@
             verificationToken,
             items,
             buyerInfo,
-            idempotencyKey
+            idempotencyKey,
+            passHolders
           })
         });
       } catch (e) {

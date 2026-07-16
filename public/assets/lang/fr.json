@@ -365,8 +365,12 @@
       "success_instructions": "Le jour de votre visite, donnez simplement votre nom<br>ou cette référence à l'accueil.",
       "success_email_sent_prefix": "Un email de confirmation a été envoyé à",
       "success_no_email": "Pensez à noter votre référence de commande.",
-      "success_receipt_link": "Voir le reçu de paiement →"
-    }
+      "success_receipt_link": "Voir le reçu de paiement →",
+      "err_pass_names": "Merci de renseigner le prénom et le nom de chaque titulaire de pass saison.",
+      "success_passes_note": "Les codes de vos pass saison ont été envoyés par email."
+    },
+    "pass_holders_title": "Titulaires des pass saison",
+    "pass_holders_hint": "Chaque pass saison est nominatif. Le code de chaque titulaire sera envoyé à l'adresse email ci-dessus."
   },
   "mentions": {
     "title": "MENTIONS LÉGALES",

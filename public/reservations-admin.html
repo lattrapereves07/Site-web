@@ -53,6 +53,14 @@
 
     .empty-state { text-align: center; padding: 60px 20px; opacity: 0.55; }
     .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
+
+    .section-sep { margin: 48px 0 28px; border: none; border-top: 2px solid var(--light-beige); }
+    .section-title-sm { font-family: var(--font-title); font-size: 1.5rem; color: var(--dark-grey); margin-bottom: 4px; }
+
+    .pass-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+    .pass-row select, .pass-row input[type=text] { padding: 9px 10px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; font-family: var(--font-ui); }
+    .pass-row input[type=text] { flex: 1; min-width: 130px; }
+    .pass-row-remove { background: transparent; border: none; color: #c0392b; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 4px 8px; }
   </style>
 </head>
 <body>
@@ -93,6 +101,38 @@
 
   <div id="resCount" class="res-count hidden"></div>
   <div id="resList"></div>
+
+  <hr class="section-sep">
+
+  <h2 class="section-title-sm">Pass saison</h2>
+  <p style="margin-bottom:20px;color:#888;">Enregistrement nominatif des pass saison (guichet ou internet) et suivi des visites — indépendant des ventes Square, qui gèrent uniquement le paiement.</p>
+
+  <div class="search-box">
+    <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Ajouter des pass (achat au guichet)</h3>
+    <div class="search-field" style="margin-bottom:14px;max-width:340px;">
+      <label for="passEmail">Email (partagé par tous les titulaires de cette commande)</label>
+      <input type="text" id="passEmail" placeholder="marie@exemple.fr">
+    </div>
+    <div id="passHoldersRows"></div>
+    <button type="button" class="res-btn res-btn-validate" onclick="addPassHolderRow()">+ Ajouter un titulaire</button>
+    <div style="margin-top:16px;">
+      <button onclick="submitPassBatch()">Enregistrer et envoyer les codes</button>
+    </div>
+    <div id="passBatchMsg" style="margin-top:12px;font-size:0.9rem;"></div>
+  </div>
+
+  <div class="search-box">
+    <div class="search-row">
+      <div class="search-field grow">
+        <label for="passSearchQ">Nom, email ou code</label>
+        <input type="text" id="passSearchQ" placeholder="PS-XXXXXX, Dupont, marie@…">
+      </div>
+      <button onclick="doPassSearch()">Rechercher</button>
+    </div>
+  </div>
+
+  <div id="passCount" class="res-count hidden"></div>
+  <div id="passList"></div>
 </div>
 
 <script>
@@ -106,6 +146,7 @@ if (token) {
 
 document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
 document.getElementById('searchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch() })
+document.getElementById('passSearchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doPassSearch() })
 
 async function doLogin() {
   const pwd = document.getElementById('loginPwd').value
@@ -129,6 +170,8 @@ function showAdmin() {
   document.getElementById('loginScreen').classList.add('hidden')
   document.getElementById('adminPanel').classList.remove('hidden')
   doSearch()
+  if (!passHolderRows.length) addPassHolderRow()
+  doPassSearch()
 }
 
 function logout() {
@@ -236,6 +279,151 @@ async function doDelete(reference) {
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// ── Pass saison ──────────────────────────────────────────────────────────
+
+let passHolderRows = []
+
+function addPassHolderRow() {
+  passHolderRows.push({ type: 'pass-plein', prenom: '', nom: '' })
+  renderPassHolderRows()
+}
+
+function removePassHolderRow(idx) {
+  passHolderRows.splice(idx, 1)
+  renderPassHolderRows()
+}
+
+function renderPassHolderRows() {
+  const el = document.getElementById('passHoldersRows')
+  if (!passHolderRows.length) {
+    el.innerHTML = '<p style="opacity:0.6;font-size:0.9rem;margin-bottom:10px;">Aucun titulaire — cliquez sur « + Ajouter un titulaire ».</p>'
+    return
+  }
+  el.innerHTML = passHolderRows.map((r, i) => `
+    <div class="pass-row">
+      <select onchange="passHolderRows[${i}].type=this.value">
+        <option value="pass-plein"${r.type === 'pass-plein' ? ' selected' : ''}>Plein tarif</option>
+        <option value="pass-reduit"${r.type === 'pass-reduit' ? ' selected' : ''}>Tarif réduit</option>
+      </select>
+      <input type="text" placeholder="Prénom" value="${esc(r.prenom)}" oninput="passHolderRows[${i}].prenom=this.value">
+      <input type="text" placeholder="Nom" value="${esc(r.nom)}" oninput="passHolderRows[${i}].nom=this.value">
+      <button type="button" class="pass-row-remove" onclick="removePassHolderRow(${i})" aria-label="Retirer">×</button>
+    </div>
+  `).join('')
+}
+
+async function submitPassBatch() {
+  const email = document.getElementById('passEmail').value.trim()
+  const msg = document.getElementById('passBatchMsg')
+  msg.style.color = '#c0392b'
+
+  if (!email || !email.includes('@')) { msg.textContent = 'Email invalide.'; return }
+  if (!passHolderRows.length) { msg.textContent = 'Ajoutez au moins un titulaire.'; return }
+  for (const r of passHolderRows) {
+    if (!r.prenom.trim() || !r.nom.trim()) { msg.textContent = 'Prénom et nom requis pour chaque titulaire.'; return }
+  }
+
+  msg.style.color = ''
+  msg.textContent = 'Enregistrement…'
+  try {
+    const r = await fetch('/api/admin/season-passes', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, holders: passHolderRows })
+    })
+    const data = await r.json()
+    if (!r.ok) { msg.style.color = '#c0392b'; msg.textContent = data.error || 'Erreur.'; return }
+    msg.style.color = '#2e7d51'
+    msg.textContent = data.emailSent
+      ? data.passes.length + ' pass enregistré(s), email envoyé à ' + email + '.'
+      : data.passes.length + ' pass enregistré(s) — email non envoyé (vérifiez la configuration Brevo).'
+    document.getElementById('passEmail').value = ''
+    passHolderRows = []
+    addPassHolderRow()
+    doPassSearch()
+  } catch (e) {
+    msg.style.color = '#c0392b'
+    msg.textContent = 'Erreur réseau.'
+  }
+}
+
+async function doPassSearch() {
+  const q = document.getElementById('passSearchQ').value.trim()
+  const list = document.getElementById('passList')
+  const countEl = document.getElementById('passCount')
+  list.innerHTML = '<div class="loading-state">Recherche en cours…</div>'
+  countEl.classList.add('hidden')
+
+  try {
+    const r = await fetch('/api/admin/season-passes?q=' + encodeURIComponent(q), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    const data = await r.json()
+    if (!r.ok) {
+      list.innerHTML = '<div class="empty-state">' + (data.error || 'Erreur de recherche') + '</div>'
+      return
+    }
+    renderPassResults(data.results)
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+const PASS_TYPE_LABELS = { 'pass-plein': 'Plein tarif', 'pass-reduit': 'Tarif réduit' }
+
+function renderPassResults(results) {
+  const list = document.getElementById('passList')
+  const countEl = document.getElementById('passCount')
+  countEl.classList.remove('hidden')
+  countEl.textContent = results.length + ' pass trouvé' + (results.length > 1 ? 's' : '')
+
+  if (!results.length) {
+    list.innerHTML = '<div class="empty-state">Aucun pass ne correspond à cette recherche.</div>'
+    return
+  }
+
+  list.innerHTML = results.map(p => `
+    <div class="res-card">
+      <div class="res-top">
+        <span class="res-ref">${esc(p.code)}</span>
+        <span class="res-date">${p.source === 'internet' ? 'Acheté en ligne' : 'Acheté au guichet'}${p.order_reference ? ' · ' + esc(p.order_reference) : ''}</span>
+      </div>
+      <div class="res-buyer">${esc(p.prenom)} ${esc(p.nom)} — ${PASS_TYPE_LABELS[p.type] || esc(p.type)}</div>
+      <div class="res-email">${esc(p.email)}</div>
+      <div class="res-items">
+        <span class="res-item">${p.visit_count} visite${p.visit_count > 1 ? 's' : ''}${p.last_visit ? ' · dernière le ' + fmtDate(p.last_visit) : ''}</span>
+      </div>
+      <div class="res-bottom">
+        <div class="res-actions">
+          <button class="res-btn res-btn-validate" onclick="recordPassVisit(${p.id})">✓ Enregistrer une visite</button>
+          <button class="res-btn res-btn-delete" onclick="deletePass(${p.id}, '${esc(p.prenom)} ${esc(p.nom)}')">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  `).join('')
+}
+
+async function recordPassVisit(id) {
+  try {
+    const r = await fetch('/api/admin/season-passes/' + id + '/visit', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    if (r.ok) doPassSearch()
+  } catch (e) {}
+}
+
+async function deletePass(id, label) {
+  if (!confirm('Supprimer le pass de ' + label + ' de cette liste ?')) return
+  try {
+    const r = await fetch('/api/admin/season-passes/' + id + '/hide', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    if (r.ok) doPassSearch()
+  } catch (e) {}
 }
 </script>
 </body>

@@ -216,7 +216,7 @@ app.post('/api/billetterie/pay', async (c) => {
   if (!token) return c.json({ error: 'Paiement non configuré' }, 500)
 
   const body = await c.req.json() as any
-  const { sourceId, verificationToken, items, buyerInfo, idempotencyKey } = body
+  const { sourceId, verificationToken, items, buyerInfo, idempotencyKey, passHolders } = body
 
   if (!sourceId || !Array.isArray(items) || !idempotencyKey) {
     return c.json({ error: 'Données manquantes' }, 400)
@@ -228,6 +228,7 @@ app.post('/api/billetterie/pay', async (c) => {
   const lineItems: any[] = []
   const emailLines: { name: string; qty: number; price: number }[] = []
   let expectedTotal = 0
+  const passQtyByType: Record<string, number> = {}
 
   for (const item of items) {
     const tarif = TARIFS[item.id]
@@ -238,10 +239,35 @@ app.post('/api/billetterie/pay', async (c) => {
     lineItems.push({ catalog_object_id: tarif.variationId, quantity: String(qty) })
     emailLines.push({ name: tarif.name, qty, price: tarif.price })
     expectedTotal += tarif.price * qty
+    if (item.id === 'pass-plein' || item.id === 'pass-reduit') passQtyByType[item.id] = qty
   }
 
   if (lineItems.length === 0) return c.json({ error: 'Panier vide' }, 400)
   if (expectedTotal === 0) return c.json({ error: 'Montant nul — pas de paiement requis' }, 400)
+
+  // Les pass saison sont nominatifs : un titulaire (prénom + nom) par pass du panier.
+  const expectedPassCount = Object.values(passQtyByType).reduce((a, b) => a + b, 0)
+  const holders = Array.isArray(passHolders) ? passHolders : []
+  if (expectedPassCount > 0) {
+    if (holders.length !== expectedPassCount) {
+      return c.json({ error: 'Merci de renseigner un titulaire pour chaque pass saison' }, 400)
+    }
+    const countByType: Record<string, number> = {}
+    for (const h of holders) {
+      if (!h?.prenom?.trim() || !h?.nom?.trim()) {
+        return c.json({ error: 'Prénom et nom requis pour chaque titulaire de pass saison' }, 400)
+      }
+      if (h.type !== 'pass-plein' && h.type !== 'pass-reduit') {
+        return c.json({ error: 'Type de pass invalide' }, 400)
+      }
+      countByType[h.type] = (countByType[h.type] || 0) + 1
+    }
+    for (const [type, expected] of Object.entries(passQtyByType)) {
+      if (countByType[type] !== expected) {
+        return c.json({ error: 'Le nombre de titulaires ne correspond pas au nombre de pass saison sélectionnés' }, 400)
+      }
+    }
+  }
 
   const reference = genReference()
 
@@ -309,6 +335,18 @@ app.post('/api/billetterie/pay', async (c) => {
     })
   }
 
+  // Enregistrement nominatif des pass saison (best effort, n'affecte pas le paiement)
+  let passCodesSent = false
+  if (expectedPassCount > 0) {
+    const passResult = await createSeasonPasses(c.env.DB, c.env.BREVO_API_KEY, {
+      email: buyerInfo.email.trim(),
+      source: 'internet',
+      orderReference: reference,
+      holders: holders.map((h: any) => ({ prenom: h.prenom.trim(), nom: h.nom.trim(), type: h.type }))
+    })
+    passCodesSent = passResult.emailSent
+  }
+
   return c.json({
     success: true,
     reference,
@@ -317,7 +355,8 @@ app.post('/api/billetterie/pay', async (c) => {
     receiptUrl: payment.receipt_url,
     totalCentimes: orderTotal,
     emailSent,
-    email: buyerInfo.email.trim()
+    email: buyerInfo.email.trim(),
+    passCodesSent
   })
 })
 
@@ -440,6 +479,186 @@ app.post('/api/admin/reservations/:reference/visit', requireAuth, async (c) => {
     VALUES (?, ?, ?, datetime('now'))
     ON CONFLICT(reference) DO UPDATE SET visited = ?, visited_at = ?, updated_at = datetime('now')
   `).bind(reference, visited ? 1 : 0, visited ? new Date().toISOString() : null, visited ? 1 : 0, visited ? new Date().toISOString() : null).run()
+  return c.json({ ok: true })
+})
+
+// ===== PASS SAISON =====
+// Registre nominatif des pass saison (guichet ou internet) + comptage des visites.
+// Le paiement lui-même reste dans Square (caisse ou billetterie en ligne) ; cette
+// table sert uniquement à l'aspect nominatif (qui a un pass) et au suivi des passages,
+// que Square ne sait pas représenter simplement pour un pass illimité.
+
+async function ensureSeasonPassTables(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS season_passes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      prenom TEXT NOT NULL,
+      nom TEXT NOT NULL,
+      type TEXT NOT NULL,
+      email TEXT NOT NULL,
+      source TEXT NOT NULL DEFAULT 'guichet',
+      order_reference TEXT,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS season_pass_visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pass_id INTEGER NOT NULL,
+      visited_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+}
+
+const PASS_TYPE_NAMES: Record<string, string> = {
+  'pass-plein': 'Pass saison plein tarif',
+  'pass-reduit': 'Pass saison tarif réduit'
+}
+
+function genPassCode(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = new Uint8Array(6)
+  crypto.getRandomValues(bytes)
+  let code = ''
+  for (const b of bytes) code += alphabet[b % alphabet.length]
+  return 'PS-' + code
+}
+
+async function sendSeasonPassEmail(
+  apiKey: string,
+  params: { email: string; holders: { prenom: string; nom: string; code: string; type: string }[] }
+): Promise<boolean> {
+  const { email, holders } = params
+  const rows = holders.map(h => `
+    <tr>
+      <td style="padding:8px 0;">${escapeHtml(h.prenom)} ${escapeHtml(h.nom)}<br><span style="font-size:12px;opacity:.6;">${escapeHtml(PASS_TYPE_NAMES[h.type] || h.type)}</span></td>
+      <td style="padding:8px 0;text-align:right;font-weight:bold;color:#D57956;letter-spacing:1px;">${escapeHtml(h.code)}</td>
+    </tr>`).join('')
+
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
+    <h1 style="color:#D57956;font-size:22px;">Vos pass saison L'Attrape-Rêves</h1>
+    <p>Voici les pass saison rattachés à cette adresse email. Chaque titulaire peut se présenter indépendamment à l'accueil, avec son nom ou son code.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
+    <p style="margin-top:20px;">Le pass saison donne un accès illimité de Pâques à la Toussaint. Présentez simplement le nom du titulaire ou son code à l'accueil.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+    <p style="font-size:13px;opacity:.7;">
+      L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
+      04 28 40 00 49 · contact@lattrapereves07.fr · lattrapereves07.fr
+    </p>
+  </div>`
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: { name: "L'Attrape-Rêves", email: 'contact@lattrapereves07.fr' },
+        to: [{ email }],
+        bcc: [{ email: 'contact@lattrapereves07.fr' }],
+        replyTo: { email: 'contact@lattrapereves07.fr' },
+        subject: `Vos pass saison L'Attrape-Rêves (${holders.length})`,
+        htmlContent: html
+      })
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+// Crée des pass saison nominatifs pour une adresse email (guichet ou internet),
+// génère un code unique par pass, et envoie un email récapitulatif (best effort).
+async function createSeasonPasses(
+  db: D1Database,
+  brevoApiKey: string | undefined,
+  params: { email: string; source: string; orderReference?: string; holders: { prenom: string; nom: string; type: string }[] }
+): Promise<{ passes: { id: number; code: string; prenom: string; nom: string; type: string }[]; emailSent: boolean }> {
+  await ensureSeasonPassTables(db)
+  const created: { id: number; code: string; prenom: string; nom: string; type: string }[] = []
+
+  for (const h of params.holders) {
+    let code = ''
+    for (let attempt = 0; attempt < 5; attempt++) {
+      code = genPassCode()
+      const exists = await db.prepare('SELECT 1 FROM season_passes WHERE code=?').bind(code).first()
+      if (!exists) break
+    }
+    const result = await db.prepare(`
+      INSERT INTO season_passes (code, prenom, nom, type, email, source, order_reference)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(code, h.prenom.trim(), h.nom.trim(), h.type, params.email.trim().toLowerCase(), params.source, params.orderReference || null).run()
+    created.push({ id: result.meta.last_row_id as number, code, prenom: h.prenom.trim(), nom: h.nom.trim(), type: h.type })
+  }
+
+  let emailSent = false
+  if (brevoApiKey && created.length) {
+    emailSent = await sendSeasonPassEmail(brevoApiKey, { email: params.email.trim(), holders: created })
+  }
+
+  return { passes: created, emailSent }
+}
+
+// Saisie manuelle des pass saison achetés au guichet — le paiement est géré séparément
+// en caisse Square, cet endpoint ne fait qu'enregistrer les titulaires et envoyer les codes.
+app.post('/api/admin/season-passes', requireAuth, async (c) => {
+  const body = await c.req.json().catch(() => ({})) as any
+  const email = (body.email || '').trim()
+  const holders = Array.isArray(body.holders) ? body.holders : []
+
+  if (!email || !email.includes('@')) return c.json({ error: 'Email invalide' }, 400)
+  if (!holders.length) return c.json({ error: 'Aucun titulaire' }, 400)
+  for (const h of holders) {
+    if (!h.prenom?.trim() || !h.nom?.trim()) return c.json({ error: 'Prénom et nom requis pour chaque titulaire' }, 400)
+    if (h.type !== 'pass-plein' && h.type !== 'pass-reduit') return c.json({ error: `Type de pass invalide: ${h.type}` }, 400)
+  }
+
+  const result = await createSeasonPasses(c.env.DB, c.env.BREVO_API_KEY, { email, source: 'guichet', holders })
+  return c.json(result)
+})
+
+// Recherche des pass saison (nom / email / code)
+app.get('/api/admin/season-passes', requireAuth, async (c) => {
+  await ensureSeasonPassTables(c.env.DB)
+  const q = (c.req.query('q') || '').trim().toLowerCase()
+  const { results } = await c.env.DB.prepare(`
+    SELECT sp.id, sp.code, sp.prenom, sp.nom, sp.type, sp.email, sp.source, sp.order_reference, sp.active, sp.created_at,
+           COUNT(v.id) as visit_count, MAX(v.visited_at) as last_visit
+    FROM season_passes sp
+    LEFT JOIN season_pass_visits v ON v.pass_id = sp.id
+    WHERE sp.active = 1
+    GROUP BY sp.id
+    ORDER BY sp.created_at DESC
+  `).all()
+
+  const filtered = (results as any[]).filter((r) => {
+    if (!q) return true
+    const hay = [r.code, r.prenom, r.nom, r.email].filter(Boolean).join(' ').toLowerCase()
+    return hay.includes(q)
+  })
+
+  return c.json({ results: filtered, count: filtered.length })
+})
+
+// Enregistre une visite pour un pass saison (une ligne par passage)
+app.post('/api/admin/season-passes/:id/visit', requireAuth, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'ID invalide' }, 400)
+  await ensureSeasonPassTables(c.env.DB)
+  const pass = await c.env.DB.prepare('SELECT id FROM season_passes WHERE id=?').bind(id).first()
+  if (!pass) return c.json({ error: 'Pass introuvable' }, 404)
+  await c.env.DB.prepare('INSERT INTO season_pass_visits (pass_id) VALUES (?)').bind(id).run()
+  return c.json({ ok: true })
+})
+
+// Masque un pass saison de la liste (ne touche pas à un éventuel paiement Square)
+app.post('/api/admin/season-passes/:id/hide', requireAuth, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'ID invalide' }, 400)
+  await ensureSeasonPassTables(c.env.DB)
+  await c.env.DB.prepare('UPDATE season_passes SET active=0 WHERE id=?').bind(id).run()
   return c.json({ ok: true })
 })
 
