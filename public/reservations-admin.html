@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Réservations — Admin — L'Attrape-Rêves</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260709">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260709b">
   <style>
     .admin-wrap { max-width: 900px; margin: 100px auto 40px; padding: 0 20px; }
     .admin-title { font-family: var(--font-title); font-size: 2rem; color: var(--coral); margin-bottom: 24px; }
@@ -54,8 +54,13 @@
     .empty-state { text-align: center; padding: 60px 20px; opacity: 0.55; }
     .loading-state { text-align: center; padding: 40px 20px; opacity: 0.5; }
 
-    .section-sep { margin: 48px 0 28px; border: none; border-top: 2px solid var(--light-beige); }
-    .section-title-sm { font-family: var(--font-title); font-size: 1.5rem; color: var(--dark-grey); margin-bottom: 4px; }
+    .search-box button.res-btn-validate { background: transparent; color: #2e7d51; border: 2px solid #4caf7d; padding: 6px 14px; font-size: 0.82rem; }
+    .search-box button.res-btn-validate:hover { background: #e8f7ef; opacity: 1; }
+
+    .admin-tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--light-beige); }
+    .admin-tab { padding: 10px 20px; border: none; background: transparent; font-family: var(--font-ui); font-weight: 700; font-size: 0.95rem; color: var(--dark-grey); opacity: 0.5; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .admin-tab:hover { opacity: 0.85; }
+    .admin-tab.active { opacity: 1; color: var(--coral); border-bottom-color: var(--coral); }
 
     .pass-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
     .pass-row select, .pass-row input[type=text] { padding: 9px 10px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; font-family: var(--font-ui); }
@@ -78,61 +83,67 @@
     <h1 class="admin-title" style="margin-bottom:0;">Réservations</h1>
     <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
   </div>
-  <p style="margin-bottom:24px;color:#888;">Recherche en lecture seule dans les commandes Square — aucune donnée n'est dupliquée ici.</p>
-
-  <div class="search-box">
-    <div class="search-row">
-      <div class="search-field grow">
-        <label for="searchQ">Référence, nom ou email</label>
-        <input type="text" id="searchQ" placeholder="AR-XXXXXX, Dupont, marie@…">
-      </div>
-      <div class="search-field">
-        <label for="searchFrom">Du</label>
-        <input type="date" id="searchFrom">
-      </div>
-      <div class="search-field">
-        <label for="searchTo">Au</label>
-        <input type="date" id="searchTo">
-      </div>
-      <button onclick="doSearch()">Rechercher</button>
-    </div>
-    <p class="search-hint">Par défaut : depuis l'ouverture du site (28 juin 2026) jusqu'à aujourd'hui.</p>
+  <div class="admin-tabs">
+    <button type="button" class="admin-tab active" id="tabBtnReservations" onclick="switchTab('reservations')">Réservations</button>
+    <button type="button" class="admin-tab" id="tabBtnPasses" onclick="switchTab('passes')">Pass saison</button>
   </div>
 
-  <div id="resCount" class="res-count hidden"></div>
-  <div id="resList"></div>
+  <div id="panelReservations">
+    <p style="margin-bottom:24px;color:#888;">Recherche en lecture seule dans les commandes Square — aucune donnée n'est dupliquée ici.</p>
 
-  <hr class="section-sep">
-
-  <h2 class="section-title-sm">Pass saison</h2>
-  <p style="margin-bottom:20px;color:#888;">Enregistrement nominatif des pass saison (guichet ou internet) et suivi des visites — indépendant des ventes Square, qui gèrent uniquement le paiement.</p>
-
-  <div class="search-box">
-    <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Ajouter des pass (achat au guichet)</h3>
-    <div class="search-field" style="margin-bottom:14px;max-width:340px;">
-      <label for="passEmail">Email (partagé par tous les titulaires de cette commande)</label>
-      <input type="text" id="passEmail" placeholder="marie@exemple.fr">
-    </div>
-    <div id="passHoldersRows"></div>
-    <button type="button" class="res-btn res-btn-validate" onclick="addPassHolderRow()">+ Ajouter un titulaire</button>
-    <div style="margin-top:16px;">
-      <button onclick="submitPassBatch()">Enregistrer et envoyer les codes</button>
-    </div>
-    <div id="passBatchMsg" style="margin-top:12px;font-size:0.9rem;"></div>
-  </div>
-
-  <div class="search-box">
-    <div class="search-row">
-      <div class="search-field grow">
-        <label for="passSearchQ">Nom, email ou code</label>
-        <input type="text" id="passSearchQ" placeholder="PS-XXXXXX, Dupont, marie@…">
+    <div class="search-box">
+      <div class="search-row">
+        <div class="search-field grow">
+          <label for="searchQ">Référence, nom ou email</label>
+          <input type="text" id="searchQ" placeholder="AR-XXXXXX, Dupont, marie@…">
+        </div>
+        <div class="search-field">
+          <label for="searchFrom">Du</label>
+          <input type="date" id="searchFrom">
+        </div>
+        <div class="search-field">
+          <label for="searchTo">Au</label>
+          <input type="date" id="searchTo">
+        </div>
+        <button onclick="doSearch()">Rechercher</button>
       </div>
-      <button onclick="doPassSearch()">Rechercher</button>
+      <p class="search-hint">Par défaut : depuis l'ouverture du site (28 juin 2026) jusqu'à aujourd'hui.</p>
     </div>
+
+    <div id="resCount" class="res-count hidden"></div>
+    <div id="resList"></div>
   </div>
 
-  <div id="passCount" class="res-count hidden"></div>
-  <div id="passList"></div>
+  <div id="panelPasses" class="hidden">
+    <p style="margin-bottom:20px;color:#888;">Enregistrement nominatif des pass saison (guichet ou internet) et suivi des visites — indépendant des ventes Square, qui gèrent uniquement le paiement.</p>
+
+    <div class="search-box">
+      <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Ajouter des pass (achat au guichet)</h3>
+      <div class="search-field" style="margin-bottom:14px;max-width:340px;">
+        <label for="passEmail">Email (partagé par tous les titulaires de cette commande)</label>
+        <input type="text" id="passEmail" placeholder="marie@exemple.fr">
+      </div>
+      <div id="passHoldersRows"></div>
+      <button type="button" class="res-btn res-btn-validate" onclick="addPassHolderRow()">+ Ajouter un titulaire</button>
+      <div style="margin-top:16px;">
+        <button onclick="submitPassBatch()">Enregistrer et envoyer les codes</button>
+      </div>
+      <div id="passBatchMsg" style="margin-top:12px;font-size:0.9rem;"></div>
+    </div>
+
+    <div class="search-box">
+      <div class="search-row">
+        <div class="search-field grow">
+          <label for="passSearchQ">Nom, email ou code</label>
+          <input type="text" id="passSearchQ" placeholder="PS-XXXXXX, Dupont, marie@…">
+        </div>
+        <button onclick="doPassSearch()">Rechercher</button>
+      </div>
+    </div>
+
+    <div id="passCount" class="res-count hidden"></div>
+    <div id="passList"></div>
+  </div>
 </div>
 
 <script>
@@ -172,6 +183,15 @@ function showAdmin() {
   doSearch()
   if (!passHolderRows.length) addPassHolderRow()
   doPassSearch()
+  switchTab(localStorage.getItem('atrv_res_tab') || 'reservations')
+}
+
+function switchTab(tab) {
+  document.getElementById('panelReservations').classList.toggle('hidden', tab !== 'reservations')
+  document.getElementById('panelPasses').classList.toggle('hidden', tab !== 'passes')
+  document.getElementById('tabBtnReservations').classList.toggle('active', tab === 'reservations')
+  document.getElementById('tabBtnPasses').classList.toggle('active', tab === 'passes')
+  localStorage.setItem('atrv_res_tab', tab)
 }
 
 function logout() {
