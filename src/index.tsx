@@ -537,13 +537,14 @@ async function sendSeasonPassEmail(
       <td style="padding:8px 0;text-align:right;font-weight:bold;color:#D57956;letter-spacing:1px;">${escapeHtml(h.code)}</td>
     </tr>`).join('')
 
+  const year = new Date().getFullYear()
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
     <h1 style="color:#D57956;font-size:22px;">Vos pass saison L'Attrape-Rêves</h1>
+    <p style="font-style:italic;">Merci d'avoir choisi le pass saison — vous faites maintenant partie de la grande famille de l'Attrape-Rêves !</p>
     <p>Voici les pass saison rattachés à cette adresse email. Chaque titulaire peut se présenter indépendamment à l'accueil, avec son nom ou son code.</p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
-    <p style="margin-top:20px;">Le pass saison donne un accès illimité toute l'année, à chaque jour d'ouverture de la ferme — y compris lors d'ouvertures exceptionnelles (à Noël par exemple). Présentez simplement le nom du titulaire ou son code à l'accueil.</p>
-    <p style="margin-top:16px;font-style:italic;">Merci d'avoir choisi le pass saison — vous faites maintenant partie de la grande famille de l'Attrape-Rêves !</p>
+    <p style="margin-top:20px;">Le pass saison donne un accès illimité pour l'année ${year}, à chaque jour d'ouverture de la ferme. Présentez simplement le nom du titulaire ou son code à l'accueil.</p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
     <p style="font-size:13px;opacity:.7;">
       L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
