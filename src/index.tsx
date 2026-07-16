@@ -542,7 +542,8 @@ async function sendSeasonPassEmail(
     <h1 style="color:#D57956;font-size:22px;">Vos pass saison L'Attrape-Rêves</h1>
     <p>Voici les pass saison rattachés à cette adresse email. Chaque titulaire peut se présenter indépendamment à l'accueil, avec son nom ou son code.</p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
-    <p style="margin-top:20px;">Le pass saison donne un accès illimité de Pâques à la Toussaint. Présentez simplement le nom du titulaire ou son code à l'accueil.</p>
+    <p style="margin-top:20px;">Le pass saison donne un accès illimité toute l'année, à chaque jour d'ouverture de la ferme — y compris lors d'ouvertures exceptionnelles (à Noël par exemple). Présentez simplement le nom du titulaire ou son code à l'accueil.</p>
+    <p style="margin-top:16px;font-style:italic;">Merci d'avoir choisi le pass saison — vous faites maintenant partie de la grande famille de l'Attrape-Rêves !</p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
     <p style="font-size:13px;opacity:.7;">
       L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
