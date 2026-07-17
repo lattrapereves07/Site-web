@@ -22,7 +22,8 @@
     .search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
     .search-field { display: flex; flex-direction: column; gap: 4px; }
     .search-field label { font-size: 0.8rem; font-weight: 700; color: var(--dark-grey); opacity: 0.7; }
-    .search-field input { padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; font-family: var(--font-ui); }
+    .search-field input, .search-field textarea { padding: 10px 12px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; font-family: var(--font-ui); }
+    .search-field textarea { resize: vertical; min-height: 70px; }
     .search-field.grow { flex: 1; min-width: 220px; }
     .search-box button { padding: 11px 22px; border: none; border-radius: 8px; background: var(--coral); color: white; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
     .search-box button:hover { opacity: 0.9; }
@@ -80,7 +81,7 @@
 
 <div id="adminPanel" class="admin-wrap hidden">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <h1 class="admin-title" style="margin-bottom:0;">Réservations</h1>
+    <h1 class="admin-title" id="adminTitle" style="margin-bottom:0;">Réservations</h1>
     <button class="btn btn-outline" onclick="logout()" style="cursor:pointer;font-size:0.9rem;">Déconnexion</button>
   </div>
   <div class="admin-tabs">
@@ -179,6 +180,10 @@
             <input type="text" id="invEmail" placeholder="marie@exemple.fr">
           </div>
         </div>
+        <div class="search-field" style="max-width:480px;margin-top:10px;">
+          <label for="invMessage">Petit mot personnalisé (optionnel)</label>
+          <textarea id="invMessage" placeholder="Ex : Merci pour votre gentillesse, on est ravis de vous accueillir bientôt !"></textarea>
+        </div>
       </div>
 
       <div id="invFieldsLot" class="hidden">
@@ -193,12 +198,16 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-          <input type="checkbox" id="invSendEmail" onchange="document.getElementById('invPartnerEmailField').classList.toggle('hidden', !this.checked)">
+          <input type="checkbox" id="invSendEmail" onchange="document.getElementById('invPartnerEmailField').classList.toggle('hidden', !this.checked); document.getElementById('invPartnerMessageField').classList.toggle('hidden', !this.checked)">
           <label for="invSendEmail" style="font-size:0.9rem;color:var(--dark-grey);">Envoyer aussi les codes par email au partenaire</label>
         </div>
-        <div id="invPartnerEmailField" class="search-field hidden" style="max-width:340px;margin-top:10px;">
+        <div id="invPartnerEmailField" class="search-field hidden" style="max-width:480px;margin-top:10px;">
           <label for="invPartnerEmail">Email du partenaire</label>
           <input type="text" id="invPartnerEmail" placeholder="contact@camping-des-gorges.fr">
+        </div>
+        <div id="invPartnerMessageField" class="search-field hidden" style="max-width:480px;margin-top:10px;">
+          <label for="invPartnerMessage">Petit mot personnalisé (optionnel)</label>
+          <textarea id="invPartnerMessage" placeholder="Ex : Merci pour votre partenariat, à bientôt !"></textarea>
         </div>
       </div>
 
@@ -265,6 +274,8 @@ function showAdmin() {
   switchTab(localStorage.getItem('atrv_res_tab') || 'reservations')
 }
 
+const TAB_TITLES = { reservations: 'Réservations', passes: 'Pass saison', invitations: 'Invitations' }
+
 function switchTab(tab) {
   document.getElementById('panelReservations').classList.toggle('hidden', tab !== 'reservations')
   document.getElementById('panelPasses').classList.toggle('hidden', tab !== 'passes')
@@ -272,6 +283,8 @@ function switchTab(tab) {
   document.getElementById('tabBtnReservations').classList.toggle('active', tab === 'reservations')
   document.getElementById('tabBtnPasses').classList.toggle('active', tab === 'passes')
   document.getElementById('tabBtnInvitations').classList.toggle('active', tab === 'invitations')
+  document.getElementById('adminTitle').textContent = TAB_TITLES[tab] || 'Réservations'
+  document.title = TAB_TITLES[tab] + ' — Admin — L\'Attrape-Rêves'
   localStorage.setItem('atrv_res_tab', tab)
 }
 
@@ -587,6 +600,7 @@ async function submitInvitation() {
     if (!email || !email.includes('@')) { msg.textContent = 'Email invalide.'; return }
     body.nom = nom
     body.email = email
+    body.message = document.getElementById('invMessage').value.trim()
   } else if (mode === 'lot') {
     const partnerName = document.getElementById('invPartner').value.trim()
     const quantity = parseInt(document.getElementById('invQty').value)
@@ -599,6 +613,7 @@ async function submitInvitation() {
     body.quantity = quantity
     body.sendEmail = sendEmailChecked
     body.email = email
+    body.message = document.getElementById('invPartnerMessage').value.trim()
   }
 
   msg.style.color = ''
@@ -619,10 +634,11 @@ async function submitInvitation() {
         (data.emailSent ? ', email envoyé.' : (sendEmailChecked ? ' — email non envoyé (vérifiez la configuration Brevo).' : '.')) +
         ' <a href="' + printUrl + '" target="_blank" style="color:#D57956;font-weight:700;">🖨️ Voir et imprimer les billets →</a>'
       document.getElementById('invPartner').value = ''
+      document.getElementById('invPartnerMessage').value = ''
     } else {
       msg.textContent = 'Invitation créée' + (data.emailSent ? ', email envoyé.' : (mode === 'email' ? ' — email non envoyé (vérifiez la configuration Brevo).' : '.'))
       if (mode === 'nom') document.getElementById('invNom').value = ''
-      if (mode === 'email') { document.getElementById('invEmailNom').value = ''; document.getElementById('invEmail').value = '' }
+      if (mode === 'email') { document.getElementById('invEmailNom').value = ''; document.getElementById('invEmail').value = ''; document.getElementById('invMessage').value = '' }
     }
     doInvSearch()
   } catch (e) {

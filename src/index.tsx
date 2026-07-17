@@ -702,9 +702,9 @@ function genInvitationCode(): string {
 
 async function sendGiftInvitationEmail(
   apiKey: string,
-  params: { email: string; toName: string; subject: string; intro: string; codes: { code: string; nom?: string }[]; year: number; printUrl?: string }
+  params: { email: string; toName: string; subject: string; intro: string; codes: { code: string; nom?: string }[]; year: number; printUrl?: string; customMessage?: string }
 ): Promise<boolean> {
-  const { email, toName, subject, intro, codes, year, printUrl } = params
+  const { email, toName, subject, intro, codes, year, printUrl, customMessage } = params
   const rows = codes.map(c => `
     <tr>
       <td style="padding:8px 0;">${c.nom ? escapeHtml(c.nom) : 'Entrée offerte'}</td>
@@ -715,6 +715,7 @@ async function sendGiftInvitationEmail(
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
     <h1 style="color:#D57956;font-size:22px;">Une invitation L'Attrape-Rêves</h1>
     <p>${escapeHtml(intro)}</p>
+    ${customMessage ? `<p style="background:#FDF3E7;border-left:3px solid #D57956;padding:12px 16px;border-radius:4px;font-style:italic;white-space:pre-wrap;">${escapeHtml(customMessage)}</p>` : ''}
     <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
     <p style="margin-top:20px;">Cette invitation donne une entrée gratuite pour l'année ${year}, à présenter (nom ou code) à l'accueil de la ferme.</p>
     ${printUrl ? `
@@ -768,6 +769,7 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
   if (mode === 'email') {
     const nom = (body.nom || '').trim()
     const email = (body.email || '').trim()
+    const customMessage = (body.message || '').trim()
     if (!email || !email.includes('@')) return c.json({ error: 'Email invalide' }, 400)
     const code = genInvitationCode()
     const result = await c.env.DB.prepare(
@@ -784,7 +786,8 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
           ? `${nom}, vous avez reçu une invitation pour l'Attrape-Rêves !`
           : `Vous avez reçu une invitation pour l'Attrape-Rêves !`,
         codes: [{ code, nom }],
-        year
+        year,
+        customMessage
       })
     }
     return c.json({ invitations: [{ id: result.meta.last_row_id, code, nom, email }], emailSent })
@@ -795,6 +798,7 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
     const quantity = parseInt(body.quantity)
     const email = (body.email || '').trim()
     const sendEmail = !!body.sendEmail
+    const customMessage = (body.message || '').trim()
     if (!partnerName) return c.json({ error: 'Nom du partenaire requis' }, 400)
     if (isNaN(quantity) || quantity < 1 || quantity > 100) return c.json({ error: 'Quantité invalide (1 à 100)' }, 400)
     if (sendEmail && (!email || !email.includes('@'))) return c.json({ error: 'Email invalide' }, 400)
@@ -819,7 +823,8 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
         intro: `Voici ${quantity} invitation${quantity > 1 ? 's' : ''} offerte${quantity > 1 ? 's' : ''} par l'Attrape-Rêves pour ${partnerName}.`,
         codes: created.map(x => ({ code: x.code })),
         year,
-        printUrl
+        printUrl,
+        customMessage
       })
     }
 
