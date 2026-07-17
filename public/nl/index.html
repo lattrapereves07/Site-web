@@ -22,7 +22,14 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../assets/images/logo.png">
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="../assets/css/style.css?v=20260709b">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&amp;family=Londrina+Solid:wght@400;900&amp;family=Patrick+Hand&amp;family=Unkempt:wght@400;700&amp;display=swap">
+  <link rel="stylesheet" href="../assets/css/style.css?v=20260717">
+  <!-- Image hero préchargée en priorité (LCP) -->
+  <link rel="preload" as="image" href="../assets/images/photo-ane-enfant.jpg" fetchpriority="high">
+  <!-- Décide avant le premier rendu si le bandeau canicule doit s'afficher, pour éviter un décalage de mise en page (CLS) -->
+  <script>document.documentElement.classList.toggle('atrv-no-heat-banner', !!localStorage.getItem('atrv_heat_banner_dismissed'))</script>
   <!-- Schema.org JSON-LD -->
   <script type="application/ld+json">
   {
@@ -151,18 +158,15 @@
     <!-- BANDEAU STATUT — géré par assets/js/site-status.js -->
     <div id="site-status-banner" class="site-status-banner" hidden=""></div>
 
-    <!-- BANDEAU CANICULE / FRAÎCHEUR -->
-    <div id="heatBanner" class="heat-banner" hidden="">
+    <!-- BANDEAU CANICULE / FRAÎCHEUR — visibilité décidée avant rendu (voir script en <head>) -->
+    <div id="heatBanner" class="heat-banner">
       <span class="heat-banner-icon" aria-hidden="true">🌳</span>
       <span class="heat-banner-text" data-i18n="home.heat_banner_text">Te warm buiten? Kom bij ons verkoeling zoeken! Een bezoek <strong>100% in de schaduw van bomen</strong>, toegang tot de rivier, en verkoelende nevelventilatoren ter plaatse.</span>
       <button class="heat-banner-close" onclick="dismissHeatBanner()" aria-label="Fermer" data-i18n-title="home.heat_banner_close" title="Sluiten">×</button>
     </div>
     <script>
-      if (!localStorage.getItem('atrv_heat_banner_dismissed')) {
-        document.getElementById('heatBanner').hidden = false;
-      }
       function dismissHeatBanner() {
-        document.getElementById('heatBanner').hidden = true;
+        document.documentElement.classList.add('atrv-no-heat-banner');
         localStorage.setItem('atrv_heat_banner_dismissed', '1');
       }
     </script>
@@ -170,7 +174,7 @@
     <!-- ======== HERO ======== -->
     <section class="hero hero--photo torn-edge-bottom torn-beige" aria-label="Accueil">
       <div class="hero-bg-photo">
-        <img src="../assets/images/photo-ane-enfant.jpg" alt="Un enfant et un âne à l'Attrape-Rêves, Gravières — Cévennes d'Ardèche" loading="eager">
+        <img src="../assets/images/photo-ane-enfant.jpg" alt="Un enfant et un âne à l'Attrape-Rêves, Gravières — Cévennes d'Ardèche" loading="eager" fetchpriority="high">
       </div>
 
       <div class="hero-content">

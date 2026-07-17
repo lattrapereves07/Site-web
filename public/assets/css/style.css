@@ -3,8 +3,11 @@
    Ferme de decouverte et d'emerveillement
    ============================================ */
 
-/* --- GOOGLE FONTS --- */
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Londrina+Solid:wght@400;900&family=Patrick+Hand&family=Unkempt:wght@400;700&display=swap');
+/* --- GOOGLE FONTS ---
+   Chargées via <link> dans le <head> de chaque page (preconnect + stylesheet),
+   pas via @import ici : @import retarde la découverte des polices jusqu'à ce que
+   ce fichier CSS soit lui-même téléchargé et analysé, ce qui ajoute un aller-retour
+   complet et contribue au décalage visuel (CLS) quand le texte change de police. */
 
 /* --- CSS CUSTOM PROPERTIES --- */
 :root {
@@ -550,6 +553,12 @@ main {
   box-shadow: 3px 4px 0 var(--brown), 0 6px 20px rgba(0,0,0,0.2);
   letter-spacing: 0.01em;
   line-height: 1.2;
+}
+
+/* Visibilité décidée en <head> avant le premier rendu (voir index.html) pour éviter
+   tout décalage de mise en page (CLS) quand le bandeau apparaît/disparaît. */
+.atrv-no-heat-banner .heat-banner {
+  display: none;
 }
 
 .heat-banner {
@@ -1954,6 +1963,83 @@ main {
 .who-card h3 {
   color: var(--coral);
   margin-bottom: 12px;
+}
+
+/* --- ÉCOUTER LE CONTE (audio + texte complet) --- */
+.audio-players {
+  max-width: 640px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.audio-player-item {
+  background: var(--white);
+  border: 2px dashed var(--light-beige);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+}
+
+.audio-player-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--coral);
+  margin-bottom: 10px;
+}
+
+.audio-player-item audio {
+  width: 100%;
+}
+
+.legend-text-toggle {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.legend-text-toggle summary {
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--coral);
+  font-size: 1.05rem;
+  padding: 14px 0;
+  list-style: none;
+}
+
+.legend-text-toggle summary::-webkit-details-marker {
+  display: none;
+}
+
+.legend-text-toggle summary::before {
+  content: '▸ ';
+}
+
+.legend-text-toggle[open] summary::before {
+  content: '▾ ';
+}
+
+.legend-full-text {
+  padding-top: 12px;
+}
+
+.legend-full-text p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 1.1em;
+}
+
+.legend-full-text .legend-dialogue {
+  font-style: italic;
+  color: var(--dark-grey);
+  padding-left: 18px;
+  border-left: 3px solid var(--coral-light);
+  margin-bottom: 1.1em;
+}
+
+.legend-full-text .legend-dialogue p {
+  margin-bottom: 0.3em;
 }
 
 /* Photo gallery */
