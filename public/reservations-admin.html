@@ -198,7 +198,7 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-          <input type="checkbox" id="invSendEmail" onchange="document.getElementById('invPartnerEmailField').classList.toggle('hidden', !this.checked); document.getElementById('invPartnerMessageField').classList.toggle('hidden', !this.checked)">
+          <input type="checkbox" id="invSendEmail" onchange="updateInvSendEmailUI()">
           <label for="invSendEmail" style="font-size:0.9rem;color:var(--dark-grey);">Envoyer aussi les codes par email au partenaire</label>
         </div>
         <div id="invPartnerEmailField" class="search-field hidden" style="max-width:480px;margin-top:10px;">
@@ -271,6 +271,8 @@ function showAdmin() {
   if (!passHolderRows.length) addPassHolderRow()
   doPassSearch()
   doInvSearch()
+  updateInvModeUI()
+  updateInvSendEmailUI()
   switchTab(localStorage.getItem('atrv_res_tab') || 'reservations')
 }
 
@@ -580,6 +582,21 @@ function updateInvModeUI() {
   document.getElementById('invFieldsEmail').classList.toggle('hidden', mode !== 'email')
   document.getElementById('invFieldsLot').classList.toggle('hidden', mode !== 'lot')
 }
+
+function updateInvSendEmailUI() {
+  const checked = document.getElementById('invSendEmail').checked
+  document.getElementById('invPartnerEmailField').classList.toggle('hidden', !checked)
+  document.getElementById('invPartnerMessageField').classList.toggle('hidden', !checked)
+}
+
+// Retour arrière/avant depuis le cache du navigateur (bfcache) : le formulaire
+// peut être restauré tel quel sans redéclencher les événements de changement.
+window.addEventListener('pageshow', () => {
+  if (!document.getElementById('adminPanel').classList.contains('hidden')) {
+    updateInvModeUI()
+    updateInvSendEmailUI()
+  }
+})
 
 async function submitInvitation() {
   const mode = document.getElementById('invMode').value
