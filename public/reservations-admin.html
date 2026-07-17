@@ -647,6 +647,7 @@ function renderInvResults(results) {
       ${sub ? `<div class="res-email">${esc(sub)}</div>` : ''}
       <div class="res-bottom">
         <div class="res-actions">
+          ${inv.batch_id ? `<a href="invitation-billets.html?batch=${encodeURIComponent(inv.batch_id)}" target="_blank" class="res-btn res-btn-unvalidate" style="text-decoration:none;display:inline-block;">🖨️ Imprimer</a>` : ''}
           ${inv.used
             ? `<span class="res-badge-visited">✓ Utilisée${inv.used_at ? ' le ' + fmtDate(inv.used_at) : ''}</span><button class="res-btn res-btn-unvalidate" onclick="redeemInvitation(${inv.id}, false)">Annuler</button>`
             : `<button class="res-btn res-btn-validate" onclick="redeemInvitation(${inv.id}, true)">✓ Valider l'entrée</button>`
