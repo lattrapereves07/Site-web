@@ -157,7 +157,7 @@ function renderTickets(tickets) {
       </div>
       <div class="ticket-main">
         <p class="ticket-gift">🎁 1 entrée offerte</p>
-        ${t.partner_name ? `<p class="ticket-partner">Offert par L'Attrape-Rêves — ${esc(t.partner_name)}</p>` : ''}
+        ${t.partner_name ? `<p class="ticket-partner">${esc(t.partner_name)}</p>` : ''}
       </div>
       <div class="ticket-code">${esc(t.code)}</div>
       <div class="ticket-foot">Valable en ${t.year} · À présenter à l'accueil</div>
