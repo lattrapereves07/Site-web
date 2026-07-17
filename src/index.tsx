@@ -702,9 +702,9 @@ function genInvitationCode(): string {
 
 async function sendGiftInvitationEmail(
   apiKey: string,
-  params: { email: string; toName: string; subject: string; intro: string; codes: { code: string; nom?: string }[]; year: number }
+  params: { email: string; toName: string; subject: string; intro: string; codes: { code: string; nom?: string }[]; year: number; printUrl?: string }
 ): Promise<boolean> {
-  const { email, toName, subject, intro, codes, year } = params
+  const { email, toName, subject, intro, codes, year, printUrl } = params
   const rows = codes.map(c => `
     <tr>
       <td style="padding:8px 0;">${c.nom ? escapeHtml(c.nom) : 'Entrée offerte'}</td>
@@ -717,6 +717,11 @@ async function sendGiftInvitationEmail(
     <p>${escapeHtml(intro)}</p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
     <p style="margin-top:20px;">Cette invitation donne une entrée gratuite pour l'année ${year}, à présenter (nom ou code) à l'accueil de la ferme.</p>
+    ${printUrl ? `
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${printUrl}" style="display:inline-block;background:#D57956;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 28px;border-radius:8px;">Voir et imprimer les billets →</a>
+    </div>
+    <p style="font-size:13px;opacity:.7;">Ce lien ouvre une page prête à imprimer (format A4) : il ne vous reste qu'à imprimer, découper et distribuer les billets.</p>` : ''}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
     <p style="font-size:13px;opacity:.7;">
       L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
@@ -806,13 +811,15 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
 
     let emailSent = false
     if (sendEmail && c.env.BREVO_API_KEY) {
+      const printUrl = new URL(c.req.url).origin + '/invitation-billets.html?batch=' + encodeURIComponent(batchId)
       emailSent = await sendGiftInvitationEmail(c.env.BREVO_API_KEY, {
         email,
         toName: partnerName,
         subject: `${quantity} invitations L'Attrape-Rêves — ${partnerName}`,
         intro: `Voici ${quantity} invitation${quantity > 1 ? 's' : ''} offerte${quantity > 1 ? 's' : ''} par l'Attrape-Rêves pour ${partnerName}.`,
         codes: created.map(x => ({ code: x.code })),
-        year
+        year,
+        printUrl
       })
     }
 
@@ -839,8 +846,12 @@ app.get('/api/admin/gift-invitations', requireAuth, async (c) => {
   return c.json({ results: filtered, count: filtered.length })
 })
 
-// Récupère toutes les invitations d'un même lot (pour (ré)imprimer les billets)
-app.get('/api/admin/gift-invitations/batch/:batchId', requireAuth, async (c) => {
+// Récupère toutes les invitations d'un même lot (pour (ré)imprimer les billets).
+// Volontairement public (pas de requireAuth) : le partenaire (camping, etc.) doit
+// pouvoir ouvrir ce lien lui-même sans identifiants admin. L'UUID du lot fait office
+// de secret (non devinable), même principe que les liens de reçu Square déjà utilisés
+// sur ce site — ne révèle que les codes de ce lot, pas d'autre donnée.
+app.get('/api/gift-invitations/batch/:batchId', async (c) => {
   await ensureGiftInvitationTable(c.env.DB)
   const batchId = c.req.param('batchId')
   const { results } = await c.env.DB.prepare(
