@@ -281,6 +281,40 @@ function logout() {
   location.reload()
 }
 
+// Confirmation de suppression intégrée à la page (les popups navigateur type
+// confirm() sont bloquées sur certains ordinateurs) : remplace le bouton cliqué
+// par un couple Confirmer / Annuler, sans quitter la page.
+function confirmDelete(btn, onConfirm, note) {
+  const wrap = document.createElement('span')
+  wrap.style.display = 'inline-flex'
+  wrap.style.gap = '6px'
+  wrap.style.alignItems = 'center'
+  wrap.style.flexWrap = 'wrap'
+
+  const confirmBtn = document.createElement('button')
+  confirmBtn.type = 'button'
+  confirmBtn.className = 'res-btn res-btn-delete'
+  confirmBtn.textContent = 'Confirmer la suppression'
+  confirmBtn.onclick = onConfirm
+
+  const cancelBtn = document.createElement('button')
+  cancelBtn.type = 'button'
+  cancelBtn.className = 'res-btn res-btn-unvalidate'
+  cancelBtn.textContent = 'Annuler'
+  cancelBtn.onclick = () => wrap.replaceWith(btn)
+
+  wrap.appendChild(confirmBtn)
+  wrap.appendChild(cancelBtn)
+  if (note) {
+    const noteEl = document.createElement('span')
+    noteEl.style.fontSize = '0.78rem'
+    noteEl.style.opacity = '0.6'
+    noteEl.textContent = note
+    wrap.appendChild(noteEl)
+  }
+  btn.replaceWith(wrap)
+}
+
 function fmtEur(centimes) {
   return (centimes / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
 }
@@ -348,7 +382,7 @@ function renderResults(results) {
             ? `<span class="res-badge-visited">✓ Visite validée</span><button class="res-btn res-btn-unvalidate" onclick="doValidate('${esc(r.reference)}', false)">Annuler</button>`
             : `<button class="res-btn res-btn-validate" onclick="doValidate('${esc(r.reference)}', true)">✓ Valider la visite</button>`
           }
-          <button class="res-btn res-btn-delete" onclick="doDelete('${esc(r.reference)}')">Supprimer</button>
+          <button class="res-btn res-btn-delete" onclick="confirmDelete(this, () => doDelete('${esc(r.reference)}'), 'Ne touche pas Square — annulation/remboursement à faire là-bas si besoin.')">Supprimer</button>
         </div>
         <span class="res-total">${fmtEur(r.totalCentimes)}</span>
       </div>
@@ -368,7 +402,6 @@ async function doValidate(reference, visited) {
 }
 
 async function doDelete(reference) {
-  if (!confirm('Supprimer la réservation ' + reference + ' de cette liste ?\n\nCela ne touche pas la commande Square (annulation/remboursement à faire dans Square si besoin) — la réservation sera simplement masquée ici.')) return
   try {
     const r = await fetch('/api/admin/reservations/' + encodeURIComponent(reference) + '/hide', {
       method: 'POST',
@@ -499,7 +532,7 @@ function renderPassResults(results) {
       <div class="res-bottom">
         <div class="res-actions">
           <button class="res-btn res-btn-validate" onclick="recordPassVisit(${p.id})">✓ Enregistrer une visite</button>
-          <button class="res-btn res-btn-delete" onclick="deletePass(${p.id}, '${esc(p.prenom)} ${esc(p.nom)}')">Supprimer</button>
+          <button class="res-btn res-btn-delete" onclick="confirmDelete(this, () => deletePass(${p.id}))">Supprimer</button>
         </div>
       </div>
     </div>
@@ -516,8 +549,7 @@ async function recordPassVisit(id) {
   } catch (e) {}
 }
 
-async function deletePass(id, label) {
-  if (!confirm('Supprimer le pass de ' + label + ' de cette liste ?')) return
+async function deletePass(id) {
   try {
     const r = await fetch('/api/admin/season-passes/' + id + '/hide', {
       method: 'POST',
@@ -652,7 +684,7 @@ function renderInvResults(results) {
             ? `<span class="res-badge-visited">✓ Utilisée${inv.used_at ? ' le ' + fmtDate(inv.used_at) : ''}</span><button class="res-btn res-btn-unvalidate" onclick="redeemInvitation(${inv.id}, false)">Annuler</button>`
             : `<button class="res-btn res-btn-validate" onclick="redeemInvitation(${inv.id}, true)">✓ Valider l'entrée</button>`
           }
-          <button class="res-btn res-btn-delete" onclick="deleteInvitation(${inv.id}, '${esc(label)}')">Supprimer</button>
+          <button class="res-btn res-btn-delete" onclick="confirmDelete(this, () => deleteInvitation(${inv.id}))">Supprimer</button>
         </div>
       </div>
     </div>`
@@ -670,8 +702,7 @@ async function redeemInvitation(id, used) {
   } catch (e) {}
 }
 
-async function deleteInvitation(id, label) {
-  if (!confirm('Supprimer l\'invitation de ' + label + ' de cette liste ?')) return
+async function deleteInvitation(id) {
   try {
     const r = await fetch('/api/admin/gift-invitations/' + id + '/hide', {
       method: 'POST',
