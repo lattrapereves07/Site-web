@@ -86,6 +86,7 @@
   <div class="admin-tabs">
     <button type="button" class="admin-tab active" id="tabBtnReservations" onclick="switchTab('reservations')">Réservations</button>
     <button type="button" class="admin-tab" id="tabBtnPasses" onclick="switchTab('passes')">Pass saison</button>
+    <button type="button" class="admin-tab" id="tabBtnInvitations" onclick="switchTab('invitations')">Invitations</button>
   </div>
 
   <div id="panelReservations">
@@ -144,6 +145,82 @@
     <div id="passCount" class="res-count hidden"></div>
     <div id="passList"></div>
   </div>
+
+  <div id="panelInvitations" class="hidden">
+    <p style="margin-bottom:20px;color:#888;">Entrées offertes — nominatives ou en lot pour un partenaire. Usage unique, valables pour l'année en cours.</p>
+
+    <div class="search-box">
+      <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Créer une invitation</h3>
+
+      <div class="search-field" style="margin-bottom:14px;max-width:320px;">
+        <label for="invMode">Type</label>
+        <select id="invMode" onchange="updateInvModeUI()" style="padding:10px 12px;border:2px solid var(--light-beige);border-radius:8px;font-size:0.95rem;font-family:var(--font-ui);">
+          <option value="nom">Nom seul (validation à l'accueil)</option>
+          <option value="email">Nom + email (code envoyé par email)</option>
+          <option value="lot">Lot pour un partenaire (camping, etc.)</option>
+        </select>
+      </div>
+
+      <div id="invFieldsNom">
+        <div class="search-field" style="max-width:340px;">
+          <label for="invNom">Nom</label>
+          <input type="text" id="invNom" placeholder="Marie Dupont">
+        </div>
+      </div>
+
+      <div id="invFieldsEmail" class="hidden">
+        <div class="search-row">
+          <div class="search-field" style="max-width:280px;">
+            <label for="invEmailNom">Nom (optionnel)</label>
+            <input type="text" id="invEmailNom" placeholder="Marie Dupont">
+          </div>
+          <div class="search-field grow">
+            <label for="invEmail">Email</label>
+            <input type="text" id="invEmail" placeholder="marie@exemple.fr">
+          </div>
+        </div>
+      </div>
+
+      <div id="invFieldsLot" class="hidden">
+        <div class="search-row">
+          <div class="search-field grow">
+            <label for="invPartner">Nom du partenaire / occasion</label>
+            <input type="text" id="invPartner" placeholder="Camping des Gorges — loto 2026">
+          </div>
+          <div class="search-field" style="max-width:110px;">
+            <label for="invQty">Quantité</label>
+            <input type="number" id="invQty" min="1" max="100" value="8">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+          <input type="checkbox" id="invSendEmail" onchange="document.getElementById('invPartnerEmailField').classList.toggle('hidden', !this.checked)">
+          <label for="invSendEmail" style="font-size:0.9rem;color:var(--dark-grey);">Envoyer aussi les codes par email au partenaire</label>
+        </div>
+        <div id="invPartnerEmailField" class="search-field hidden" style="max-width:340px;margin-top:10px;">
+          <label for="invPartnerEmail">Email du partenaire</label>
+          <input type="text" id="invPartnerEmail" placeholder="contact@camping-des-gorges.fr">
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button onclick="submitInvitation()">Créer</button>
+      </div>
+      <div id="invMsg" style="margin-top:12px;font-size:0.9rem;"></div>
+    </div>
+
+    <div class="search-box">
+      <div class="search-row">
+        <div class="search-field grow">
+          <label for="invSearchQ">Nom, email, code ou partenaire</label>
+          <input type="text" id="invSearchQ" placeholder="INV-XXXXXX, Dupont, camping…">
+        </div>
+        <button onclick="doInvSearch()">Rechercher</button>
+      </div>
+    </div>
+
+    <div id="invCount" class="res-count hidden"></div>
+    <div id="invList"></div>
+  </div>
 </div>
 
 <script>
@@ -158,6 +235,7 @@ if (token) {
 document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
 document.getElementById('searchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch() })
 document.getElementById('passSearchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doPassSearch() })
+document.getElementById('invSearchQ').addEventListener('keydown', e => { if (e.key === 'Enter') doInvSearch() })
 
 async function doLogin() {
   const pwd = document.getElementById('loginPwd').value
@@ -183,14 +261,17 @@ function showAdmin() {
   doSearch()
   if (!passHolderRows.length) addPassHolderRow()
   doPassSearch()
+  doInvSearch()
   switchTab(localStorage.getItem('atrv_res_tab') || 'reservations')
 }
 
 function switchTab(tab) {
   document.getElementById('panelReservations').classList.toggle('hidden', tab !== 'reservations')
   document.getElementById('panelPasses').classList.toggle('hidden', tab !== 'passes')
+  document.getElementById('panelInvitations').classList.toggle('hidden', tab !== 'invitations')
   document.getElementById('tabBtnReservations').classList.toggle('active', tab === 'reservations')
   document.getElementById('tabBtnPasses').classList.toggle('active', tab === 'passes')
+  document.getElementById('tabBtnInvitations').classList.toggle('active', tab === 'invitations')
   localStorage.setItem('atrv_res_tab', tab)
 }
 
@@ -443,6 +524,159 @@ async function deletePass(id, label) {
       headers: { 'Authorization': 'Bearer ' + token }
     })
     if (r.ok) doPassSearch()
+  } catch (e) {}
+}
+
+// ── Invitations ──────────────────────────────────────────────────────────
+
+function updateInvModeUI() {
+  const mode = document.getElementById('invMode').value
+  document.getElementById('invFieldsNom').classList.toggle('hidden', mode !== 'nom')
+  document.getElementById('invFieldsEmail').classList.toggle('hidden', mode !== 'email')
+  document.getElementById('invFieldsLot').classList.toggle('hidden', mode !== 'lot')
+}
+
+async function submitInvitation() {
+  const mode = document.getElementById('invMode').value
+  const msg = document.getElementById('invMsg')
+  msg.style.color = '#c0392b'
+  msg.innerHTML = ''
+
+  const body = { mode }
+  let sendEmailChecked = false
+
+  if (mode === 'nom') {
+    const nom = document.getElementById('invNom').value.trim()
+    if (!nom) { msg.textContent = 'Nom requis.'; return }
+    body.nom = nom
+  } else if (mode === 'email') {
+    const nom = document.getElementById('invEmailNom').value.trim()
+    const email = document.getElementById('invEmail').value.trim()
+    if (!email || !email.includes('@')) { msg.textContent = 'Email invalide.'; return }
+    body.nom = nom
+    body.email = email
+  } else if (mode === 'lot') {
+    const partnerName = document.getElementById('invPartner').value.trim()
+    const quantity = parseInt(document.getElementById('invQty').value)
+    sendEmailChecked = document.getElementById('invSendEmail').checked
+    const email = document.getElementById('invPartnerEmail').value.trim()
+    if (!partnerName) { msg.textContent = 'Nom du partenaire requis.'; return }
+    if (!quantity || quantity < 1 || quantity > 100) { msg.textContent = 'Quantité invalide (1 à 100).'; return }
+    if (sendEmailChecked && (!email || !email.includes('@'))) { msg.textContent = 'Email du partenaire invalide.'; return }
+    body.partnerName = partnerName
+    body.quantity = quantity
+    body.sendEmail = sendEmailChecked
+    body.email = email
+  }
+
+  msg.style.color = ''
+  msg.textContent = 'Création…'
+  try {
+    const r = await fetch('/api/admin/gift-invitations', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    const data = await r.json()
+    if (!r.ok) { msg.style.color = '#c0392b'; msg.textContent = data.error || 'Erreur.'; return }
+
+    msg.style.color = '#2e7d51'
+    if (mode === 'lot') {
+      const printUrl = 'invitation-billets.html?batch=' + encodeURIComponent(data.batchId)
+      msg.innerHTML = data.invitations.length + ' invitation(s) créée(s)' +
+        (data.emailSent ? ', email envoyé.' : (sendEmailChecked ? ' — email non envoyé (vérifiez la configuration Brevo).' : '.')) +
+        ' <a href="' + printUrl + '" target="_blank" style="color:#D57956;font-weight:700;">🖨️ Voir et imprimer les billets →</a>'
+      document.getElementById('invPartner').value = ''
+    } else {
+      msg.textContent = 'Invitation créée' + (data.emailSent ? ', email envoyé.' : (mode === 'email' ? ' — email non envoyé (vérifiez la configuration Brevo).' : '.'))
+      if (mode === 'nom') document.getElementById('invNom').value = ''
+      if (mode === 'email') { document.getElementById('invEmailNom').value = ''; document.getElementById('invEmail').value = '' }
+    }
+    doInvSearch()
+  } catch (e) {
+    msg.style.color = '#c0392b'
+    msg.textContent = 'Erreur réseau.'
+  }
+}
+
+async function doInvSearch() {
+  const q = document.getElementById('invSearchQ').value.trim()
+  const list = document.getElementById('invList')
+  const countEl = document.getElementById('invCount')
+  list.innerHTML = '<div class="loading-state">Recherche en cours…</div>'
+  countEl.classList.add('hidden')
+
+  try {
+    const r = await fetch('/api/admin/gift-invitations?q=' + encodeURIComponent(q), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    const data = await r.json()
+    if (!r.ok) {
+      list.innerHTML = '<div class="empty-state">' + (data.error || 'Erreur de recherche') + '</div>'
+      return
+    }
+    renderInvResults(data.results)
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+const INV_MODE_LABELS = { nom: 'Nom seul', email: 'Envoyée par email', lot: 'Billet imprimable' }
+
+function renderInvResults(results) {
+  const list = document.getElementById('invList')
+  const countEl = document.getElementById('invCount')
+  countEl.classList.remove('hidden')
+  countEl.textContent = results.length + ' invitation' + (results.length > 1 ? 's' : '') + ' trouvée' + (results.length > 1 ? 's' : '')
+
+  if (!results.length) {
+    list.innerHTML = '<div class="empty-state">Aucune invitation ne correspond à cette recherche.</div>'
+    return
+  }
+
+  list.innerHTML = results.map(inv => {
+    const label = inv.nom || (inv.partner_name ? 'Lot — ' + inv.partner_name : 'Invitation')
+    const sub = [inv.email, INV_MODE_LABELS[inv.mode]].filter(Boolean).join(' · ')
+    return `
+    <div class="res-card${inv.used ? ' visited' : ''}">
+      <div class="res-top">
+        <span class="res-ref">${esc(inv.code)}</span>
+        <span class="res-date">Année ${inv.year}</span>
+      </div>
+      <div class="res-buyer">${esc(label)}</div>
+      ${sub ? `<div class="res-email">${esc(sub)}</div>` : ''}
+      <div class="res-bottom">
+        <div class="res-actions">
+          ${inv.used
+            ? `<span class="res-badge-visited">✓ Utilisée${inv.used_at ? ' le ' + fmtDate(inv.used_at) : ''}</span><button class="res-btn res-btn-unvalidate" onclick="redeemInvitation(${inv.id}, false)">Annuler</button>`
+            : `<button class="res-btn res-btn-validate" onclick="redeemInvitation(${inv.id}, true)">✓ Valider l'entrée</button>`
+          }
+          <button class="res-btn res-btn-delete" onclick="deleteInvitation(${inv.id}, '${esc(label)}')">Supprimer</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+async function redeemInvitation(id, used) {
+  try {
+    const r = await fetch('/api/admin/gift-invitations/' + id + '/redeem', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ used })
+    })
+    if (r.ok) doInvSearch()
+  } catch (e) {}
+}
+
+async function deleteInvitation(id, label) {
+  if (!confirm('Supprimer l\'invitation de ' + label + ' de cette liste ?')) return
+  try {
+    const r = await fetch('/api/admin/gift-invitations/' + id + '/hide', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    if (r.ok) doInvSearch()
   } catch (e) {}
 }
 </script>

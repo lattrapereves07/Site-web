@@ -9,6 +9,7 @@ Disallow: /invitation-pro.html
 Disallow: /panneaux.html
 Disallow: /avis.html
 Disallow: /reservations-admin.html
+Disallow: /invitation-billets.html
 Disallow: /beneloves.html
 Disallow: /beneloves-admin.html
 Disallow: /api/

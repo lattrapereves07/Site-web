@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Billets d'invitation — Admin — L'Attrape-Rêves</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260709b">
+  <style>
+    body { background: #ececec; }
+
+    .login-box { max-width: 400px; margin: 120px auto; padding: 40px; background: var(--beige); border-radius: 16px; text-align: center; }
+    .login-box h1 { font-family: var(--font-title); color: var(--coral); margin-bottom: 20px; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-box .error { color: #c0392b; font-size: 0.9rem; margin-bottom: 8px; }
+    .hidden { display: none !important; }
+
+    .toolbar { max-width: 900px; margin: 24px auto 0; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+    .toolbar h1 { font-family: var(--font-title); font-size: 1.6rem; color: var(--coral); margin: 0; }
+    .toolbar-actions { display: flex; gap: 10px; }
+    .toolbar button, .toolbar a { padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
+    .btn-print { background: var(--coral); color: white; border: none; }
+    .btn-back { background: transparent; color: var(--dark-grey); border: 2px solid var(--light-beige); }
+
+    .empty-state, .loading-state { text-align: center; padding: 60px 20px; opacity: 0.6; max-width: 600px; margin: 0 auto; }
+
+    /* ── Feuille A4 (aperçu écran = calque du rendu impression) ── */
+    .sheet {
+      background: white;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto 60px;
+      padding: 12mm;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      box-sizing: border-box;
+    }
+    .ticket-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6mm;
+    }
+    .ticket {
+      border: 2px dashed #c9a48a;
+      border-radius: 4mm;
+      padding: 5mm 6mm;
+      min-height: 48mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .ticket-head {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+    }
+    .ticket-head img { width: 9mm; height: 9mm; flex-shrink: 0; }
+    .ticket-head span {
+      font-family: var(--font-title);
+      font-size: 3.4mm;
+      color: var(--dark-grey);
+      letter-spacing: 0.3px;
+    }
+    .ticket-main {
+      text-align: center;
+      margin: 2mm 0;
+    }
+    .ticket-gift {
+      font-family: var(--font-title);
+      font-size: 5mm;
+      color: var(--coral);
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+    .ticket-partner {
+      font-family: var(--font-ui);
+      font-size: 3mm;
+      color: var(--dark-grey);
+      opacity: 0.75;
+      margin: 1mm 0 0;
+      font-style: italic;
+    }
+    .ticket-code {
+      font-family: 'Courier New', monospace;
+      font-size: 4.2mm;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--dark-grey);
+      text-align: center;
+      border: 1.5px solid var(--light-beige);
+      border-radius: 2mm;
+      padding: 2mm 0;
+      margin: 1mm 0;
+    }
+    .ticket-foot {
+      font-family: var(--font-ui);
+      font-size: 2.4mm;
+      color: var(--dark-grey);
+      opacity: 0.65;
+      text-align: center;
+    }
+
+    @media print {
+      body { background: white; }
+      .toolbar, .login-box { display: none !important; }
+      .sheet { box-shadow: none; margin: 0; width: auto; min-height: 0; padding: 8mm; }
+      @page { size: A4; margin: 8mm; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-box hidden">
+  <img src="assets/images/logo.png" alt="Logo" width="60" style="margin-bottom: 12px;">
+  <h1>Billets d'invitation</h1>
+  <div id="loginError" class="error hidden"></div>
+  <input type="password" id="loginPwd" placeholder="Mot de passe" autofocus>
+  <button class="btn btn-coral" onclick="doLogin()" style="width:100%;cursor:pointer;border:none;font-size:1rem;">Connexion</button>
+</div>
+
+<div id="toolbar" class="toolbar hidden">
+  <h1>Billets d'invitation</h1>
+  <div class="toolbar-actions">
+    <a href="reservations-admin.html" class="btn-back">← Retour</a>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+  </div>
+</div>
+
+<div id="content"></div>
+
+<script>
+let token = localStorage.getItem('atrv_token') || ''
+const params = new URLSearchParams(location.search)
+const batchId = params.get('batch')
+
+document.getElementById('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  if (r.ok) {
+    const data = await r.json()
+    token = data.token
+    localStorage.setItem('atrv_token', token)
+    document.getElementById('loginScreen').classList.add('hidden')
+    loadBatch()
+  } else {
+    document.getElementById('loginError').textContent = 'Mot de passe incorrect'
+    document.getElementById('loginError').classList.remove('hidden')
+  }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+async function loadBatch() {
+  const content = document.getElementById('content')
+  if (!batchId) {
+    content.innerHTML = '<div class="empty-state">Aucun lot spécifié. Retournez sur la page Réservations et créez un lot d\'invitations pour un partenaire.</div>'
+    return
+  }
+  content.innerHTML = '<div class="loading-state">Chargement des billets…</div>'
+  try {
+    const r = await fetch('/api/admin/gift-invitations/batch/' + encodeURIComponent(batchId), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    if (r.status === 401) {
+      token = ''
+      localStorage.removeItem('atrv_token')
+      document.getElementById('toolbar').classList.add('hidden')
+      document.getElementById('loginScreen').classList.remove('hidden')
+      return
+    }
+    const data = await r.json()
+    if (!r.ok) {
+      content.innerHTML = '<div class="empty-state">' + (data.error || 'Lot introuvable.') + '</div>'
+      return
+    }
+    document.getElementById('toolbar').classList.remove('hidden')
+    renderTickets(data.results)
+  } catch (e) {
+    content.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+function renderTickets(tickets) {
+  const content = document.getElementById('content')
+  const cards = tickets.map(t => `
+    <div class="ticket">
+      <div class="ticket-head">
+        <img src="assets/images/logo.png" alt="">
+        <span>L'ATTRAPE-RÊVES</span>
+      </div>
+      <div class="ticket-main">
+        <p class="ticket-gift">🎁 1 entrée offerte</p>
+        ${t.partner_name ? `<p class="ticket-partner">Offert par ${esc(t.partner_name)}</p>` : ''}
+      </div>
+      <div class="ticket-code">${esc(t.code)}</div>
+      <div class="ticket-foot">Valable en ${t.year} · À présenter à l'accueil</div>
+    </div>
+  `)
+
+  // Une feuille A4 par tranche de 10 billets (2 colonnes × 5 lignes)
+  const perSheet = 10
+  const sheets = []
+  for (let i = 0; i < cards.length; i += perSheet) {
+    sheets.push(cards.slice(i, i + perSheet))
+  }
+
+  content.innerHTML = sheets.map(sheetCards => `
+    <div class="sheet">
+      <div class="ticket-grid">${sheetCards.join('')}</div>
+    </div>
+  `).join('')
+}
+
+if (token) {
+  loadBatch()
+} else {
+  document.getElementById('loginScreen').classList.remove('hidden')
+}
+</script>
+</body>
+</html>

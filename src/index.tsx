@@ -664,6 +664,214 @@ app.post('/api/admin/season-passes/:id/hide', requireAuth, async (c) => {
   return c.json({ ok: true })
 })
 
+// ===== INVITATIONS CADEAUX (entrées offertes) =====
+// Distinct du système d'invitations RSVP (table `invitations`, soirée avec repas).
+// Une invitation = une entrée gratuite pour 1 personne, valable pour l'année civile
+// de sa création, usage unique. Trois façons de la créer : nom seul (validation par
+// nom à l'accueil), nom + email (code envoyé par email), ou lot pour un partenaire
+// (ex: camping) — soit envoyé par email au partenaire, soit imprimé en billets à
+// découper que le partenaire distribue lui-même.
+
+async function ensureGiftInvitationTable(db: D1Database) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS gift_invitations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      mode TEXT NOT NULL,
+      nom TEXT,
+      email TEXT,
+      partner_name TEXT,
+      batch_id TEXT,
+      year INTEGER NOT NULL,
+      used INTEGER NOT NULL DEFAULT 0,
+      used_at TEXT,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
+}
+
+function genInvitationCode(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = new Uint8Array(6)
+  crypto.getRandomValues(bytes)
+  let code = ''
+  for (const b of bytes) code += alphabet[b % alphabet.length]
+  return 'INV-' + code
+}
+
+async function sendGiftInvitationEmail(
+  apiKey: string,
+  params: { email: string; toName: string; subject: string; intro: string; codes: { code: string; nom?: string }[]; year: number }
+): Promise<boolean> {
+  const { email, toName, subject, intro, codes, year } = params
+  const rows = codes.map(c => `
+    <tr>
+      <td style="padding:8px 0;">${c.nom ? escapeHtml(c.nom) : 'Entrée offerte'}</td>
+      <td style="padding:8px 0;text-align:right;font-weight:bold;color:#D57956;letter-spacing:1px;">${escapeHtml(c.code)}</td>
+    </tr>`).join('')
+
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
+    <h1 style="color:#D57956;font-size:22px;">Une invitation L'Attrape-Rêves</h1>
+    <p>${escapeHtml(intro)}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
+    <p style="margin-top:20px;">Cette invitation donne une entrée gratuite pour l'année ${year}, à présenter (nom ou code) à l'accueil de la ferme.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+    <p style="font-size:13px;opacity:.7;">
+      L'Attrape-Rêves — 514 chemin de la Vernède, 07140 Gravières<br>
+      04 28 40 00 49 · contact@lattrapereves07.fr · lattrapereves07.fr
+    </p>
+  </div>`
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: { name: "L'Attrape-Rêves", email: 'contact@lattrapereves07.fr' },
+        to: [{ email, name: toName || undefined }],
+        bcc: [{ email: 'contact@lattrapereves07.fr' }],
+        replyTo: { email: 'contact@lattrapereves07.fr' },
+        subject,
+        htmlContent: html
+      })
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+// Crée une ou plusieurs invitations cadeaux.
+app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
+  await ensureGiftInvitationTable(c.env.DB)
+  const body = await c.req.json().catch(() => ({})) as any
+  const mode = body.mode
+  const year = new Date().getFullYear()
+
+  if (mode === 'nom') {
+    const nom = (body.nom || '').trim()
+    if (!nom) return c.json({ error: 'Nom requis' }, 400)
+    const code = genInvitationCode()
+    const result = await c.env.DB.prepare(
+      `INSERT INTO gift_invitations (code, mode, nom, year) VALUES (?, 'nom', ?, ?)`
+    ).bind(code, nom, year).run()
+    return c.json({ invitations: [{ id: result.meta.last_row_id, code, nom }], emailSent: false })
+  }
+
+  if (mode === 'email') {
+    const nom = (body.nom || '').trim()
+    const email = (body.email || '').trim()
+    if (!email || !email.includes('@')) return c.json({ error: 'Email invalide' }, 400)
+    const code = genInvitationCode()
+    const result = await c.env.DB.prepare(
+      `INSERT INTO gift_invitations (code, mode, nom, email, year) VALUES (?, 'email', ?, ?, ?)`
+    ).bind(code, nom || null, email, year).run()
+
+    let emailSent = false
+    if (c.env.BREVO_API_KEY) {
+      emailSent = await sendGiftInvitationEmail(c.env.BREVO_API_KEY, {
+        email,
+        toName: nom,
+        subject: "Une invitation L'Attrape-Rêves",
+        intro: nom
+          ? `${nom}, vous avez reçu une invitation pour l'Attrape-Rêves !`
+          : `Vous avez reçu une invitation pour l'Attrape-Rêves !`,
+        codes: [{ code, nom }],
+        year
+      })
+    }
+    return c.json({ invitations: [{ id: result.meta.last_row_id, code, nom, email }], emailSent })
+  }
+
+  if (mode === 'lot') {
+    const partnerName = (body.partnerName || '').trim()
+    const quantity = parseInt(body.quantity)
+    const email = (body.email || '').trim()
+    const sendEmail = !!body.sendEmail
+    if (!partnerName) return c.json({ error: 'Nom du partenaire requis' }, 400)
+    if (isNaN(quantity) || quantity < 1 || quantity > 100) return c.json({ error: 'Quantité invalide (1 à 100)' }, 400)
+    if (sendEmail && (!email || !email.includes('@'))) return c.json({ error: 'Email invalide' }, 400)
+
+    const batchId = crypto.randomUUID()
+    const created: { id: number; code: string }[] = []
+    for (let i = 0; i < quantity; i++) {
+      const code = genInvitationCode()
+      const result = await c.env.DB.prepare(
+        `INSERT INTO gift_invitations (code, mode, partner_name, batch_id, year) VALUES (?, 'lot', ?, ?, ?)`
+      ).bind(code, partnerName, batchId, year).run()
+      created.push({ id: result.meta.last_row_id as number, code })
+    }
+
+    let emailSent = false
+    if (sendEmail && c.env.BREVO_API_KEY) {
+      emailSent = await sendGiftInvitationEmail(c.env.BREVO_API_KEY, {
+        email,
+        toName: partnerName,
+        subject: `${quantity} invitations L'Attrape-Rêves — ${partnerName}`,
+        intro: `Voici ${quantity} invitation${quantity > 1 ? 's' : ''} offerte${quantity > 1 ? 's' : ''} par l'Attrape-Rêves pour ${partnerName}.`,
+        codes: created.map(x => ({ code: x.code })),
+        year
+      })
+    }
+
+    return c.json({ invitations: created, emailSent, batchId, partnerName, year })
+  }
+
+  return c.json({ error: 'Mode invalide' }, 400)
+})
+
+// Recherche des invitations cadeaux (nom / email / code / partenaire)
+app.get('/api/admin/gift-invitations', requireAuth, async (c) => {
+  await ensureGiftInvitationTable(c.env.DB)
+  const q = (c.req.query('q') || '').trim().toLowerCase()
+  const { results } = await c.env.DB.prepare(
+    `SELECT * FROM gift_invitations WHERE active = 1 ORDER BY created_at DESC`
+  ).all()
+
+  const filtered = (results as any[]).filter((r) => {
+    if (!q) return true
+    const hay = [r.code, r.nom, r.email, r.partner_name].filter(Boolean).join(' ').toLowerCase()
+    return hay.includes(q)
+  })
+
+  return c.json({ results: filtered, count: filtered.length })
+})
+
+// Récupère toutes les invitations d'un même lot (pour (ré)imprimer les billets)
+app.get('/api/admin/gift-invitations/batch/:batchId', requireAuth, async (c) => {
+  await ensureGiftInvitationTable(c.env.DB)
+  const batchId = c.req.param('batchId')
+  const { results } = await c.env.DB.prepare(
+    `SELECT code, partner_name, year FROM gift_invitations WHERE batch_id = ? AND active = 1 ORDER BY id ASC`
+  ).bind(batchId).all()
+  if (!results.length) return c.json({ error: 'Lot introuvable' }, 404)
+  return c.json({ results })
+})
+
+// Marque (ou démarque) une invitation comme utilisée à l'accueil
+app.post('/api/admin/gift-invitations/:id/redeem', requireAuth, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'ID invalide' }, 400)
+  const body = await c.req.json().catch(() => ({})) as { used?: boolean }
+  const used = body.used !== false
+  await ensureGiftInvitationTable(c.env.DB)
+  await c.env.DB.prepare(
+    `UPDATE gift_invitations SET used=?, used_at=? WHERE id=?`
+  ).bind(used ? 1 : 0, used ? new Date().toISOString() : null, id).run()
+  return c.json({ ok: true })
+})
+
+// Masque une invitation de la liste
+app.post('/api/admin/gift-invitations/:id/hide', requireAuth, async (c) => {
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'ID invalide' }, 400)
+  await ensureGiftInvitationTable(c.env.DB)
+  await c.env.DB.prepare('UPDATE gift_invitations SET active=0 WHERE id=?').bind(id).run()
+  return c.json({ ok: true })
+})
+
 // ===== PUBLIC API =====
 
 // Initialise la table site_config si elle n'existe pas encore
