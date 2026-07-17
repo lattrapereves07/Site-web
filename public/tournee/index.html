@@ -452,6 +452,31 @@ details.t-filters summary {
   margin-left: 4px;
 }
 
+/* ---- LOTO ---- */
+.t-loto-btn {
+  padding: 5px 9px;
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  background: var(--white);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #92400e;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.t-loto-btn.on {
+  background: var(--yellow);
+  border-color: #ca8a04;
+  color: #451a03;
+}
+
+/* ---- QUICK-ADD ---- */
+.t-quickadd-row { border-top: 1px solid var(--light-beige); padding-top: 8px; margin-top: 2px; }
+.t-quickadd-row .t-search { border-style: dashed; }
+.t-quickadd-row .t-search:focus { border-style: solid; border-color: var(--coral); }
+
 @media (min-width: 640px) {
   .t-lieu-nom { font-size: 16px; }
 }
@@ -521,6 +546,13 @@ details.t-filters summary {
       <button class="t-btn sm sec" onclick="document.getElementById('importFile').click()" title="Importer JSON">📥</button>
       <input type="file" id="importFile" style="display:none" accept=".json">
     </div>
+    <!-- Barre d'ajout rapide -->
+    <div class="t-row t-quickadd-row">
+      <input type="text" id="qa-nom" class="t-search" placeholder="✚ Nom du lieu…" style="flex:2" onkeydown="if(event.key==='Enter')document.getElementById('qa-ville').focus()">
+      <input type="text" id="qa-ville" class="t-search" placeholder="Ville" style="flex:1;min-width:80px" onkeydown="if(event.key==='Enter')quickAdd()">
+      <button class="t-btn" onclick="quickAdd()" title="Ajouter rapidement">＋</button>
+    </div>
+
     <details class="t-filters" id="filtersBlock">
       <summary>🎛️ Filtres <span id="filterCount" style="font-weight:400;font-size:12px;color:#78716c"></span></summary>
       <div class="t-filter-grid">
@@ -589,6 +621,10 @@ details.t-filters summary {
     <input type="text" id="m-hor" placeholder="Ex: Lun-Sam 9h-19h">
     <label>Notes fixes sur le lieu</label>
     <textarea id="m-notes" rows="2" placeholder="Ex: Demander Sophie. Préfère affiche grand format."></textarea>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:12px">
+      <input type="checkbox" id="m-loto" style="width:auto;padding:0;margin:0;accent-color:var(--coral)">
+      🎟️ Invitation au loto proposée
+    </label>
     <div class="t-modal-actions">
       <button class="t-btn sec" onclick="closeModal()">Annuler</button>
       <button class="t-btn dan" id="m-delete" onclick="deleteFromModal()" style="display:none">Supprimer</button>
@@ -754,7 +790,11 @@ function renderMap() {
     if (!filterCat.has(l.categorie)) return false;
     if (!filterStatut.has(l.statut || 'non_visite')) return false;
     if (filterVille.size > 0 && !filterVille.has(l.ville)) return false;
-    if (search && !(l.nom.toLowerCase().includes(search) || l.ville.toLowerCase().includes(search))) return false;
+    if (search) {
+      const inText = ['nom','ville','notes_lieu','notes_depot','horaires','adresse'].some(f => (l[f]||'').toLowerCase().includes(search));
+      const byLoto = l.loto && 'loto'.startsWith(search);
+      if (!inText && !byLoto) return false;
+    }
     return l.lat && l.lng;
   }).forEach(l => {
     const color = STATUS_COLORS[l.statut || 'non_visite'] || '#9ca3af';
@@ -821,6 +861,48 @@ async function geocodeMissing() {
   bar.classList.remove('visible');
 }
 
+// ============ QUICK-ADD ============
+async function quickAdd() {
+  const nom = document.getElementById('qa-nom').value.trim();
+  const villeRaw = document.getElementById('qa-ville').value.trim();
+  if (!nom) { document.getElementById('qa-nom').focus(); return; }
+  if (!villeRaw) { document.getElementById('qa-ville').focus(); return; }
+  const ville = villeRaw.charAt(0).toUpperCase() + villeRaw.slice(1);
+  const existing = lieux.find(l => l.ville.toLowerCase() === ville.toLowerCase());
+  const secteur = existing ? existing.secteur : SECTEURS[0];
+  const nomL = nom.toLowerCase();
+  let cat = 'autre';
+  if (nomL.includes('camping') || nomL.includes('camp ')) cat = 'camping';
+  else if (nomL.includes('gîte') || nomL.includes('gite') || nomL.includes('chambre')) cat = 'hebergement';
+  else if (nomL.includes('resto') || nomL.includes('restaurant') || nomL.includes('brasserie') || nomL.includes('pizz') || nomL.includes('auberge')) cat = 'resto';
+  else if (nomL.includes('office') || nomL.includes('mairie') || nomL.includes('syndicat')) cat = 'tourisme';
+  const payload = { secteur, ville, nom, categorie: cat, adresse: '', horaires: '', notes_lieu: '', statut: 'non_visite', loto: false };
+  if (useSupabase) {
+    const { data, error } = await sb.from('tournee_lieux').insert(payload).select().single();
+    if (error) { alert('Erreur : ' + error.message); return; }
+    lieux.push(data);
+    render();
+    geocode(nom, '', ville).then(coords => {
+      if (!coords || !data) return;
+      sb.from('tournee_lieux').update(coords).eq('id', data.id);
+      const l = lieux.find(x => x.id === data.id);
+      if (l) Object.assign(l, coords);
+    });
+  } else {
+    lieux.push({ ...payload, id: 'local-'+Date.now() });
+    saveLocalFallback(); render();
+  }
+  document.getElementById('qa-nom').value = '';
+  document.getElementById('qa-ville').value = '';
+  document.getElementById('qa-nom').focus();
+}
+
+async function toggleLoto(id) {
+  const l = lieux.find(x => x.id === id);
+  if (!l) return;
+  await updateLieu(id, { loto: !l.loto });
+}
+
 // ============ FILTRES ============
 function buildFilterChips() {
   const catEl = document.getElementById('catChips');
@@ -880,7 +962,11 @@ function render() {
     if (!filterCat.has(l.categorie)) return false;
     if (!filterStatut.has(l.statut || 'non_visite')) return false;
     if (filterVille.size > 0 && !filterVille.has(l.ville)) return false;
-    if (search && !(l.nom.toLowerCase().includes(search) || l.ville.toLowerCase().includes(search))) return false;
+    if (search) {
+      const inText = ['nom','ville','notes_lieu','notes_depot','horaires','adresse'].some(f => (l[f]||'').toLowerCase().includes(search));
+      const byLoto = l.loto && 'loto'.startsWith(search);
+      if (!inText && !byLoto) return false;
+    }
     return true;
   });
 
@@ -960,6 +1046,7 @@ function renderLieu(l) {
     </div>
     <textarea class="t-notes-depot" placeholder="Notes du passage…" onchange="setField('${l.id}','notes_depot',this.value)">${escHtml(l.notes_depot||'')}</textarea>
     <div class="t-lieu-actions">
+      <button class="t-loto-btn${l.loto ? ' on' : ''}" onclick="toggleLoto('${l.id}')">🎟️ Loto</button>
       <button class="t-btn sm sec" onclick="openEditModal('${l.id}')">✏️ Modifier</button>
       ${l.archive
         ? `<button class="t-btn sm" onclick="setField('${l.id}','archive',false)">↩️ Restaurer</button>`
@@ -1016,6 +1103,7 @@ function openAddModal() {
   fillSecteurSelect(); fillVilleSelect();
   ['m-nom','m-adresse','m-hor','m-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('m-cat').value = 'commerce';
+  document.getElementById('m-loto').checked = false;
   document.getElementById('modal').classList.add('open');
 }
 
@@ -1031,6 +1119,7 @@ function openEditModal(id) {
   document.getElementById('m-adresse').value = l.adresse || '';
   document.getElementById('m-hor').value = l.horaires || '';
   document.getElementById('m-notes').value = l.notes_lieu || '';
+  document.getElementById('m-loto').checked = !!l.loto;
   document.getElementById('modal').classList.add('open');
 }
 
@@ -1066,7 +1155,8 @@ async function saveFromModal() {
     secteur, ville, adresse,
     categorie: document.getElementById('m-cat').value, nom,
     horaires: document.getElementById('m-hor').value.trim(),
-    notes_lieu: document.getElementById('m-notes').value.trim()
+    notes_lieu: document.getElementById('m-notes').value.trim(),
+    loto: document.getElementById('m-loto').checked
   };
   const existing = id ? lieux.find(x => x.id === id) : null;
   if (!existing || existing.nom !== nom || (existing.adresse||'') !== adresse || existing.ville !== ville) {
@@ -1118,7 +1208,7 @@ async function handleImport(e) {
       categorie: l.categorie, nom: l.nom, horaires: l.horaires||'',
       notes_lieu: l.notes_lieu||'', statut: l.statut||'non_visite',
       qui: l.qui||'', date_depot: l.date_depot||null, notes_depot: l.notes_depot||'',
-      archive: !!l.archive, lat: l.lat||null, lng: l.lng||null
+      archive: !!l.archive, loto: !!l.loto, lat: l.lat||null, lng: l.lng||null
     }));
   if (useSupabase && toInsert.length) {
     const { data, error } = await sb.from('tournee_lieux').insert(toInsert).select();
