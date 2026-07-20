@@ -57,7 +57,7 @@
     /* Cropper */
     .cropper-box { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; background: #222; touch-action: none; margin-bottom: 10px; cursor: grab; }
     .cropper-box:active { cursor: grabbing; }
-    .cropper-img { position: absolute; left: 0; top: 0; transform-origin: top left; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+    .cropper-img { position: absolute; left: 0; top: 0; max-width: none; max-height: none; transform-origin: top left; user-select: none; -webkit-user-drag: none; pointer-events: none; }
     .cropper-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .cropper-controls input[type=range] { flex: 1; }
     .cropper-hint { font-size: 0.78rem; color: #888; margin: 0 0 12px; }
