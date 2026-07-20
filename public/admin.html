@@ -55,7 +55,7 @@
     .modal .preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 12px; }
 
     /* Cropper */
-    .cropper-box { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; background: #222; touch-action: none; margin-bottom: 10px; cursor: grab; }
+    .cropper-box { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; background: #E8DFD0; touch-action: none; margin-bottom: 10px; cursor: grab; }
     .cropper-box:active { cursor: grabbing; }
     .cropper-img { position: absolute; left: 0; top: 0; max-width: none; max-height: none; transform-origin: top left; user-select: none; -webkit-user-drag: none; pointer-events: none; }
     .cropper-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -277,7 +277,7 @@
         <span>🔍</span>
         <input type="range" id="cropperZoom" min="1" max="4" step="0.01" value="1">
       </div>
-      <p class="cropper-hint">Glisse l'image pour la repositionner, utilise le curseur pour zoomer. Le cadre correspond à l'affichage sur le site.</p>
+      <p class="cropper-hint">Glisse l'image pour la repositionner, utilise le curseur pour zoomer/dézoomer. Le cadre correspond à l'affichage sur le site (dézoome pour voir l'image entière, sans rognage).</p>
     </div>
     <div class="form-actions">
       <button class="btn btn-coral" onclick="uploadImage()" style="cursor:pointer;border:none;font-size:1rem;">Envoyer</button>
@@ -597,10 +597,14 @@ function initCropper(dataUrl) {
   tmp.onload = () => {
     const boxW = box.clientWidth
     const boxH = box.clientHeight
-    const baseScale = Math.max(boxW / tmp.naturalWidth, boxH / tmp.naturalHeight)
-    cropState = { naturalW: tmp.naturalWidth, naturalH: tmp.naturalHeight, boxW, boxH, baseScale, zoom: 1, offsetX: 0, offsetY: 0 }
+    const coverScale = Math.max(boxW / tmp.naturalWidth, boxH / tmp.naturalHeight)
+    const containScale = Math.min(boxW / tmp.naturalWidth, boxH / tmp.naturalHeight)
+    const minZoom = containScale / coverScale
+    cropState = { naturalW: tmp.naturalWidth, naturalH: tmp.naturalHeight, boxW, boxH, baseScale: coverScale, zoom: 1, offsetX: 0, offsetY: 0 }
     imgEl.src = dataUrl
-    document.getElementById('cropperZoom').value = 1
+    const zoomEl = document.getElementById('cropperZoom')
+    zoomEl.min = minZoom
+    zoomEl.value = 1
     centerCrop()
     applyCropTransform()
   }
@@ -619,10 +623,10 @@ function clampOffset() {
   const scale = s.baseScale * s.zoom
   const w = s.naturalW * scale
   const h = s.naturalH * scale
-  const minX = Math.min(0, s.boxW - w)
-  const minY = Math.min(0, s.boxH - h)
-  s.offsetX = Math.max(minX, Math.min(0, s.offsetX))
-  s.offsetY = Math.max(minY, Math.min(0, s.offsetY))
+  // Si l'image (dézoomée) est plus petite que le cadre sur un axe, on la centre
+  // sur cet axe au lieu de la laisser se déplacer (rien à recadrer sur cet axe).
+  s.offsetX = w <= s.boxW ? (s.boxW - w) / 2 : Math.max(s.boxW - w, Math.min(0, s.offsetX))
+  s.offsetY = h <= s.boxH ? (s.boxH - h) / 2 : Math.max(s.boxH - h, Math.min(0, s.offsetY))
 }
 
 function applyCropTransform() {
@@ -668,15 +672,18 @@ function renderCroppedBlob() {
     if (!cropState) { reject(new Error('no image')); return }
     const s = cropState
     const scale = s.baseScale * s.zoom
-    const sx = -s.offsetX / scale
-    const sy = -s.offsetY / scale
-    const sWidth = s.boxW / scale
-    const sHeight = s.boxH / scale
+    const canvasScale = CROP_OUT_W / s.boxW
     const canvas = document.createElement('canvas')
     canvas.width = CROP_OUT_W
     canvas.height = CROP_OUT_H
     const ctx = canvas.getContext('2d')
-    ctx.drawImage(document.getElementById('cropperImg'), sx, sy, sWidth, sHeight, 0, 0, CROP_OUT_W, CROP_OUT_H)
+    ctx.fillStyle = '#E8DFD0'
+    ctx.fillRect(0, 0, CROP_OUT_W, CROP_OUT_H)
+    ctx.drawImage(
+      document.getElementById('cropperImg'),
+      s.offsetX * canvasScale, s.offsetY * canvasScale,
+      s.naturalW * scale * canvasScale, s.naturalH * scale * canvasScale
+    )
 
     function tryQuality(q) {
       canvas.toBlob(blob => {
