@@ -34,8 +34,8 @@
     /* Event list */
     .event-item { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .event-item.unpublished { opacity: 0.6; border-left: 4px solid #aaa; }
-    .event-thumb { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--light-beige); }
-    .event-thumb-placeholder { width: 80px; height: 80px; border-radius: 8px; background: var(--light-beige); display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.75rem; flex-shrink: 0; }
+    .event-thumb { width: 110px; height: 62px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--light-beige); }
+    .event-thumb-placeholder { width: 110px; height: 62px; border-radius: 8px; background: var(--light-beige); display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.75rem; flex-shrink: 0; }
     .event-info { flex: 1; }
     .event-info h3 { margin: 0 0 4px; font-family: var(--font-accent); color: var(--dark-grey); }
     .event-info .meta { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
@@ -53,6 +53,14 @@
     .modal h3 { font-family: var(--font-title); color: var(--dark-grey); margin-bottom: 16px; }
     .modal input[type=file] { margin-bottom: 12px; }
     .modal .preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 12px; }
+
+    /* Cropper */
+    .cropper-box { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; background: #222; touch-action: none; margin-bottom: 10px; cursor: grab; }
+    .cropper-box:active { cursor: grabbing; }
+    .cropper-img { position: absolute; left: 0; top: 0; transform-origin: top left; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+    .cropper-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .cropper-controls input[type=range] { flex: 1; }
+    .cropper-hint { font-size: 0.78rem; color: #888; margin: 0 0 12px; }
     
     .hidden { display: none !important; }
     .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
@@ -261,7 +269,16 @@
     <h3>📷 Image de l'événement</h3>
     <div id="currentImage"></div>
     <input type="file" id="imageFile" accept="image/*">
-    <div id="imagePreview"></div>
+    <div id="cropperWrap" class="hidden">
+      <div class="cropper-box" id="cropperBox">
+        <img id="cropperImg" class="cropper-img" alt="">
+      </div>
+      <div class="cropper-controls">
+        <span>🔍</span>
+        <input type="range" id="cropperZoom" min="1" max="4" step="0.01" value="1">
+      </div>
+      <p class="cropper-hint">Glisse l'image pour la repositionner, utilise le curseur pour zoomer. Le cadre correspond à l'affichage sur le site.</p>
+    </div>
     <div class="form-actions">
       <button class="btn btn-coral" onclick="uploadImage()" style="cursor:pointer;border:none;font-size:1rem;">Envoyer</button>
       <button class="btn btn-del" id="btnDelImage" onclick="deleteImage()" style="cursor:pointer;font-size:0.9rem;" class="hidden">Supprimer image</button>
@@ -536,6 +553,7 @@ async function deleteEvent(id) {
 // Image modal
 function openImageModal(id) {
   imageEventId = id
+  cropState = null
   const e = events.find(ev => ev.id === id)
   const curr = document.getElementById('currentImage')
   const delBtn = document.getElementById('btnDelImage')
@@ -546,35 +564,133 @@ function openImageModal(id) {
     curr.innerHTML = '<p style="color:#888;">Aucune image</p>'
     delBtn.classList.add('hidden')
   }
-  document.getElementById('imagePreview').innerHTML = ''
+  document.getElementById('cropperWrap').classList.add('hidden')
   document.getElementById('imageFile').value = ''
   document.getElementById('imageModal').classList.remove('hidden')
 }
 
 function closeImageModal() {
   document.getElementById('imageModal').classList.add('hidden')
+  document.getElementById('cropperWrap').classList.add('hidden')
+  cropState = null
   imageEventId = null
 }
 
+// ===== CROPPER (16:9, format des cartes agenda/accueil) =====
+const CROP_OUT_W = 1200
+const CROP_OUT_H = 675
+let cropState = null
+
 document.getElementById('imageFile').addEventListener('change', function() {
   const file = this.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = e => {
-      document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" class="preview" alt="Aperçu">`
-    }
-    reader.readAsDataURL(file)
-  }
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = e => initCropper(e.target.result)
+  reader.readAsDataURL(file)
 })
 
-async function uploadImage() {
-  const file = document.getElementById('imageFile').files[0]
-  if (!file) { alert('Choisis une image.'); return }
-
-  if (file.size > 1.5 * 1024 * 1024) {
-    alert('Image trop grande (max 1,5 Mo). Réduis sa taille avant de l\'envoyer.')
-    return
+function initCropper(dataUrl) {
+  document.getElementById('cropperWrap').classList.remove('hidden')
+  const box = document.getElementById('cropperBox')
+  const imgEl = document.getElementById('cropperImg')
+  const tmp = new Image()
+  tmp.onload = () => {
+    const boxW = box.clientWidth
+    const boxH = box.clientHeight
+    const baseScale = Math.max(boxW / tmp.naturalWidth, boxH / tmp.naturalHeight)
+    cropState = { naturalW: tmp.naturalWidth, naturalH: tmp.naturalHeight, boxW, boxH, baseScale, zoom: 1, offsetX: 0, offsetY: 0 }
+    imgEl.src = dataUrl
+    document.getElementById('cropperZoom').value = 1
+    centerCrop()
+    applyCropTransform()
   }
+  tmp.src = dataUrl
+}
+
+function centerCrop() {
+  const s = cropState
+  const scale = s.baseScale * s.zoom
+  s.offsetX = (s.boxW - s.naturalW * scale) / 2
+  s.offsetY = (s.boxH - s.naturalH * scale) / 2
+}
+
+function clampOffset() {
+  const s = cropState
+  const scale = s.baseScale * s.zoom
+  const w = s.naturalW * scale
+  const h = s.naturalH * scale
+  const minX = Math.min(0, s.boxW - w)
+  const minY = Math.min(0, s.boxH - h)
+  s.offsetX = Math.max(minX, Math.min(0, s.offsetX))
+  s.offsetY = Math.max(minY, Math.min(0, s.offsetY))
+}
+
+function applyCropTransform() {
+  const s = cropState
+  if (!s) return
+  const scale = s.baseScale * s.zoom
+  const imgEl = document.getElementById('cropperImg')
+  imgEl.style.width = (s.naturalW * scale) + 'px'
+  imgEl.style.height = (s.naturalH * scale) + 'px'
+  imgEl.style.transform = `translate(${s.offsetX}px, ${s.offsetY}px)`
+}
+
+document.getElementById('cropperZoom').addEventListener('input', function() {
+  if (!cropState) return
+  cropState.zoom = parseFloat(this.value)
+  clampOffset()
+  applyCropTransform()
+})
+
+;(function() {
+  const box = document.getElementById('cropperBox')
+  let dragging = false, startX = 0, startY = 0, startOffX = 0, startOffY = 0
+  box.addEventListener('pointerdown', e => {
+    if (!cropState) return
+    dragging = true
+    startX = e.clientX; startY = e.clientY
+    startOffX = cropState.offsetX; startOffY = cropState.offsetY
+    box.setPointerCapture(e.pointerId)
+  })
+  box.addEventListener('pointermove', e => {
+    if (!dragging || !cropState) return
+    cropState.offsetX = startOffX + (e.clientX - startX)
+    cropState.offsetY = startOffY + (e.clientY - startY)
+    clampOffset()
+    applyCropTransform()
+  })
+  box.addEventListener('pointerup', () => { dragging = false })
+  box.addEventListener('pointercancel', () => { dragging = false })
+})()
+
+function renderCroppedBlob() {
+  return new Promise((resolve, reject) => {
+    if (!cropState) { reject(new Error('no image')); return }
+    const s = cropState
+    const scale = s.baseScale * s.zoom
+    const sx = -s.offsetX / scale
+    const sy = -s.offsetY / scale
+    const sWidth = s.boxW / scale
+    const sHeight = s.boxH / scale
+    const canvas = document.createElement('canvas')
+    canvas.width = CROP_OUT_W
+    canvas.height = CROP_OUT_H
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(document.getElementById('cropperImg'), sx, sy, sWidth, sHeight, 0, 0, CROP_OUT_W, CROP_OUT_H)
+
+    function tryQuality(q) {
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('export failed')); return }
+        if (blob.size > 500 * 1024 && q > 0.5) tryQuality(q - 0.1)
+        else resolve(blob)
+      }, 'image/jpeg', q)
+    }
+    tryQuality(0.85)
+  })
+}
+
+async function uploadImage() {
+  if (!cropState) { alert('Choisis une image.'); return }
 
   const btn = document.querySelector('#imageModal .btn-coral')
   const origText = btn.textContent
@@ -582,8 +698,9 @@ async function uploadImage() {
   btn.disabled = true
 
   try {
+    const blob = await renderCroppedBlob()
     const formData = new FormData()
-    formData.append('image', file)
+    formData.append('image', blob, 'event.jpg')
     const r = await fetch(`/api/admin/events/${imageEventId}/image`, {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
