@@ -70,6 +70,18 @@
     .pass-row select, .pass-row input[type=text] { padding: 9px 10px; border: 2px solid var(--light-beige); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; font-family: var(--font-ui); }
     .pass-row input[type=text] { flex: 1; min-width: 130px; }
     .pass-row-remove { background: transparent; border: none; color: #c0392b; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 4px 8px; }
+
+    .inv-subnav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .inv-subnav-btn { padding: 9px 18px; border-radius: 20px; border: 2px solid var(--light-beige); background: white; font-family: var(--font-ui); font-weight: 700; font-size: 0.88rem; color: var(--dark-grey); opacity: 0.65; cursor: pointer; }
+    .inv-subnav-btn:hover { opacity: 0.9; }
+    .inv-subnav-btn.active { opacity: 1; border-color: var(--coral); color: var(--coral); background: var(--coral-light); }
+
+    .guichet-search { background: var(--coral); border-radius: 16px; padding: 22px 24px; margin-bottom: 20px; }
+    .guichet-search label { display: block; color: white; font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; }
+    .guichet-search-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .guichet-search-row input { flex: 1; min-width: 220px; padding: 16px 18px; border: none; border-radius: 10px; font-size: 1.15rem; box-sizing: border-box; font-family: var(--font-ui); }
+    .guichet-search-row button { padding: 16px 30px; border: none; border-radius: 10px; background: white; color: var(--coral); font-weight: 800; font-size: 1.05rem; cursor: pointer; }
+    .guichet-search-row button:hover { opacity: 0.92; }
   </style>
 </head>
 <body>
@@ -151,7 +163,28 @@
   </div>
 
   <div id="panelInvitations" class="hidden">
-    <p style="margin-bottom:20px;color:#888;">Entrées offertes — nominatives ou en lot pour un partenaire. Usage unique, valables pour l'année en cours.</p>
+    <p style="margin-bottom:16px;color:#888;">Entrées offertes — nominatives ou en lot pour un partenaire. Usage unique, valables pour l'année en cours.</p>
+
+    <div class="inv-subnav">
+      <button type="button" class="inv-subnav-btn active" id="invSubBtnCheck" onclick="switchInvSubview('check')">✓ Vérifier une invitation</button>
+      <button type="button" class="inv-subnav-btn" id="invSubBtnManage" onclick="switchInvSubview('manage')">⚙ Créer / gérer les invitations</button>
+    </div>
+
+    <!-- Vue accueil — pour les salariés à l'entrée : juste chercher et valider -->
+    <div id="invCheckPanel">
+      <div class="guichet-search">
+        <label for="invSearchQ">Nom, email, code ou partenaire</label>
+        <div class="guichet-search-row">
+          <input type="text" id="invSearchQ" placeholder="INV-XXXXXX, Dupont, camping…" autocomplete="off">
+          <button onclick="doInvSearch()">Rechercher</button>
+        </div>
+      </div>
+      <div id="invCount" class="res-count hidden"></div>
+      <div id="invList"></div>
+    </div>
+
+    <!-- Vue gestion — création, envoi groupé, diagnostics (usage occasionnel, côté bureau) -->
+    <div id="invManagePanel" class="hidden">
 
     <div class="search-box">
       <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Créer une invitation</h3>
@@ -351,18 +384,7 @@ L'équipe de L'Attrape-Rêves</textarea>
       <div id="brevoCheckResult" style="margin-top:12px;"></div>
     </div>
 
-    <div class="search-box">
-      <div class="search-row">
-        <div class="search-field grow">
-          <label for="invSearchQ">Nom, email, code ou partenaire</label>
-          <input type="text" id="invSearchQ" placeholder="INV-XXXXXX, Dupont, camping…">
-        </div>
-        <button onclick="doInvSearch()">Rechercher</button>
-      </div>
     </div>
-
-    <div id="invCount" class="res-count hidden"></div>
-    <div id="invList"></div>
   </div>
 </div>
 
@@ -422,6 +444,20 @@ function switchTab(tab) {
   document.getElementById('adminTitle').textContent = TAB_TITLES[tab] || 'Réservations'
   document.title = TAB_TITLES[tab] + ' — Admin — L\'Attrape-Rêves'
   localStorage.setItem('atrv_res_tab', tab)
+  if (tab === 'invitations') {
+    switchInvSubview(localStorage.getItem('atrv_inv_subview') || 'check')
+  }
+}
+
+function switchInvSubview(view) {
+  document.getElementById('invCheckPanel').classList.toggle('hidden', view !== 'check')
+  document.getElementById('invManagePanel').classList.toggle('hidden', view !== 'manage')
+  document.getElementById('invSubBtnCheck').classList.toggle('active', view === 'check')
+  document.getElementById('invSubBtnManage').classList.toggle('active', view === 'manage')
+  localStorage.setItem('atrv_inv_subview', view)
+  if (view === 'check') {
+    setTimeout(() => document.getElementById('invSearchQ').focus(), 0)
+  }
 }
 
 function logout() {
