@@ -803,36 +803,53 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
     if (isNaN(quantity) || quantity < 1 || quantity > 100) return c.json({ error: 'Quantité invalide (1 à 100)' }, 400)
     if (sendEmail && (!email || !email.includes('@'))) return c.json({ error: 'Email invalide' }, 400)
 
-    const batchId = crypto.randomUUID()
-    const created: { id: number; code: string }[] = []
-    for (let i = 0; i < quantity; i++) {
-      const code = genInvitationCode()
-      const result = await c.env.DB.prepare(
-        `INSERT INTO gift_invitations (code, mode, partner_name, batch_id, year) VALUES (?, 'lot', ?, ?, ?)`
-      ).bind(code, partnerName, batchId, year).run()
-      created.push({ id: result.meta.last_row_id as number, code })
-    }
-
-    let emailSent = false
-    if (sendEmail && c.env.BREVO_API_KEY) {
-      const printUrl = new URL(c.req.url).origin + '/invitation-billets.html?batch=' + encodeURIComponent(batchId)
-      emailSent = await sendGiftInvitationEmail(c.env.BREVO_API_KEY, {
-        email,
-        toName: partnerName,
-        subject: `${quantity} invitations L'Attrape-Rêves — ${partnerName}`,
-        intro: `Voici ${quantity} invitation${quantity > 1 ? 's' : ''} offerte${quantity > 1 ? 's' : ''} par l'Attrape-Rêves pour ${partnerName}.`,
-        codes: created.map(x => ({ code: x.code })),
-        year,
-        printUrl,
-        customMessage
-      })
-    }
-
-    return c.json({ invitations: created, emailSent, batchId, partnerName, year })
+    const result = await createGiftInvitationLot(c.env.DB, c.env.BREVO_API_KEY, new URL(c.req.url).origin, {
+      partnerName, quantity, email, sendEmail, customMessage
+    })
+    return c.json(result)
   }
 
   return c.json({ error: 'Mode invalide' }, 400)
 })
+
+// Crée un lot d'invitations pour un partenaire, avec envoi email optionnel.
+// Factorisé pour être réutilisé par la création manuelle d'un lot et par
+// l'envoi groupé à une liste de contacts Brevo.
+async function createGiftInvitationLot(
+  db: D1Database,
+  brevoApiKey: string | undefined,
+  origin: string,
+  params: { partnerName: string; quantity: number; email: string; sendEmail: boolean; customMessage: string }
+): Promise<{ invitations: { id: number; code: string }[]; emailSent: boolean; batchId: string; partnerName: string; year: number }> {
+  const { partnerName, quantity, email, sendEmail, customMessage } = params
+  const year = new Date().getFullYear()
+  const batchId = crypto.randomUUID()
+  const created: { id: number; code: string }[] = []
+  for (let i = 0; i < quantity; i++) {
+    const code = genInvitationCode()
+    const result = await db.prepare(
+      `INSERT INTO gift_invitations (code, mode, partner_name, batch_id, year, email) VALUES (?, 'lot', ?, ?, ?, ?)`
+    ).bind(code, partnerName, batchId, year, email || null).run()
+    created.push({ id: result.meta.last_row_id as number, code })
+  }
+
+  let emailSent = false
+  if (sendEmail && brevoApiKey && email) {
+    const printUrl = origin + '/invitation-billets.html?batch=' + encodeURIComponent(batchId)
+    emailSent = await sendGiftInvitationEmail(brevoApiKey, {
+      email,
+      toName: partnerName,
+      subject: `${quantity} invitations L'Attrape-Rêves — ${partnerName}`,
+      intro: `Voici ${quantity} invitation${quantity > 1 ? 's' : ''} offerte${quantity > 1 ? 's' : ''} par l'Attrape-Rêves pour ${partnerName}.`,
+      codes: created.map(x => ({ code: x.code })),
+      year,
+      printUrl,
+      customMessage
+    })
+  }
+
+  return { invitations: created, emailSent, batchId, partnerName, year }
+}
 
 // Recherche des invitations cadeaux (nom / email / code / partenaire)
 app.get('/api/admin/gift-invitations', requireAuth, async (c) => {
@@ -886,6 +903,128 @@ app.post('/api/admin/gift-invitations/:id/hide', requireAuth, async (c) => {
   await ensureGiftInvitationTable(c.env.DB)
   await c.env.DB.prepare('UPDATE gift_invitations SET active=0 WHERE id=?').bind(id).run()
   return c.json({ ok: true })
+})
+
+// ===== ENVOI GROUPÉ D'INVITATIONS À UNE LISTE BREVO =====
+// Permet d'envoyer un lot d'invitations à chaque contact d'une liste Brevo
+// (ex: campings/hébergeurs) en une seule opération, avec repérage des
+// contacts déjà invités par ce système.
+
+// Liste les listes de contacts Brevo, pour que l'admin choisisse celle des campings/hébergeurs
+app.get('/api/admin/brevo/lists', requireAuth, async (c) => {
+  const token = c.env.BREVO_API_KEY
+  if (!token) return c.json({ error: 'Brevo non configuré' }, 500)
+  try {
+    const res = await fetch('https://api.brevo.com/v3/contacts/lists?limit=50&sort=desc', {
+      headers: { 'api-key': token, 'Accept': 'application/json' }
+    })
+    if (!res.ok) {
+      const err = await res.json() as any
+      return c.json({ error: 'Erreur Brevo', details: err?.message }, 502)
+    }
+    const data = await res.json() as any
+    const lists = (data.lists || []).map((l: any) => ({ id: l.id, name: l.name, totalSubscribers: l.totalSubscribers }))
+    return c.json({ lists })
+  } catch (e: any) {
+    return c.json({ error: 'Erreur réseau Brevo', details: e.message }, 502)
+  }
+})
+
+// Récupère les contacts d'une liste Brevo (nom + email), avec statut "déjà invité"
+app.get('/api/admin/brevo/lists/:id/contacts', requireAuth, async (c) => {
+  const token = c.env.BREVO_API_KEY
+  if (!token) return c.json({ error: 'Brevo non configuré' }, 500)
+  const listId = c.req.param('id')
+  await ensureGiftInvitationTable(c.env.DB)
+
+  const contacts: any[] = []
+  let offset = 0
+  try {
+    while (true) {
+      const res = await fetch(`https://api.brevo.com/v3/contacts/lists/${encodeURIComponent(listId)}/contacts?limit=500&offset=${offset}`, {
+        headers: { 'api-key': token, 'Accept': 'application/json' }
+      })
+      if (!res.ok) {
+        const err = await res.json() as any
+        return c.json({ error: 'Erreur Brevo', details: err?.message }, 502)
+      }
+      const data = await res.json() as any
+      contacts.push(...(data.contacts || []))
+      if (!data.contacts || data.contacts.length < 500) break
+      offset += 500
+      if (offset > 5000) break
+    }
+  } catch (e: any) {
+    return c.json({ error: 'Erreur réseau Brevo', details: e.message }, 502)
+  }
+
+  const { results: existing } = await c.env.DB.prepare(
+    `SELECT email, partner_name, created_at FROM gift_invitations WHERE mode='lot' AND email IS NOT NULL`
+  ).all()
+  const alreadyInvited = new Map<string, { partnerName: string; createdAt: string }>()
+  for (const r of existing as any[]) {
+    const key = String(r.email).toLowerCase()
+    if (!alreadyInvited.has(key)) alreadyInvited.set(key, { partnerName: r.partner_name, createdAt: r.created_at })
+  }
+
+  const results = contacts.map((ct: any) => {
+    const attrs = ct.attributes || {}
+    const company = attrs.COMPANY || attrs.SOCIETE || attrs.SOCIÉTÉ || attrs.NOM_SOCIETE || ''
+    const firstName = attrs.PRENOM || attrs.FIRSTNAME || ''
+    const lastName = attrs.NOM || attrs.LASTNAME || ''
+    const personName = [firstName, lastName].filter(Boolean).join(' ')
+    const name = company || personName || ct.email
+    const prev = alreadyInvited.get(String(ct.email).toLowerCase())
+    return {
+      email: ct.email,
+      name,
+      alreadyInvited: !!prev,
+      previousInvite: prev || null
+    }
+  })
+
+  return c.json({ results, count: results.length })
+})
+
+// Envoi groupé : crée et envoie un lot d'invitations pour chaque contact fourni
+app.post('/api/admin/gift-invitations/bulk-lot', requireAuth, async (c) => {
+  const body = await c.req.json().catch(() => ({})) as any
+  const items = Array.isArray(body.items) ? body.items : []
+  const message = (body.message || '').trim()
+  if (!items.length) return c.json({ error: 'Aucun contact fourni' }, 400)
+
+  await ensureGiftInvitationTable(c.env.DB)
+  const origin = new URL(c.req.url).origin
+  const results: any[] = []
+
+  for (const item of items) {
+    const email = (item.email || '').trim()
+    const partnerName = (item.partnerName || '').trim()
+    const quantity = parseInt(item.quantity)
+    if (!email || !email.includes('@') || !partnerName || isNaN(quantity) || quantity < 1 || quantity > 100) {
+      results.push({ email, partnerName, status: 'error', error: 'Données invalides' })
+      continue
+    }
+    if (!item.force) {
+      const existing = await c.env.DB.prepare(
+        `SELECT 1 FROM gift_invitations WHERE mode='lot' AND lower(email) = lower(?) LIMIT 1`
+      ).bind(email).first()
+      if (existing) {
+        results.push({ email, partnerName, status: 'skipped' })
+        continue
+      }
+    }
+    try {
+      const lot = await createGiftInvitationLot(c.env.DB, c.env.BREVO_API_KEY, origin, {
+        partnerName, quantity, email, sendEmail: true, customMessage: message
+      })
+      results.push({ email, partnerName, status: lot.emailSent ? 'sent' : 'created_no_email', batchId: lot.batchId, count: lot.invitations.length })
+    } catch (e: any) {
+      results.push({ email, partnerName, status: 'error', error: e.message })
+    }
+  }
+
+  return c.json({ results })
 })
 
 // ===== PUBLIC API =====

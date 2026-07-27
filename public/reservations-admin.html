@@ -221,6 +221,46 @@
     </div>
 
     <div class="search-box">
+      <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Envoyer à une liste Brevo (campings/hébergeurs)</h3>
+
+      <div class="search-row">
+        <div class="search-field grow">
+          <label for="brevoListSelect">Liste Brevo</label>
+          <select id="brevoListSelect" style="padding:10px 12px;border:2px solid var(--light-beige);border-radius:8px;font-size:0.95rem;font-family:var(--font-ui);">
+            <option value="">Chargement des listes…</option>
+          </select>
+        </div>
+        <div class="search-field" style="max-width:110px;">
+          <label for="brevoDefaultQty">Quantité</label>
+          <input type="number" id="brevoDefaultQty" min="1" max="100" value="8">
+        </div>
+        <button onclick="loadBrevoContacts()">Charger les contacts</button>
+      </div>
+
+      <div class="search-field" style="margin-top:14px;max-width:600px;">
+        <label for="brevoMessage">Petit mot (envoyé à tous)</label>
+        <textarea id="brevoMessage" style="min-height:130px;">Nous vous offrons avec plaisir plusieurs invitations pour L'Attrape-Rêves, à distribuer comme vous le souhaitez : lors d'un loto, d'un tirage au sort, ou tout simplement à offrir à vos clients.
+
+Petite précision : merci de limiter, dans la mesure du possible, une invitation par famille ou groupe, afin d'en faire profiter un maximum de monde 🙂
+
+À bientôt à la ferme !
+L'équipe de L'Attrape-Rêves</textarea>
+      </div>
+
+      <div class="search-field" style="margin-top:10px;max-width:600px;">
+        <label for="brevoExclude">Exclure manuellement (un nom ou email par ligne — campings déjà invités hors de cet outil)</label>
+        <textarea id="brevoExclude" placeholder="camping-du-lac@exemple.fr&#10;Camping des Pins" style="min-height:60px;"></textarea>
+      </div>
+
+      <div id="brevoContactsList" style="margin-top:16px;"></div>
+
+      <div style="margin-top:16px;">
+        <button onclick="sendBrevoInvitations()" id="brevoSendBtn" style="display:none;">Envoyer les invitations sélectionnées</button>
+      </div>
+      <div id="brevoMsg" style="margin-top:12px;font-size:0.9rem;"></div>
+    </div>
+
+    <div class="search-box">
       <div class="search-row">
         <div class="search-field grow">
           <label for="invSearchQ">Nom, email, code ou partenaire</label>
@@ -291,6 +331,10 @@ function switchTab(tab) {
   document.getElementById('adminTitle').textContent = TAB_TITLES[tab] || 'Réservations'
   document.title = TAB_TITLES[tab] + ' — Admin — L\'Attrape-Rêves'
   localStorage.setItem('atrv_res_tab', tab)
+  if (tab === 'invitations' && !brevoListsLoaded) {
+    brevoListsLoaded = true
+    loadBrevoLists()
+  }
 }
 
 function logout() {
@@ -817,6 +861,125 @@ async function deleteLot(batchId) {
     })))
     doInvSearch()
   } catch (e) {}
+}
+
+// ── Envoi groupé à une liste Brevo ─────────────────────────────────────────
+
+let brevoListsLoaded = false
+let brevoContacts = []
+
+async function loadBrevoLists() {
+  const sel = document.getElementById('brevoListSelect')
+  sel.innerHTML = '<option value="">Chargement…</option>'
+  try {
+    const r = await fetch('/api/admin/brevo/lists', { headers: { 'Authorization': 'Bearer ' + token } })
+    const data = await r.json()
+    if (!r.ok) { sel.innerHTML = '<option value="">Erreur : ' + esc(data.error || 'inconnue') + '</option>'; return }
+    if (!data.lists.length) { sel.innerHTML = '<option value="">Aucune liste trouvée</option>'; return }
+    sel.innerHTML = data.lists.map(l => `<option value="${l.id}">${esc(l.name)} (${l.totalSubscribers})</option>`).join('')
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur réseau</option>'
+  }
+}
+
+async function loadBrevoContacts() {
+  const listId = document.getElementById('brevoListSelect').value
+  const container = document.getElementById('brevoContactsList')
+  document.getElementById('brevoSendBtn').style.display = 'none'
+  if (!listId) { container.innerHTML = '<p style="opacity:0.6;font-size:0.9rem;">Choisissez une liste.</p>'; return }
+  container.innerHTML = '<div class="loading-state">Chargement des contacts…</div>'
+  const defaultQty = parseInt(document.getElementById('brevoDefaultQty').value) || 8
+  try {
+    const r = await fetch('/api/admin/brevo/lists/' + encodeURIComponent(listId) + '/contacts', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    const data = await r.json()
+    if (!r.ok) { container.innerHTML = '<div class="empty-state">' + esc(data.error || 'Erreur') + '</div>'; return }
+    brevoContacts = data.results.map(ct => ({ ...ct, checked: !ct.alreadyInvited, quantity: defaultQty }))
+    renderBrevoContacts()
+  } catch (e) {
+    container.innerHTML = '<div class="empty-state">Erreur réseau, réessayez.</div>'
+  }
+}
+
+function renderBrevoContacts() {
+  const container = document.getElementById('brevoContactsList')
+  if (!brevoContacts.length) {
+    container.innerHTML = '<div class="empty-state">Aucun contact dans cette liste.</div>'
+    document.getElementById('brevoSendBtn').style.display = 'none'
+    return
+  }
+
+  container.innerHTML = `<p style="font-size:0.85rem;opacity:0.65;margin-bottom:10px;">${brevoContacts.length} contact(s) — les déjà invités sont décochés par défaut, mais tu peux les recocher.</p>` +
+    brevoContacts.map((ct, i) => `
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
+        <input type="checkbox" ${ct.checked ? 'checked' : ''} onchange="brevoContacts[${i}].checked=this.checked">
+        <div style="flex:1;min-width:180px;">
+          <div style="font-weight:700;color:var(--dark-grey);">${esc(ct.name)}${ct.alreadyInvited ? ' <span class="res-badge-visited" style="margin-left:6px;">Déjà invité</span>' : ''}</div>
+          <div style="font-size:0.85rem;opacity:0.7;">${esc(ct.email)}</div>
+        </div>
+        <label style="font-size:0.85rem;color:var(--dark-grey);">Qté <input type="number" min="1" max="100" value="${ct.quantity}" style="width:60px;padding:6px 8px;border:2px solid var(--light-beige);border-radius:6px;box-sizing:border-box;" onchange="brevoContacts[${i}].quantity=parseInt(this.value)||1"></label>
+      </div>
+    `).join('')
+
+  document.getElementById('brevoSendBtn').style.display = ''
+}
+
+async function sendBrevoInvitations() {
+  const msg = document.getElementById('brevoMsg')
+  const message = document.getElementById('brevoMessage').value.trim()
+  const excludeLines = document.getElementById('brevoExclude').value.toLowerCase().split('\n').map(s => s.trim()).filter(Boolean)
+
+  const selected = brevoContacts.filter(ct => ct.checked)
+  const items = []
+  let manuallyExcluded = 0
+  for (const ct of selected) {
+    const matchesExclude = excludeLines.some(ex => ct.email.toLowerCase().includes(ex) || ct.name.toLowerCase().includes(ex))
+    if (matchesExclude) { manuallyExcluded++; continue }
+    items.push({ email: ct.email, partnerName: ct.name, quantity: ct.quantity })
+  }
+
+  if (!items.length) {
+    msg.style.color = '#c0392b'
+    msg.textContent = 'Aucun contact à envoyer (tout est décoché ou exclu).'
+    return
+  }
+
+  const sendBtn = document.getElementById('brevoSendBtn')
+  sendBtn.disabled = true
+  msg.style.color = ''
+  msg.textContent = 'Envoi en cours pour ' + items.length + ' contact(s)…'
+
+  try {
+    const r = await fetch('/api/admin/gift-invitations/bulk-lot', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items, message })
+    })
+    const data = await r.json()
+    if (!r.ok) {
+      msg.style.color = '#c0392b'
+      msg.textContent = data.error || 'Erreur.'
+      sendBtn.disabled = false
+      return
+    }
+    const sent = data.results.filter(x => x.status === 'sent').length
+    const skipped = data.results.filter(x => x.status === 'skipped').length
+    const errors = data.results.filter(x => x.status === 'error' || x.status === 'created_no_email')
+    msg.style.color = '#2e7d51'
+    msg.innerHTML = `${sent} email(s) envoyé(s)` +
+      (skipped ? `, ${skipped} déjà invité(s) ignoré(s)` : '') +
+      (manuallyExcluded ? `, ${manuallyExcluded} exclu(s) manuellement` : '') +
+      (errors.length ? `, ${errors.length} erreur(s) : ${errors.map(e => esc(e.email)).join(', ')}` : '') + '.'
+    doInvSearch()
+    brevoContacts = []
+    document.getElementById('brevoContactsList').innerHTML = ''
+    sendBtn.style.display = 'none'
+  } catch (e) {
+    msg.style.color = '#c0392b'
+    msg.textContent = 'Erreur réseau.'
+  }
+  sendBtn.disabled = false
 }
 </script>
 </body>
