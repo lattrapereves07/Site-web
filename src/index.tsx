@@ -905,58 +905,16 @@ app.post('/api/admin/gift-invitations/:id/hide', requireAuth, async (c) => {
   return c.json({ ok: true })
 })
 
-// ===== ENVOI GROUPÉ D'INVITATIONS À UNE LISTE BREVO =====
-// Permet d'envoyer un lot d'invitations à chaque contact d'une liste Brevo
-// (ex: campings/hébergeurs) en une seule opération, avec repérage des
-// contacts déjà invités par ce système.
+// ===== ENVOI GROUPÉ D'INVITATIONS À UNE LISTE DE CONTACTS =====
+// Permet d'envoyer un lot d'invitations à une liste de contacts collée
+// manuellement (ex: campings/hébergeurs) en une seule opération, avec
+// repérage des contacts déjà invités par ce système.
 
-// Liste les listes de contacts Brevo, pour que l'admin choisisse celle des campings/hébergeurs
-app.get('/api/admin/brevo/lists', requireAuth, async (c) => {
-  const token = c.env.BREVO_API_KEY
-  if (!token) return c.json({ error: 'Brevo non configuré' }, 500)
-  try {
-    const res = await fetch('https://api.brevo.com/v3/contacts/lists?limit=50&sort=desc', {
-      headers: { 'api-key': token, 'Accept': 'application/json' }
-    })
-    if (!res.ok) {
-      const err = await res.json() as any
-      return c.json({ error: 'Erreur Brevo', details: err?.message }, 502)
-    }
-    const data = await res.json() as any
-    const lists = (data.lists || []).map((l: any) => ({ id: l.id, name: l.name, totalSubscribers: l.totalSubscribers }))
-    return c.json({ lists })
-  } catch (e: any) {
-    return c.json({ error: 'Erreur réseau Brevo', details: e.message }, 502)
-  }
-})
-
-// Récupère les contacts d'une liste Brevo (nom + email), avec statut "déjà invité"
-app.get('/api/admin/brevo/lists/:id/contacts', requireAuth, async (c) => {
-  const token = c.env.BREVO_API_KEY
-  if (!token) return c.json({ error: 'Brevo non configuré' }, 500)
-  const listId = c.req.param('id')
+// Vérifie, pour une liste d'emails, lesquels ont déjà reçu un lot d'invitations
+app.post('/api/admin/gift-invitations/check-emails', requireAuth, async (c) => {
   await ensureGiftInvitationTable(c.env.DB)
-
-  const contacts: any[] = []
-  let offset = 0
-  try {
-    while (true) {
-      const res = await fetch(`https://api.brevo.com/v3/contacts/lists/${encodeURIComponent(listId)}/contacts?limit=500&offset=${offset}`, {
-        headers: { 'api-key': token, 'Accept': 'application/json' }
-      })
-      if (!res.ok) {
-        const err = await res.json() as any
-        return c.json({ error: 'Erreur Brevo', details: err?.message }, 502)
-      }
-      const data = await res.json() as any
-      contacts.push(...(data.contacts || []))
-      if (!data.contacts || data.contacts.length < 500) break
-      offset += 500
-      if (offset > 5000) break
-    }
-  } catch (e: any) {
-    return c.json({ error: 'Erreur réseau Brevo', details: e.message }, 502)
-  }
+  const body = await c.req.json().catch(() => ({})) as any
+  const emails = Array.isArray(body.emails) ? body.emails : []
 
   const { results: existing } = await c.env.DB.prepare(
     `SELECT email, partner_name, created_at FROM gift_invitations WHERE mode='lot' AND email IS NOT NULL`
@@ -967,23 +925,11 @@ app.get('/api/admin/brevo/lists/:id/contacts', requireAuth, async (c) => {
     if (!alreadyInvited.has(key)) alreadyInvited.set(key, { partnerName: r.partner_name, createdAt: r.created_at })
   }
 
-  const results = contacts.map((ct: any) => {
-    const attrs = ct.attributes || {}
-    const company = attrs.COMPANY || attrs.SOCIETE || attrs.SOCIÉTÉ || attrs.NOM_SOCIETE || ''
-    const firstName = attrs.PRENOM || attrs.FIRSTNAME || ''
-    const lastName = attrs.NOM || attrs.LASTNAME || ''
-    const personName = [firstName, lastName].filter(Boolean).join(' ')
-    const name = company || personName || ct.email
-    const prev = alreadyInvited.get(String(ct.email).toLowerCase())
-    return {
-      email: ct.email,
-      name,
-      alreadyInvited: !!prev,
-      previousInvite: prev || null
-    }
-  })
-
-  return c.json({ results, count: results.length })
+  const results: Record<string, { partnerName: string; createdAt: string } | null> = {}
+  for (const email of emails) {
+    results[String(email).toLowerCase()] = alreadyInvited.get(String(email).toLowerCase()) || null
+  }
+  return c.json({ results })
 })
 
 // Envoi groupé : crée et envoie un lot d'invitations pour chaque contact fourni
