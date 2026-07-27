@@ -696,6 +696,15 @@ async function ensureGiftInvitationTable(db: D1Database) {
       created_at TEXT DEFAULT (datetime('now'))
     )
   `).run()
+  // Marques manuelles "déjà invité" — pour les contacts invités avant l'existence de
+  // cet outil (à la main, en personne), qui n'ont donc pas de vraie invitation en base.
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS gift_invitation_manual_marks (
+      email TEXT PRIMARY KEY,
+      partner_name TEXT,
+      marked_at TEXT DEFAULT (datetime('now'))
+    )
+  `).run()
 }
 
 function genInvitationCode(): string {
@@ -918,25 +927,55 @@ app.post('/api/admin/gift-invitations/:id/hide', requireAuth, async (c) => {
 // repérage des contacts déjà invités par ce système.
 
 // Vérifie, pour une liste d'emails, lesquels ont déjà reçu un lot d'invitations
+// (réellement envoyé, ou marqué manuellement comme déjà fait)
 app.post('/api/admin/gift-invitations/check-emails', requireAuth, async (c) => {
   await ensureGiftInvitationTable(c.env.DB)
   const body = await c.req.json().catch(() => ({})) as any
   const emails = Array.isArray(body.emails) ? body.emails : []
 
+  const alreadyInvited = new Map<string, { partnerName: string; createdAt: string; manual: boolean }>()
+
   const { results: existing } = await c.env.DB.prepare(
     `SELECT email, partner_name, created_at FROM gift_invitations WHERE mode='lot' AND email IS NOT NULL`
   ).all()
-  const alreadyInvited = new Map<string, { partnerName: string; createdAt: string }>()
   for (const r of existing as any[]) {
     const key = String(r.email).toLowerCase()
-    if (!alreadyInvited.has(key)) alreadyInvited.set(key, { partnerName: r.partner_name, createdAt: r.created_at })
+    if (!alreadyInvited.has(key)) alreadyInvited.set(key, { partnerName: r.partner_name, createdAt: r.created_at, manual: false })
   }
 
-  const results: Record<string, { partnerName: string; createdAt: string } | null> = {}
+  const { results: manual } = await c.env.DB.prepare(
+    `SELECT email, partner_name, marked_at FROM gift_invitation_manual_marks`
+  ).all()
+  for (const r of manual as any[]) {
+    const key = String(r.email).toLowerCase()
+    alreadyInvited.set(key, { partnerName: r.partner_name, createdAt: r.marked_at, manual: true })
+  }
+
+  const results: Record<string, { partnerName: string; createdAt: string; manual: boolean } | null> = {}
   for (const email of emails) {
     results[String(email).toLowerCase()] = alreadyInvited.get(String(email).toLowerCase()) || null
   }
   return c.json({ results })
+})
+
+// Marque (ou démarque) manuellement un contact comme déjà invité, sans créer de vraie invitation
+app.post('/api/admin/gift-invitations/mark-invited', requireAuth, async (c) => {
+  await ensureGiftInvitationTable(c.env.DB)
+  const body = await c.req.json().catch(() => ({})) as any
+  const email = (body.email || '').trim()
+  const partnerName = (body.partnerName || '').trim()
+  const marked = body.marked !== false
+  if (!email || !isValidEmail(email)) return c.json({ error: 'Email invalide' }, 400)
+
+  if (marked) {
+    await c.env.DB.prepare(`
+      INSERT INTO gift_invitation_manual_marks (email, partner_name) VALUES (?, ?)
+      ON CONFLICT(email) DO UPDATE SET partner_name = ?, marked_at = datetime('now')
+    `).bind(email.toLowerCase(), partnerName, partnerName).run()
+  } else {
+    await c.env.DB.prepare(`DELETE FROM gift_invitation_manual_marks WHERE email = ?`).bind(email.toLowerCase()).run()
+  }
+  return c.json({ ok: true })
 })
 
 // Envoi groupé : crée et envoie un lot d'invitations pour chaque contact fourni
@@ -962,7 +1001,10 @@ app.post('/api/admin/gift-invitations/bulk-lot', requireAuth, async (c) => {
       const existing = await c.env.DB.prepare(
         `SELECT 1 FROM gift_invitations WHERE mode='lot' AND lower(email) = lower(?) LIMIT 1`
       ).bind(email).first()
-      if (existing) {
+      const manualMark = await c.env.DB.prepare(
+        `SELECT 1 FROM gift_invitation_manual_marks WHERE email = lower(?) LIMIT 1`
+      ).bind(email).first()
+      if (existing || manualMark) {
         results.push({ email, partnerName, status: 'skipped' })
         continue
       }

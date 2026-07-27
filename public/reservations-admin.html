@@ -271,17 +271,40 @@ Les Cabanes de Cornillon;info@ceven-aventure.com
 Domaine des Blachas;contact@lesblachas.com
 Village de gîtes Le Mas Lachamp;contact@ardeche-gites-maslachamp.com
 Manoir de Champvert;richard.font07@orange.fr
-Office de Tourisme Cévennes d'Ardèche - Les Vans;contact@cevennes-ardeche.com
-Office de Tourisme Gorges de l'Ardèche - Pont d'Arc | Bureau de Ruoms;info@gorges-ardeche-pontdarc.fr
-Office de Tourisme du Pays d'Aubenas-Vals-Antraïgues;contact@aubenas-vals.com
-Office de Tourisme du Val de ligne;tourisme@cc-valdeligne.fr
-Office de Tourisme de Mont Lozere Villefort;contact@destination-montlozere.fr
-Maison du Tourisme et du Parc - Génolhac;contact@cevennes-tourisme.fr
-Office de Tourisme Cèze - Cévennes - Bureau de Saint-Ambroix;otcezecevennes@gmail.com
-Office de Tourisme Cèze-Cévennes - Bureau de Bessèges;ot.besseges@gmail.com
-Office de tourisme de Barjac - Destination Cèze Cévennes;ot.barjac@gmail.com
-ADT Agence de Développement Touristique;cdt07@ardeche-guide.com</textarea>
-        <p class="search-hint">Pré-rempli avec ton fichier Listing.xlsx (56 contacts, doublons d'email fusionnés). Modifie, ajoute ou colle une nouvelle liste ici quand tu veux.</p>
+Le vanseen hotel;hotellevanseen@gmail.com
+Madame Les Vans (chambres d'hôtes);contact.madamelesvans@gmail.com
+Camping Les Jardins Célestes;lesjardinscelestes07@gmail.com
+Cabanes Lodges Le Servière;leserviere@free.fr
+Camping Rives d'Arc (ex-Le Provençal);contact@rivesdarc.com
+Camping Domaine de l'Esquiras;esquiras@orange.fr
+Camping Beau Rivage;campingbeaurivage@wanadoo.fr
+Camping La Rouvière;ardbat@yahoo.fr
+Domaine de Jossoin;domaine.de.jossoin@gmx.fr
+Camping de Laborie;contact@campingdelaborie.com
+Camping du Pont;contact@campingdupontardeche.com
+Camping La Grand'Terre;contact@campinglagrandterre.com
+Camping Le Clos;contact@campingleclos.com
+Camping Mas de Linde;masdelinde.bayle@gmail.com
+Camping Le Mas Cauvy;mas.cauvy@hotmail.fr
+Les Rives de l'Ardèche;lesrivesdelardeche.contact@gmail.com
+Camping Le Verger de Jastres;contact@camping-levergerdejastres.com
+Domaine de la Sablière;contact@villagesabliere.com
+Le Clos des Capitelles;contact@campingcdc.com
+Camping Vagues Océanes Labeiller;labeiller@vagues-oceanes.com
+Village Nature Zen;contact@village-nature-zen.com
+Camping Lac de Villefort;contact@camping-lac-cevennes.com
+Camping Lou Cantou Cévenol;loucantoucevenol@gmail.com
+Camping Le Plan d'Eau;info@campingleplandeau.com
+Camping Municipal de Bessèges;contact@camping-besseges.fr
+Camping bord du lac d'Atuech;campinglolivieranduze@gmail.com
+Camping Bel Air;camping-bel-air@orange.fr
+Arbres et cabanes;arbresetcabanes@gmail.com
+Lou Castel Vacances Bleues;loucastel@vacancesbleues.fr
+Camping La Buissière;buissiere@koawa.com
+Camping La Plage Fleurie;info@laplagefleurie.com
+Camping Le Mas des Sédariès;vacances48@gmail.com
+Camping Le Pradal - Anduze;camping-le-pradal@orange.fr</textarea>
+        <p class="search-hint">Pré-rempli avec ta liste + les campings de la tournée manquants (79 contacts). Modifie, ajoute ou colle une nouvelle liste ici quand tu veux.</p>
       </div>
 
       <div class="search-row" style="margin-top:10px;">
@@ -983,9 +1006,26 @@ async function loadBrevoContacts() {
 
   brevoContacts = parsed.map(ct => {
     const prev = alreadyInvitedMap[ct.email.toLowerCase()]
-    return { ...ct, alreadyInvited: !!prev, previousInvite: prev || null, checked: !prev, quantity: defaultQty }
+    return { ...ct, alreadyInvited: !!prev, manual: !!(prev && prev.manual), previousInvite: prev || null, checked: !prev, quantity: defaultQty }
   })
   renderBrevoContacts()
+}
+
+async function toggleManualMark(i) {
+  const ct = brevoContacts[i]
+  const newMarked = !ct.alreadyInvited
+  try {
+    const r = await fetch('/api/admin/gift-invitations/mark-invited', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: ct.email, partnerName: ct.name, marked: newMarked })
+    })
+    if (!r.ok) return
+    ct.alreadyInvited = newMarked
+    ct.manual = newMarked
+    ct.checked = !newMarked
+    renderBrevoContacts()
+  } catch (e) {}
 }
 
 function renderBrevoContacts() {
@@ -996,15 +1036,16 @@ function renderBrevoContacts() {
     return
   }
 
-  container.innerHTML = `<p style="font-size:0.85rem;opacity:0.65;margin-bottom:10px;">${brevoContacts.length} contact(s) — les déjà invités sont décochés par défaut, mais tu peux les recocher.</p>` +
+  container.innerHTML = `<p style="font-size:0.85rem;opacity:0.65;margin-bottom:10px;">${brevoContacts.length} contact(s) — les déjà invités sont décochés par défaut, mais tu peux les recocher. Utilise "Marquer déjà invité" pour ceux que tu as contactés en dehors de cet outil.</p>` +
     brevoContacts.map((ct, i) => `
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
         <input type="checkbox" ${ct.checked ? 'checked' : ''} onchange="brevoContacts[${i}].checked=this.checked">
         <div style="flex:1;min-width:180px;">
-          <div style="font-weight:700;color:var(--dark-grey);">${esc(ct.name)}${ct.alreadyInvited ? ' <span class="res-badge-visited" style="margin-left:6px;">Déjà invité</span>' : ''}</div>
+          <div style="font-weight:700;color:var(--dark-grey);">${esc(ct.name)}${ct.alreadyInvited ? ` <span class="res-badge-visited" style="margin-left:6px;">${ct.manual ? 'Déjà invité (manuel)' : 'Déjà invité'}</span>` : ''}</div>
           <div style="font-size:0.85rem;opacity:0.7;">${esc(ct.email)}</div>
         </div>
         <label style="font-size:0.85rem;color:var(--dark-grey);">Qté <input type="number" min="1" max="100" value="${ct.quantity}" style="width:60px;padding:6px 8px;border:2px solid var(--light-beige);border-radius:6px;box-sizing:border-box;" onchange="brevoContacts[${i}].quantity=parseInt(this.value)||1"></label>
+        <button type="button" class="res-btn ${ct.alreadyInvited ? 'res-btn-unvalidate' : 'res-btn-validate'}" onclick="toggleManualMark(${i})">${ct.alreadyInvited ? 'Retirer la marque' : 'Marquer déjà invité'}</button>
       </div>
     `).join('')
 
