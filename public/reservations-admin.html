@@ -316,6 +316,19 @@ L'équipe de L'Attrape-Rêves</textarea>
     </div>
 
     <div class="search-box">
+      <h3 style="margin:0 0 14px;font-family:var(--font-title);color:var(--dark-grey);font-size:1.1rem;">Vérifier une livraison Brevo</h3>
+      <p style="margin:0 0 12px;font-size:0.85rem;opacity:0.7;">Vérifie directement dans les journaux Brevo si un email a été délivré, a échoué ou a rebondi — utile en cas de doute après un envoi.</p>
+      <div class="search-row">
+        <div class="search-field grow">
+          <label for="brevoCheckEmail">Adresse email à vérifier</label>
+          <input type="text" id="brevoCheckEmail" placeholder="contact@camping-exemple.fr">
+        </div>
+        <button onclick="checkBrevoDelivery()">Vérifier</button>
+      </div>
+      <div id="brevoCheckResult" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="search-box">
       <div class="search-row">
         <div class="search-field grow">
           <label for="invSearchQ">Nom, email, code ou partenaire</label>
@@ -1053,6 +1066,48 @@ async function sendBrevoInvitations() {
     msg.textContent = 'Erreur réseau.'
   }
   sendBtn.disabled = false
+}
+
+// ── Vérification de livraison Brevo ─────────────────────────────────────────
+
+const BREVO_EVENT_LABELS = {
+  requests: 'Envoi demandé',
+  delivered: '✓ Délivré',
+  hardBounces: '✗ Échec définitif (adresse invalide)',
+  softBounces: '✗ Échec temporaire',
+  blocked: '✗ Bloqué',
+  invalid: '✗ Adresse invalide',
+  deferred: 'Différé',
+  opened: 'Ouvert par le destinataire',
+  clicks: 'Lien cliqué',
+  spam: '✗ Marqué comme spam',
+  unsubscribed: 'Désabonné'
+}
+
+async function checkBrevoDelivery() {
+  const email = document.getElementById('brevoCheckEmail').value.trim()
+  const result = document.getElementById('brevoCheckResult')
+  if (!email) { result.innerHTML = '<p style="color:#c0392b;font-size:0.9rem;">Entre une adresse email.</p>'; return }
+  result.innerHTML = '<div class="loading-state">Recherche dans les journaux Brevo…</div>'
+  try {
+    const r = await fetch('/api/admin/brevo/check-email?email=' + encodeURIComponent(email), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    const data = await r.json()
+    if (!r.ok) { result.innerHTML = '<p style="color:#c0392b;font-size:0.9rem;">' + esc(data.error || 'Erreur') + '</p>'; return }
+    if (!data.events.length) {
+      result.innerHTML = '<p style="opacity:0.7;font-size:0.9rem;">Aucun événement trouvé pour cette adresse — soit aucun email n\'a jamais été envoyé, soit il est trop ancien pour apparaître dans les journaux Brevo.</p>'
+      return
+    }
+    result.innerHTML = data.events.map(e => `
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:0.9rem;">
+        <span style="font-weight:700;color:${e.event === 'delivered' ? '#2e7d51' : (['hardBounces','softBounces','blocked','invalid','spam'].includes(e.event) ? '#c0392b' : 'var(--dark-grey)')};">${esc(BREVO_EVENT_LABELS[e.event] || e.event)}</span>
+        <span style="opacity:0.7;">${esc(e.date)}${e.reason ? ' — ' + esc(e.reason) : ''}</span>
+      </div>
+    `).join('')
+  } catch (e) {
+    result.innerHTML = '<p style="color:#c0392b;font-size:0.9rem;">Erreur réseau.</p>'
+  }
 }
 </script>
 </body>

@@ -153,6 +153,13 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+// Validation stricte (pas juste "contient un @") — un simple .includes('@') laissait
+// passer des chaînes du type "Nom;email@ex.fr" collées dans le mauvais champ, qui
+// échouent silencieusement à l'envoi côté Brevo.
+function isValidEmail(s: string): boolean {
+  return /^[^\s@;,]+@[^\s@;,]+\.[^\s@;,]+$/.test(s.trim())
+}
+
 // Email de confirmation via Brevo (best effort : un échec n'annule pas le paiement)
 async function sendConfirmationEmail(
   apiKey: string,
@@ -610,7 +617,7 @@ app.post('/api/admin/season-passes', requireAuth, async (c) => {
   const email = (body.email || '').trim()
   const holders = Array.isArray(body.holders) ? body.holders : []
 
-  if (!email || !email.includes('@')) return c.json({ error: 'Email invalide' }, 400)
+  if (!email || !isValidEmail(email)) return c.json({ error: 'Email invalide' }, 400)
   if (!holders.length) return c.json({ error: 'Aucun titulaire' }, 400)
   for (const h of holders) {
     if (!h.prenom?.trim() || !h.nom?.trim()) return c.json({ error: 'Prénom et nom requis pour chaque titulaire' }, 400)
@@ -770,7 +777,7 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
     const nom = (body.nom || '').trim()
     const email = (body.email || '').trim()
     const customMessage = (body.message || '').trim()
-    if (!email || !email.includes('@')) return c.json({ error: 'Email invalide' }, 400)
+    if (!email || !isValidEmail(email)) return c.json({ error: 'Email invalide' }, 400)
     const code = genInvitationCode()
     const result = await c.env.DB.prepare(
       `INSERT INTO gift_invitations (code, mode, nom, email, year) VALUES (?, 'email', ?, ?, ?)`
@@ -801,7 +808,7 @@ app.post('/api/admin/gift-invitations', requireAuth, async (c) => {
     const customMessage = (body.message || '').trim()
     if (!partnerName) return c.json({ error: 'Nom du partenaire requis' }, 400)
     if (isNaN(quantity) || quantity < 1 || quantity > 100) return c.json({ error: 'Quantité invalide (1 à 100)' }, 400)
-    if (sendEmail && (!email || !email.includes('@'))) return c.json({ error: 'Email invalide' }, 400)
+    if (sendEmail && (!email || !isValidEmail(email))) return c.json({ error: 'Email invalide' }, 400)
 
     const result = await createGiftInvitationLot(c.env.DB, c.env.BREVO_API_KEY, new URL(c.req.url).origin, {
       partnerName, quantity, email, sendEmail, customMessage
@@ -947,7 +954,7 @@ app.post('/api/admin/gift-invitations/bulk-lot', requireAuth, async (c) => {
     const email = (item.email || '').trim()
     const partnerName = (item.partnerName || '').trim()
     const quantity = parseInt(item.quantity)
-    if (!email || !email.includes('@') || !partnerName || isNaN(quantity) || quantity < 1 || quantity > 100) {
+    if (!email || !isValidEmail(email) || !partnerName || isNaN(quantity) || quantity < 1 || quantity > 100) {
       results.push({ email, partnerName, status: 'error', error: 'Données invalides' })
       continue
     }
@@ -971,6 +978,35 @@ app.post('/api/admin/gift-invitations/bulk-lot', requireAuth, async (c) => {
   }
 
   return c.json({ results })
+})
+
+// Vérifie dans les journaux Brevo si un email a bien été délivré (ou a échoué/rebondi)
+app.get('/api/admin/brevo/check-email', requireAuth, async (c) => {
+  const token = c.env.BREVO_API_KEY
+  if (!token) return c.json({ error: 'Brevo non configuré' }, 500)
+  const email = (c.req.query('email') || '').trim()
+  if (!email) return c.json({ error: 'Email requis' }, 400)
+
+  try {
+    const res = await fetch(`https://api.brevo.com/v3/smtp/statistics/events?email=${encodeURIComponent(email)}&limit=50&sort=desc`, {
+      headers: { 'api-key': token, 'Accept': 'application/json' }
+    })
+    if (!res.ok) {
+      const err = await res.json() as any
+      return c.json({ error: 'Erreur Brevo', details: err?.message }, 502)
+    }
+    const data = await res.json() as any
+    const events = (data.events || []).map((e: any) => ({
+      event: e.event,
+      date: e.date,
+      subject: e.subject,
+      reason: e.reason || null,
+      tag: e.tag || null
+    }))
+    return c.json({ email, events, count: events.length })
+  } catch (e: any) {
+    return c.json({ error: 'Erreur réseau Brevo', details: e.message }, 502)
+  }
 })
 
 // ===== PUBLIC API =====
