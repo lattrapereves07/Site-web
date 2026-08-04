@@ -8,9 +8,9 @@
     "billetterie": "Tickets"
   },
   "home": {
-    "hero_title_1": "ONTDEKKING-",
-    "hero_title_2": "BOERDERIJ",
-    "hero_subtitle": "en verwondering",
+    "hero_title_1": "RECREATIE-",
+    "hero_title_2": "PARK",
+    "hero_subtitle": "en wonderboerderij",
     "hero_badge": "Deze zomer elke dag geopend · 10-19u",
     "hero_tagline": "Een zintuiglijke oase midden in de natuur om jong en oud op te laden!",
     "hero_cta": "Mijn tickets boeken",
@@ -113,7 +113,7 @@
     "btn": "Tickets"
   },
   "footer": {
-    "tagline": "Ontdekkingsboerderij en verwondering",
+    "tagline": "Recreatiepark en wonderboerderij",
     "col_contact": "Contact",
     "col_links": "Links",
     "col_support": "Steun ons",

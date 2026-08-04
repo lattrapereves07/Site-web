@@ -8,9 +8,9 @@
     "billetterie": "Billetterie"
   },
   "home": {
-    "hero_title_1": "FERME DE",
-    "hero_title_2": "DÉCOUVERTE",
-    "hero_subtitle": "et d'émerveillement",
+    "hero_title_1": "PARC DE",
+    "hero_title_2": "LOISIRS",
+    "hero_subtitle": "et ferme d'émerveillement",
     "hero_badge": "Ouvert tous les jours cet été · 10h-19h",
     "hero_tagline": "Un refuge sensoriel au cœur du vivant pour ressourcer petits et grands !",
     "hero_cta": "Réserver mes billets",
@@ -113,7 +113,7 @@
     "btn": "Billetterie"
   },
   "footer": {
-    "tagline": "Ferme de découverte et d'émerveillement",
+    "tagline": "Parc de loisirs et ferme d'émerveillement",
     "col_contact": "Contact",
     "col_links": "Liens",
     "col_support": "Nous soutenir",

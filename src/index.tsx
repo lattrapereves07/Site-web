@@ -180,7 +180,7 @@ async function sendConfirmationEmail(
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#3F3E3E;">
     <h1 style="color:#D57956;font-size:22px;">Merci ${escapeHtml(buyerInfo.prenom)}, vos billets sont réservés !</h1>
-    <p>Voici le récapitulatif de votre commande à <strong>L'Attrape-Rêves</strong>, ferme de découverte et d'émerveillement à Gravières (Ardèche).</p>
+    <p>Voici le récapitulatif de votre commande à <strong>L'Attrape-Rêves</strong>, parc de loisirs et ferme d'émerveillement à Gravières (Ardèche).</p>
     <div style="background:#FDF3E7;border-radius:12px;padding:16px 20px;margin:20px 0;text-align:center;">
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.6;">Référence de commande</div>
       <div style="font-size:26px;font-weight:bold;color:#D57956;letter-spacing:2px;">${reference}</div>

@@ -8,9 +8,9 @@
     "billetterie": "Tickets"
   },
   "home": {
-    "hero_title_1": "ENTDECKUNGS-",
-    "hero_title_2": "BAUERNHOF",
-    "hero_subtitle": "und Staunen",
+    "hero_title_1": "FREIZEIT-",
+    "hero_title_2": "PARK",
+    "hero_subtitle": "und Staunenbauernhof",
     "hero_badge": "Diesen Sommer täglich geöffnet · 10-19 Uhr",
     "hero_tagline": "Ein Sinnesort mitten in der Natur — zum Erholen und Staunen für Groß und Klein!",
     "hero_cta": "Tickets kaufen",
@@ -113,7 +113,7 @@
     "btn": "Tickets"
   },
   "footer": {
-    "tagline": "Entdeckungs- und Staunenbauernhof",
+    "tagline": "Freizeitpark und Staunenbauernhof",
     "col_contact": "Kontakt",
     "col_links": "Links",
     "col_support": "Uns unterstützen",

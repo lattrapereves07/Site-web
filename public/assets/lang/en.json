@@ -8,9 +8,9 @@
     "billetterie": "Tickets"
   },
   "home": {
-    "hero_title_1": "DISCOVERY",
-    "hero_title_2": "FARM",
-    "hero_subtitle": "and wonder",
+    "hero_title_1": "LEISURE",
+    "hero_title_2": "PARK",
+    "hero_subtitle": "& farm of wonders",
     "hero_badge": "Open every day this summer · 10am-7pm",
     "hero_tagline": "A sensory haven in the heart of nature to recharge young and old alike!",
     "hero_cta": "Book my tickets",
@@ -113,7 +113,7 @@
     "btn": "Tickets"
   },
   "footer": {
-    "tagline": "Discovery farm and wonder",
+    "tagline": "Leisure park & farm of wonders",
     "col_contact": "Contact",
     "col_links": "Links",
     "col_support": "Support us",
