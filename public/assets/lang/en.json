@@ -105,7 +105,13 @@
     "review3_text": "A lovely little corner of paradise for the whole family. Everything is here for wonder: nature, animals, treetop courses, a slide… and a bit of relaxation for the parents too!",
     "reviews_more": "See all Google reviews →",
     "heat_banner_text": "Too hot outside? Come find some coolness with us! A visit <strong>100% shaded by trees</strong>, river access, and misting fans on site.",
-    "heat_banner_close": "Close"
+    "heat_banner_close": "Close",
+    "hero_event_i18n": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "In {n} days",
+      "prefix": "🎪 "
+    }
   },
   "cta": {
     "title": "Ready to dream?",

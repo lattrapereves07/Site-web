@@ -105,7 +105,13 @@
     "review3_text": "Ein schönes kleines Paradies für die ganze Familie. Alles ist da für das Staunen: Natur, Tiere, Kletterparcours in den Bäumen, eine Rutsche… und auch etwas Entspannung für die Eltern!",
     "reviews_more": "Alle Google-Bewertungen ansehen →",
     "heat_banner_text": "Zu heiß draußen? Kommen Sie bei uns Abkühlung suchen! Ein Besuch <strong>100&nbsp;% im Schatten der Bäume</strong>, Zugang zum Fluss und Vernebler vor Ort.",
-    "heat_banner_close": "Schließen"
+    "heat_banner_close": "Schließen",
+    "hero_event_i18n": {
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "inDays": "In {n} Tagen",
+      "prefix": "🎪 "
+    }
   },
   "cta": {
     "title": "Bereit zum Träumen?",

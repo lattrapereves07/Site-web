@@ -105,7 +105,13 @@
     "review3_text": "Een mooi klein paradijsje voor het hele gezin. Alles is er voor verwondering: natuur, dieren, klimparcours in de bomen, een glijbaan… en ook wat ontspanning voor de ouders!",
     "reviews_more": "Bekijk alle Google-recensies →",
     "heat_banner_text": "Te warm buiten? Kom bij ons verkoeling zoeken! Een bezoek <strong>100% in de schaduw van bomen</strong>, toegang tot de rivier, en verkoelende nevelventilatoren ter plaatse.",
-    "heat_banner_close": "Sluiten"
+    "heat_banner_close": "Sluiten",
+    "hero_event_i18n": {
+      "today": "Vandaag",
+      "tomorrow": "Morgen",
+      "inDays": "Over {n} dagen",
+      "prefix": "🎪 "
+    }
   },
   "cta": {
     "title": "Klaar om te dromen?",

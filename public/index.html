@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&amp;family=Londrina+Solid:wght@400;900&amp;family=Patrick+Hand&amp;family=Unkempt:wght@400;700&amp;display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260717">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260727">
   <!-- Image hero préchargée en priorité (LCP) -->
   <link rel="preload" as="image" href="assets/images/photo-ane-enfant.jpg" fetchpriority="high">
   <!-- Décide avant le premier rendu si le bandeau canicule doit s'afficher, pour éviter un décalage de mise en page (CLS) -->
@@ -182,6 +182,7 @@
         <div class="hero-title-line2" data-i18n="home.hero_title_2">LOISIRS</div>
         <div class="hero-subtitle" data-i18n="home.hero_subtitle">et ferme d'émerveillement</div>
         <div class="hero-badge" data-i18n="home.hero_badge">Ouvert tous les jours cet été · 10h-19h</div>
+        <a href="agenda.html" id="heroEventBadge" class="hero-event-badge" hidden=""></a>
         <div class="hero-tagline" data-i18n="home.hero_tagline">Un refuge sensoriel au cœur du vivant pour ressourcer petits et grands !</div>
         <div class="hero-cta">
           <a href="billetterie.html" class="btn btn-coral-large" data-i18n="home.hero_cta">Réserver mes billets</a>
@@ -189,7 +190,31 @@
         <div class="hero-location" data-i18n="home.hero_location">Gravières — Cévennes d'Ardèche (07)</div>
       </div>
 
-
+      <script type="application/json" id="hero-event-i18n" data-i18n="home.hero_event_i18n">{"today":"Aujourd'hui","tomorrow":"Demain","inDays":"Dans {n} jours","prefix":"🎪 "}</script>
+      <script>
+        // Requête partagée : réutilisée aussi par la section "événements à venir" plus bas,
+        // pour ne charger /api/events qu'une seule fois par visite.
+        window.atrvEventsPromise = fetch('/api/events').then(r => r.json())
+        window.atrvEventsPromise.then(events => {
+          const i18n = JSON.parse(document.getElementById('hero-event-i18n').textContent)
+          const today = new Date(); today.setHours(0, 0, 0, 0)
+          const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + 5)
+          const upcoming = (events || [])
+            .map(e => ({ ...e, d: new Date(e.event_date + 'T00:00:00') }))
+            .filter(e => e.d >= today && e.d <= maxDate)
+            .sort((a, b) => a.d - b.d)
+          if (!upcoming.length) return
+          const ev = upcoming[0]
+          const diffDays = Math.round((ev.d - today) / 86400000)
+          let when
+          if (diffDays === 0) when = i18n.today
+          else if (diffDays === 1) when = i18n.tomorrow
+          else when = i18n.inDays.replace('{n}', diffDays)
+          const badge = document.getElementById('heroEventBadge')
+          badge.textContent = i18n.prefix + when + ' : ' + ev.title
+          badge.hidden = false
+        }).catch(() => {})
+      </script>
     </section>
 
     <!-- ======== DISCOVER AT A GLANCE ======== -->
@@ -317,7 +342,7 @@
 
       <script type="application/json" id="events-i18n" data-i18n="home.events_i18n">{"empty":"Pas d'événement à venir pour le moment.","error":"Impossible de charger les événements.","reserve":"Réserver →","months":["JAN","FÉV","MAR","AVR","MAI","JUIN","JUIL","AOÛ","SEP","OCT","NOV","DÉC"],"days":["DIM","LUN","MAR","MER","JEU","VEN","SAM"],"categories":{"atelier":"Atelier","spectacle":"Spectacle","concert":"Concert","evenement":"Événement"}}</script>
       <script>
-      fetch('/api/events').then(r=>r.json()).then(events => {
+      window.atrvEventsPromise.then(events => {
         const i18n = JSON.parse(document.getElementById('events-i18n').textContent)
         const now = new Date().toISOString().slice(0,10)
         const upcoming = events.filter(e => e.event_date >= now).slice(0, 3)

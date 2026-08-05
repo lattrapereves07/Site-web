@@ -105,7 +105,13 @@
     "review3_text": "Joli petit coin de paradis pour toute la famille. Tout est là pour l'émerveillement : nature, animaux, parcours dans les arbres, toboggan… et un peu de détente pour les parents !",
     "reviews_more": "Voir tous les avis Google →",
     "heat_banner_text": "Trop chaud dehors ? Venez chercher la fraîcheur chez nous ! Visite <strong>100% à l'ombre des arbres</strong>, accès à la rivière, et brumisateurs sur place.",
-    "heat_banner_close": "Fermer"
+    "heat_banner_close": "Fermer",
+    "hero_event_i18n": {
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "inDays": "Dans {n} jours",
+      "prefix": "🎪 "
+    }
   },
   "cta": {
     "title": "Prêts à rêver ?",

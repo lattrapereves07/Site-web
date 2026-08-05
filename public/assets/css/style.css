@@ -555,6 +555,31 @@ main {
   line-height: 1.2;
 }
 
+/* Petit badge événement imminent (J-5), sous le badge horaires — masqué par défaut,
+   affiché en JS uniquement quand un événement est proche (voir index.html). */
+.hero-event-badge {
+  display: block;
+  width: fit-content;
+  margin: -10px auto 20px;
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 700;
+  background: var(--teal);
+  color: var(--white);
+  padding: 7px 20px;
+  border-radius: 30px;
+  transform: rotate(1deg);
+  box-shadow: 2px 3px 0 var(--teal-dark), 0 4px 14px rgba(0,0,0,0.2);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+.hero-event-badge:hover {
+  opacity: 0.92;
+}
+.hero-event-badge[hidden] {
+  display: none;
+}
+
 /* Visibilité décidée en <head> avant le premier rendu (voir index.html) pour éviter
    tout décalage de mise en page (CLS) quand le bandeau apparaît/disparaît. */
 .atrv-no-heat-banner .heat-banner {
